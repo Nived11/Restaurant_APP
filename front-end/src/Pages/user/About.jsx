@@ -1,8 +1,14 @@
 import React from 'react'
+import {FirstAbout} from '../../features/user/About'
 
 const About = () => {
   return (
-    <div>About</div>
+    <>
+    <FirstAbout/>
+    
+    </>
+
+
   )
 }
 
