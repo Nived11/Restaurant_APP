@@ -12,7 +12,7 @@ const HomePage = () => {
     <div className="min-h-screen bg-white">
       {/* 1. Offer Carousel (Placeholder style) */}
       <section className="p-6">
-        <div className="w-full h-64 md:h-80 bg-yellow-400 rounded-3xl flex items-center justify-between px-12 overflow-hidden relative">
+        <div className="w-full h-64 md:h-80 bg-green-800 rounded-3xl flex items-center justify-between px-12 overflow-hidden relative">
           <div className="max-w-md z-10">
             <h1 className="text-4xl md:text-6xl font-black text-black leading-tight">
               GET <span className="text-white italic text-shadow">50% OFF</span>

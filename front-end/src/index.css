@@ -1,1 +1,18 @@
 @import "tailwindcss";
+
+/* 1. Import the font from Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+
+
+@theme {
+  /* 2. Map the font to a Tailwind class */
+  --font-sans: "Montserrat", ui-sans-serif, system-ui, sans-serif;
+  --font-brand: "Montserrat", sans-serif;
+
+  /* Your existing colors */
+  --color-primary: #F9A602;
+  --color-primary-light: rgba(249, 166, 2, 0.1);
+  --color-secondary: #C41212;
+  --color-accent: #0F0506;
+  --color-glass: rgba(255, 255, 255, 0.3);
+}
