@@ -2,7 +2,7 @@ import { Routes, Route } from "react-router-dom";
 import PublicRoute from "./PublicRoute";
 import AdminRoute from "./AdminRoute";
 import AuthRoutes from "./AuthRoutes";
-import NotFound from "../pages/NotFound";
+import NotFound from "../Pages/NotFound.jsx";
 
 const AppRoutes = () => {
   return (
