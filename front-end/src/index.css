@@ -1,17 +1,13 @@
-/* 1️⃣ Google font MUST be first */
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
-
-/* 2️⃣ Tailwind */
 @import "tailwindcss";
 
-/* 3️⃣ Theme config */
+
 @theme {
   --font-sans: "Montserrat", ui-sans-serif, system-ui, sans-serif;
   --font-brand: "Montserrat", sans-serif;
 
   --color-primary: #f9a602;
-  --color-primary-light: rgba(249, 166, 2, 0.1);
-  --color-secondary: #C41212;
-  --color-accent: #0F0506;
-  --color-glass: rgba(255, 255, 255, 0.3);
+  --color-dark: #0A0A0A;
+
+ 
 }

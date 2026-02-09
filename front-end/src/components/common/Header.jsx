@@ -2,19 +2,19 @@ import { Link, useLocation } from "react-router-dom";
 import { ShoppingCart, User, MapPin, Search, ChevronDown, X } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence, useScroll, useMotionValueEvent } from "framer-motion";
-import { 
-  RiHome4Fill, 
-  RiHome4Line, 
-  RiRestaurantFill, 
-  RiRestaurantLine, 
-  RiUserFill, 
-  RiUserLine, 
-  RiShoppingBag3Fill, 
+import {
+  RiHome4Fill,
+  RiHome4Line,
+  RiRestaurantFill,
+  RiRestaurantLine,
+  RiUserFill,
+  RiUserLine,
+  RiShoppingBag3Fill,
   RiShoppingBag3Line,
   RiUserStarLine,
   RiChatSmile3Line,
 } from "react-icons/ri";
-import { IoFastFoodOutline,IoFastFood  } from "react-icons/io5";
+import { IoFastFoodOutline, IoFastFood } from "react-icons/io5";
 import Logo from "../../assets/Logo-web.png";
 
 const Header = () => {
@@ -24,7 +24,7 @@ const Header = () => {
   const searchRef = useRef(null);
   const location = useLocation();
 
-  // --- Typing Placeholder Logic ---
+  // --- Typing Placeholder 
   const [displayText, setDisplayText] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
   const [loopNum, setLoopNum] = useState(0);
@@ -116,81 +116,80 @@ const Header = () => {
 
         {/* MOBILE BOTTOM NAV */}
         <nav className="fixed bottom-0 left-0 right-0 z-[100] bg-white border-t border-gray-100 shadow-[0_-10px_30px_rgba(0,0,0,0.08)] px-2 py-1 flex items-center justify-around pb-4">
-  {mobileNavLinks.slice(0, 2).map((link) => {
-    const isActive = location.pathname === link.path;
-    // Updated logic: Change icon specifically for "Menu" link
-    const displayIcon = link.name === "Menu" ? <IoFastFoodOutline size={22} /> : link.icon;
-    const displayActiveIcon = link.name === "Menu" ? <IoFastFood size={22} className="fill-current" /> : link.activeIcon;
+          {mobileNavLinks.slice(0, 2).map((link) => {
+            const isActive = location.pathname === link.path;
+            const displayIcon = link.name === "Menu" ? <IoFastFoodOutline size={22} /> : link.icon;
+            const displayActiveIcon = link.name === "Menu" ? <IoFastFood size={22} className="fill-current" /> : link.activeIcon;
 
-    return (
-      <Link 
-        key={link.path} 
-        to={link.path} 
-        className="relative flex flex-col items-center justify-center w-14 h-12 rounded-xl transition-all duration-300 hover:bg-gray-100"
-      >
-        <AnimatePresence>
-          {isActive && (
-            <motion.div
-              layoutId="mobileNavPill"
-              className="absolute inset-0 bg-primary rounded-xl border border-black/5 shadow-sm"
-              transition={{ type: "spring", stiffness: 350, damping: 30 }}
-            />
-          )}
-        </AnimatePresence>
+            return (
+              <Link
+                key={link.path}
+                to={link.path}
+                className="relative flex flex-col items-center justify-center w-14 h-12 rounded-xl transition-all duration-300 hover:bg-gray-100"
+              >
+                <AnimatePresence>
+                  {isActive && (
+                    <motion.div
+                      layoutId="mobileNavPill"
+                      className="absolute inset-0 bg-primary rounded-xl border border-black/5 shadow-sm"
+                      transition={{ type: "spring", stiffness: 350, damping: 30 }}
+                    />
+                  )}
+                </AnimatePresence>
 
-        <div className="relative z-10 flex flex-col items-center">
-          <div className={`transition-transform duration-300 ${isActive ? "text-black scale-110" : "text-gray-600"}`}>
-            {isActive ? displayActiveIcon : displayIcon}
+                <div className="relative z-10 flex flex-col items-center">
+                  <div className={`transition-transform duration-300 ${isActive ? "text-black scale-110" : "text-gray-600"}`}>
+                    {isActive ? displayActiveIcon : displayIcon}
+                  </div>
+                  <span className={`text-[9px] font-black mt-0.5 transition-colors duration-300 ${isActive ? "text-black" : "text-gray-600"}`}>
+                    {link.name}
+                  </span>
+                </div>
+              </Link>
+            );
+          })}
+
+          {/* CENTER RESERVE BUTTON */}
+          <div className="relative -mt-12 mx-2">
+            <motion.button whileTap={{ scale: 0.9 }} className="w-14 h-14 bg-black rounded-full border-4 border-white shadow-lg flex items-center justify-center text-primary">
+              <RiRestaurantLine size={24} />
+              <div className="absolute -bottom-5"><span className="text-[9px] font-black text-black uppercase">Reserve</span></div>
+            </motion.button>
           </div>
-          <span className={`text-[9px] font-black mt-0.5 transition-colors duration-300 ${isActive ? "text-black" : "text-gray-600"}`}>
-            {link.name}
-          </span>
-        </div>
-      </Link>
-    );
-  })}
 
-  {/* CENTER RESERVE BUTTON */}
-  <div className="relative -mt-12 mx-2">
-    <motion.button whileTap={{ scale: 0.9 }} className="w-14 h-14 bg-black rounded-full border-4 border-white shadow-lg flex items-center justify-center text-primary">
-      <RiRestaurantLine size={24} />
-      <div className="absolute -bottom-5"><span className="text-[9px] font-black text-black uppercase">Reserve</span></div>
-    </motion.button>
-  </div>
+          {/* CART AND PROFILE LINKS */}
+          {mobileNavLinks.slice(2, 4).map((link) => {
+            const isActive = location.pathname === link.path;
+            return (
+              <Link key={link.path} to={link.path} className="relative flex flex-col items-center justify-center w-14 h-12">
+                <AnimatePresence>
+                  {isActive && (
+                    <motion.div
+                      layoutId="mobileNavPill"
+                      className="absolute inset-0 bg-primary rounded-xl border border-black/10 shadow-sm"
+                      transition={{ type: "spring", stiffness: 350, damping: 30 }}
+                    />
+                  )}
+                </AnimatePresence>
 
-  {/* CART AND PROFILE LINKS */}
-  {mobileNavLinks.slice(2, 4).map((link) => {
-    const isActive = location.pathname === link.path;
-    return (
-      <Link key={link.path} to={link.path} className="relative flex flex-col items-center justify-center w-14 h-12">
-        <AnimatePresence>
-          {isActive && (
-            <motion.div 
-              layoutId="mobileNavPill" 
-              className="absolute inset-0 bg-primary rounded-xl border border-black/10 shadow-sm" 
-              transition={{ type: "spring", stiffness: 350, damping: 30 }} 
-            />
-          )}
-        </AnimatePresence>
-        
-        <div className="relative z-10 flex flex-col items-center">
-          <div className={`relative transition-transform duration-300 ${isActive ? "text-black scale-110" : "text-gray-600"}`}>
-            {isActive ? link.activeIcon : link.icon}
-            {link.badge && (
-              <span className="absolute -top-1 -right-1 bg-black text-white text-[8px] h-3.5 w-3.5 rounded-full flex items-center justify-center border border-white">
-                {link.badge}
-              </span>
-            )}
-          </div>
-          {/* Fixed styling here to match Home/Menu: changed font-bold to font-black and text-gray-800 to text-gray-600 */}
-          <span className={`text-[9px] font-black mt-0.5 transition-colors duration-300 ${isActive ? "text-black" : "text-gray-600"}`}>
-            {link.name}
-          </span>
-        </div>
-      </Link>
-    );
-  })}
-</nav>
+                <div className="relative z-10 flex flex-col items-center">
+                  <div className={`relative transition-transform duration-300 ${isActive ? "text-black scale-110" : "text-gray-600"}`}>
+                    {isActive ? link.activeIcon : link.icon}
+                    {link.badge && (
+                      <span className="absolute -top-1 -right-1 bg-black text-white text-[8px] h-3.5 w-3.5 rounded-full flex items-center justify-center border border-white">
+                        {link.badge}
+                      </span>
+                    )}
+                  </div>
+                  {/* Fixed styling here to match Home/Menu: changed font-bold to font-black and text-gray-800 to text-gray-600 */}
+                  <span className={`text-[9px] font-black mt-0.5 transition-colors duration-300 ${isActive ? "text-black" : "text-gray-600"}`}>
+                    {link.name}
+                  </span>
+                </div>
+              </Link>
+            );
+          })}
+        </nav>
       </div>
 
       {/* 2. DESKTOP & TABLET VIEW UI */}
@@ -217,12 +216,12 @@ const Header = () => {
                 </div>
               </div>
             </div>
-            
+
             <nav className={`flex items-center gap-1 lg:gap-3 bg-white/40 backdrop-blur-md border border-white/20 p-1.5 rounded-full relative transition-all duration-500 shadow-sm ${searchOpen ? "opacity-0 pointer-events-none" : "opacity-100"}`}>
               {[
-                { name: "Home", path: "/", icon: <RiHome4Line size={16} /> }, 
-                { name: "Menu", path: "/menu", icon: <IoFastFoodOutline size={16} /> }, 
-                { name: "About Us", path: "/about", icon: <RiUserStarLine size={16} /> }, 
+                { name: "Home", path: "/", icon: <RiHome4Line size={16} /> },
+                { name: "Menu", path: "/menu", icon: <IoFastFoodOutline size={16} /> },
+                { name: "About Us", path: "/about", icon: <RiUserStarLine size={16} /> },
                 { name: "Contact Us", path: "/contact", icon: <RiChatSmile3Line size={16} /> }
               ].map((link) => {
                 const isActive = location.pathname === link.path;
