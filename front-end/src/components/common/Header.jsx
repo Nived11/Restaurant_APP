@@ -62,6 +62,23 @@ const Header = () => {
     setSearchQuery("");
   };
 
+  // Handle click outside search bar
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (searchRef.current && !searchRef.current.contains(event.target)) {
+        handleCloseSearch();
+      }
+    };
+
+    if (searchOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [searchOpen]);
+
   // Bottom Nav Config
   const mobileNavLinks = [
     { name: "Home", path: "/", icon: <RiHome4Line size={22} />, activeIcon: <RiHome4Fill size={22} /> },
@@ -220,11 +237,11 @@ const Header = () => {
             </nav>
 
             <div className="flex items-center gap-1 md:gap-3 lg:gap-6 shrink-0 relative">
-              <div ref={searchRef} className="flex items-center justify-end">
-                {!searchOpen && <button onClick={() => setSearchOpen(true)} className="p-2 lg:p-3 hover:bg-gray-100 rounded-full text-gray-700 transition-all active:scale-90"><Search size={20} className="lg:size-[23px] text-black/80" /></button>}
+              <div ref={searchRef} className="flex items-center justify-center relative">
+                {!searchOpen && <button onClick={() => setSearchOpen(true)} className="cursor-pointer p-2 lg:p-3 hover:bg-gray-100 rounded-full text-gray-700 transition-all active:scale-90"><Search size={20} className="lg:size-[23px] text-black/80" /></button>}
                 <AnimatePresence>
                   {searchOpen && (
-                    <motion.div initial={{ width: 0, opacity: 0 }} animate={{ width: "clamp(200px, 30vw, 350px)", opacity: 1 }} exit={{ width: 0, opacity: 0 }} className="absolute right-0 top-1/2 -translate-y-1/2 flex items-center bg-white rounded-full px-4 py-2 border-2 border-primary shadow-xl z-50 overflow-hidden">
+                    <motion.div initial={{ width: 0, opacity: 0 }} animate={{ width: "clamp(200px, 30vw, 350px)", opacity: 1 }} exit={{ width: 0, opacity: 0 }} className=" absolute right-0 top-1/2 -translate-y-1/2 flex items-center bg-white rounded-full px-4 py-2 border-2 border-primary shadow-xl z-50 overflow-hidden">
                       <Search size={18} className="text-black/80 shrink-0 mr-2" />
                       <input type="text" placeholder="Search..." className="bg-transparent outline-none text-xs lg:text-sm w-full font-semibold" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} autoFocus />
                       <button onClick={handleCloseSearch} className="shrink-0 p-1 hover:bg-gray-100 rounded-full ml-1"><X size={14} /></button>
