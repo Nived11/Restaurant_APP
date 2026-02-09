@@ -1,6 +1,6 @@
 import { Route } from "react-router-dom";
 import PublicLayout from "../Layouts/PublicLayout";
-import { Home, Cart, Menu, About, Contact } from "../Pages/user";
+import { Home, Cart, Menu, About, Contact, Profile } from "../Pages/user";
 
 const PublicRoute = () => (
   <Route path="/" element={<PublicLayout />}>
@@ -9,6 +9,7 @@ const PublicRoute = () => (
     <Route path="menu" element={<Menu />} />
     <Route path="about" element={<About />} />
     <Route path="contact" element={<Contact />} />
+    <Route path="profile" element={<Profile />} />
   </Route>
 );
 
