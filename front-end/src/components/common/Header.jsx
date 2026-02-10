@@ -90,7 +90,7 @@ const Header = () => {
   return (
     <>
       {/* 1. MOBILE VIEW UI */}
-      <div className="md:hidden sticky top-0 z-[100] transition-all duration-300" style={{ background: "linear-gradient(180deg, #f9a602 0%, #fffbeb 60%, #ffffff 100%)" }}>
+      <div className=" rounded-b-2xl  md:hidden sticky top-0 z-[100] transition-all duration-300" style={{ background: "linear-gradient(180deg, #f9a602 0%, #fffbeb 60%, #ffffff 100%)" }}>
         <div className="flex justify-center pt-0">
           <Link to="/"><img src={Logo} alt="Logo" className="h-20 w-50 object-contain" /></Link>
         </div>

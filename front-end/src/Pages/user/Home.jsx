@@ -1,10 +1,10 @@
-import { HomePage } from "../../features/user/home";
+import {  BannerSection } from "../../features/user/home";
 
 const Home = () => {
   return (
-    <div>
+     <div>
+      <BannerSection />
       
-      <HomePage />
     </div>
   );
 };
