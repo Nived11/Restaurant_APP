@@ -5,9 +5,9 @@ const Home = () => {
      <div>
       <BannerSection />
       <CategorySection />
+      <FirstOrderBanner />
       <DailySpecials />
       <BestSellers />
-      <FirstOrderBanner />
       <ComboSection />
       <Testimonials />
       <FAQ />
