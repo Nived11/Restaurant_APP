@@ -39,69 +39,55 @@ const bestSellersData = [
   },
 ];
 
-const BestSellers = () => (
-  <section className="py-12 bg-white">
-    <div className="max-w-[1440px] mx-auto px-4 md:px-10">
-      
-      {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-2">
-        <div>
-          <h2 className="text-2xl md:text-3xl font-black uppercase text-gray-900">
-            Our <span className="text-primary">Best</span> Sellers
-          </h2>
-          <div className="h-1 w-10 bg-primary mt-1 rounded-full" />
+const FirstOrderBanner = () => (
+  <section className="py-6 px-4 md:px-10">
+    <div className="max-w-[1440px] mx-auto">
+      <div className="relative h-[180px] md:h-[260px] rounded-[1.5rem] md:rounded-[2.5rem] overflow-hidden flex items-center shadow-xl bg-black transform-gpu">
+        <div className="absolute inset-0 z-0">
+          <img 
+            src="https://images.unsplash.com/photo-1555949258-eb67b1ef0ceb?auto=format&fit=crop&q=80&w=1600" 
+            alt="Food"
+            className="w-full h-full object-cover opacity-50"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-black via-black/40 to-transparent" />
         </div>
-        <p className="text-gray-400 font-bold text-[10px] md:text-xs uppercase tracking-[0.2em]">
-          Community Favorites
-        </p>
-      </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-4 gap-y-8 md:gap-x-8 md:gap-y-12">
-        {bestSellersData.map((item) => (
-          <div key={item.id} className="group">
-            
-            {/* Image Container */}
-            <div className="relative aspect-square rounded-[1.5rem] md:rounded-[2.5rem] overflow-hidden bg-gray-50 mb-3 md:mb-5 shadow-sm">
-              <img 
-                src={item.img} 
-                alt={item.name}
-                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-in-out" 
-              />
+        <div className="relative z-10 px-6 md:px-16 w-full flex justify-between items-center">
+          <motion.div 
+            initial={{ opacity: 0, y: 15 }} 
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.1 }} // Once: true is vital for lag-free mobile
+            transition={{ duration: 0.4, ease: "easeOut" }}
+            className="max-w-[65%] md:max-w-xl will-change-transform"
+          >
+            <h2 className="text-white text-xl md:text-4xl font-black uppercase leading-tight tracking-tight">
+              First Order? <br /> 
+              <span className="text-primary italic">Grab Your Discount</span>
+            </h2>
+            <p className="text-gray-300 mt-1 md:mt-2 text-[9px] md:text-base font-medium opacity-90">
+              Automatically applied at checkout.
+            </p>
+            <button className="mt-3 md:mt-6 bg-primary text-black font-black px-5 py-2 md:px-8 md:py-3 rounded-xl text-[9px] md:text-sm uppercase shadow-lg">
+              Order Now
+            </button>
+          </motion.div>
 
-              {/* Discount Badge */}
-              <div className="absolute top-3 left-3 md:top-5 md:left-5">
-                <span className="bg-primary text-black text-[9px] md:text-[11px] font-black px-2 md:px-3 py-1 rounded-lg shadow-lg uppercase">
-                  {item.discount}
-                </span>
-              </div>
-              
-              {/* + Plus Button with Glass Background */}
-              <button className="absolute bottom-3 right-3 md:bottom-5 md:right-5 bg-white/80 backdrop-blur-sm text-black size-8 md:size-12 cursor-pointer rounded-md md:rounded-xl flex items-center justify-center shadow-xl transition-all duration-300 hover:bg-primary active:scale-95 z-10 border border-white/20">
-                <RiAddLine size={24} className="md:size-8 font-bold " />
-              </button>
+          <motion.div 
+            initial={{ scale: 0.8, opacity: 0 }}
+            whileInView={{ scale: 1, opacity: 1, rotate: -10 }}
+            viewport={{ once: true, amount: 0.1 }}
+            transition={{ type: "spring", stiffness: 100, damping: 15 }}
+            className="relative will-change-transform"
+          >
+            <div className="bg-primary border-[3px] border-black p-3 md:p-6 shadow-[6px_6px_0px_rgba(0,0,0,1)] flex flex-col items-center justify-center min-w-[95px] md:min-w-[160px]">
+              <span className="text-black font-bold text-[10px] md:text-sm uppercase leading-none">Get</span>
+              <span className="text-black font-black text-3xl md:text-6xl leading-none my-1">20%</span>
+              <span className="text-black font-black text-[10px] md:text-lg leading-none border-t-2 border-black pt-1">OFF</span>
             </div>
-
-            {/* Content Area */}
-            <div className="px-1">
-              <h3 className="font-black text-gray-900 text-[14px] md:text-lg leading-tight mb-1 truncate">
-                {item.name}
-              </h3>
-              <p className="text-[10px] md:text-xs text-gray-500 font-medium line-clamp-1 mb-2">
-                {item.desc}
-              </p>
-              
-              <div className="flex flex-col">
-                <span className="text-gray-400 text-[10px] md:text-xs line-through font-bold">
-                  ₹{item.originalPrice}
-                </span>
-                <span className="font-black text-black text-base md:text-xl leading-none">
-                  ₹{item.price}
-                </span>
-              </div>
-            </div>
-
-          </div>
-        ))}
+            {/* Simple tail for mobile performance */}
+            <div className="absolute -bottom-3 left-4 w-0 h-0 border-l-[15px] border-l-transparent border-t-[15px] border-t-black" />
+          </motion.div>
+        </div>
       </div>
     </div>
   </section>
