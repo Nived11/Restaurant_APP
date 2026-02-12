@@ -7,10 +7,10 @@ const Home = () => {
       <CategorySection />
       <DailySpecials />
       <BestSellers />
+      <FirstOrderBanner /> 
       <ComboSection />
       <Testimonials />
       <FAQ />
-      <FirstOrderBanner /> 
       <BrandFeatures />
       
     </div>
