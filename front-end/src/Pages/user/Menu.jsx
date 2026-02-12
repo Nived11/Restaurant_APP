@@ -1,8 +1,10 @@
 import React from 'react'
+import {MenuPage} from '../../features/user/Menu'
+
 
  const Menu = () => {
   return (
-    <div>menu</div>
+    <div><MenuPage/></div>
   )
 }
 
