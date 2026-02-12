@@ -99,7 +99,6 @@ const FirstAbout = () => {
           Download App Now
         </button>
       </section>
-
     </div>
   )
 }
