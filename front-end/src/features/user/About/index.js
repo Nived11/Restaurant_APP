@@ -1,1 +1,1 @@
-export { default as FirstAbout } from "./components/FirstAbout";
+export { default as FirstAbout } from "./FirstAbout";
