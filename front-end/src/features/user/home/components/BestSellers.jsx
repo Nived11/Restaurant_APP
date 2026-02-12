@@ -58,14 +58,16 @@ const BestSellers = () => (
 
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-4 gap-y-8 md:gap-x-8 md:gap-y-12">
         {bestSellersData.map((item) => (
-          <div key={item.id} className="group">
+          <div key={item.id} className="group will-change-transform">
             
             {/* Image Container */}
-            <div className="relative aspect-square rounded-[1.5rem] md:rounded-[2.5rem] overflow-hidden bg-gray-50 mb-3 md:mb-5 shadow-sm">
+            <div className="relative aspect-square rounded-[1.5rem] md:rounded-[2.5rem] overflow-hidden bg-gray-50 mb-3 md:mb-5 shadow-sm transform-gpu">
               <img 
                 src={item.img} 
                 alt={item.name}
-                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-in-out" 
+                loading="lazy"      // Improved performance
+                decoding="async"    // Improved performance
+                className="w-full h-full object-cover md:group-hover:scale-110 transition-transform duration-500 ease-out" 
               />
 
               {/* Discount Badge */}
@@ -75,9 +77,9 @@ const BestSellers = () => (
                 </span>
               </div>
               
-              {/* + Plus Button with Glass Background */}
-              <button className="absolute bottom-3 right-3 md:bottom-5 md:right-5 bg-white/80 backdrop-blur-sm text-black size-8 md:size-12 cursor-pointer rounded-md md:rounded-xl flex items-center justify-center shadow-xl transition-all duration-300 hover:bg-primary active:scale-95 z-10 border border-white/20">
-                <RiAddLine size={24} className="md:size-8 font-bold " />
+              {/* + Plus Button */}
+              <button className="absolute bottom-3 right-3 md:bottom-5 md:right-5 bg-white/90 backdrop-blur-md text-black size-8 md:size-12 cursor-pointer rounded-md md:rounded-xl flex items-center justify-center shadow-xl transition-all duration-300 md:hover:bg-primary active:scale-90 z-10">
+                <RiAddLine size={24} className="md:size-8 font-bold" />
               </button>
             </div>
 

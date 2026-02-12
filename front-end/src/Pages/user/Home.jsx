@@ -5,12 +5,12 @@ const Home = () => {
      <div>
       <BannerSection />
       <CategorySection />
-      <FirstOrderBanner />
       <DailySpecials />
       <BestSellers />
       <ComboSection />
       <Testimonials />
       <FAQ />
+      <FirstOrderBanner /> 
       <BrandFeatures />
       
     </div>
