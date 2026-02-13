@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Users, Calendar, Phone, User, Mail, MessageSquare, Clock } from "lucide-react";
-import logo from "../../assets/logo-web.png";
+import { X,  Phone, User, Mail, } from "lucide-react";
+import Logo from "../../assets/Logo-web.png";
 
 const ReserveTable = ({ isOpen, onClose }) => {
   const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
@@ -56,7 +56,7 @@ const ReserveTable = ({ isOpen, onClose }) => {
               </button>
 
               <div className="flex justify-center mb-1">
-                <img src={logo} alt="Logo" className="h-12 md:h-16 w-auto object-contain" />
+                <img src={Logo} alt="Logo" className="h-12 md:h-16 w-auto object-contain" />
               </div>
 
               <h2 className="text-lg md:text-3xl font-black uppercase tracking-tight">
