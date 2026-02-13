@@ -16,6 +16,7 @@ import {
 } from "react-icons/ri";
 import { IoFastFoodOutline, IoFastFood } from "react-icons/io5";
 import Logo from "../../assets/Logo-web.png";
+import ReserveTable from "./ReserveTable";
 
 const Header = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -30,6 +31,7 @@ const Header = () => {
   const [loopNum, setLoopNum] = useState(0);
   const [typingSpeed, setTypingSpeed] = useState(150);
   const words = ["Pizza", "Burger", "Biryani", "Pasta", "Desserts"];
+  const [isReserveOpen, setIsReserveOpen] = useState(false);
 
   useEffect(() => {
     const handleTyping = () => {
@@ -120,7 +122,9 @@ const Header = () => {
             );
           })}
           <div className="relative -mt-12 mx-2">
-            <motion.button whileTap={{ scale: 0.9 }} className="w-14 h-14 bg-black rounded-full border-4 border-white shadow-lg flex items-center justify-center text-primary">
+            <motion.button
+            onClick={() => setIsReserveOpen(true)}
+             whileTap={{ scale: 0.9 }} className="w-14 h-14 bg-black rounded-full border-4 border-white shadow-lg flex items-center justify-center text-primary">
               <RiRestaurantLine size={24} />
               <div className="absolute -bottom-5"><span className="text-[9px] font-black text-black uppercase">Reserve</span></div>
             </motion.button>
@@ -147,7 +151,9 @@ const Header = () => {
       <div className="hidden md:block sticky top-0 z-50">
         {/* Floating Reserve Button */}
         <div className="fixed bottom-6 right-6 lg:bottom-10 lg:right-10 z-[100] ">
-          <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="cursor-pointer relative w-20 h-20 lg:w-25 lg:h-25 bg-black rounded-full shadow-[0_10px_30_rgba(0,0,0,0.4)] border-4 lg:border-6 border-primary flex items-center justify-center group transition-all">
+          <motion.button 
+          onClick={() => setIsReserveOpen(true)}
+          whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="cursor-pointer relative w-20 h-20 lg:w-25 lg:h-25 bg-black rounded-full shadow-[0_10px_30_rgba(0,0,0,0.4)] border-4 lg:border-6 border-primary flex items-center justify-center group transition-all">
             <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100">
               <defs><path id="topCurve" d="M 25,45 a 25,25 0 1,1 50,0" /><path id="bottomCurve" d="M 25,60 a 25,25 0 0,0 50,0" /></defs>
               <text className="fill-white font-black uppercase text-[8px] lg:text-[12px] tracking-[0.2em]"><textPath xlinkHref="#topCurve" startOffset="50%" textAnchor="middle">Reserve</textPath></text>
@@ -220,6 +226,10 @@ const Header = () => {
           </div>
         </header>
       </div>
+      <ReserveTable 
+        isOpen={isReserveOpen} 
+        onClose={() => setIsReserveOpen(false)} 
+      />
     </>
   );
 };
