@@ -16,7 +16,7 @@ import {
 } from "react-icons/ri";
 import { IoFastFoodOutline, IoFastFood } from "react-icons/io5";
 import Logo from "../../assets/Logo-web.png";
-import ReserveTable from "./ReserveTable";
+import ReserveTable from "./ReserveTable.jsx";
 
 const Header = () => {
   const [searchQuery, setSearchQuery] = useState("");
