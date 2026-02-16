@@ -1,24 +1,24 @@
 import { Route, Navigate } from "react-router-dom";
+import AdminLayout from "../Layouts/AdminLayout";
+import { Dashboard, Orders, Menu, Banners, Inbox, Customers, Revenue } from "../Pages/admin";
 
-const AdminRoute = (isAdmin) => {
+const AdminRoute = () => {
+  const user = { name: "Designer Mode", role: "SUPER_ADMIN" };
+
   return (
-    <>
-      <Route path="/admin/login" element={<div>Admin Login</div>} />
+    <Route path="/admin" element={<AdminLayout user={user} />}>
+      <Route index element={<Navigate to="/admin/dashboard" replace />} />
 
-      <Route
-        path="/admin/*"
-        element={
-          isAdmin ? (
-            <div>Admin Layout</div>
-          ) : (
-            <Navigate to="/admin/login" replace />
-          )
-        }
-      >
-        <Route path="dashboard" element={<div>Dashboard</div>} />
-        <Route path="*" element={<Navigate to="/admin/dashboard" replace />} />
-      </Route>
-    </>
+      <Route path="dashboard" element={<Dashboard user={user} />} />
+      <Route path="orders" element={<Orders user={user} />} />
+      <Route path="menu" element={<Menu user={user} />} />
+      <Route path="banners" element={<Banners user={user} />} />
+      <Route path="inbox" element={<Inbox user={user} />} />
+      <Route path="customers" element={<Customers user={user} />} />
+      <Route path="revenue" element={<Revenue user={user} />} />
+
+      <Route path="*" element={<Navigate to="/admin/dashboard" replace />} />
+    </Route>
   );
 };
 
