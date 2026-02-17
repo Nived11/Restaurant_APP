@@ -67,8 +67,8 @@ const AdminLayout = ({ user }) => {
         </div>
 
         {/* 4. SCROLLABLE CONTENT AREA */}
-        <main className="flex-1 overflow-y-auto p-4 md:p-10">
-          <div className="max-w-7xl mx-auto">
+        <main className="flex-1 overflow-y-auto p-4 md:p-10  bg-white">
+          <div className="max-w-7xl mx-auto ">
             <Outlet context={{ user }} />
           </div>
         </main>
