@@ -2,17 +2,22 @@ import React, { useState } from "react";
 import { Outlet } from "react-router-dom";
 import AdminSidebar from "../components/common/AdminSidebar";
 import AdminHeader from "../components/common/AdminHeader";
-import { Menu, Bell, X } from "lucide-react";
+import { Menu, Bell } from "lucide-react";
 
 const AdminLayout = ({ user }) => {
   const [isExpanded, setIsExpanded] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false); 
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
-    <div className="flex min-h-screen bg-[#F8F8F8] text-[#1A1A1A] font-sans antialiased">
-
-      <div className={`fixed inset-y-0 left-0 z-[100] transition-transform duration-500 lg:translate-x-0 lg:static
-          ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}>
+    <div className="flex h-screen overflow-hidden bg-[#F8F8F8] text-[#1A1A1A] font-sans antialiased">
+      
+      {/* 1. SIDEBAR: Fixed and locked to the top (inset-y-0) */}
+      <div 
+        className={`fixed inset-y-0 left-0 z-[100] transition-transform duration-500 
+          ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
+          ${isExpanded ? "lg:w-60" : "lg:w-24"} 
+        `}
+      >
         <AdminSidebar
           isExpanded={isExpanded}
           setIsExpanded={setIsExpanded}
@@ -22,7 +27,7 @@ const AdminLayout = ({ user }) => {
         />
       </div>
 
-      {/* Mobile Backdrop (Click to close menu) */}
+      {/* Mobile Backdrop - Restored */}
       {isMobileMenuOpen && (
         <div
           className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[90] lg:hidden"
@@ -30,14 +35,15 @@ const AdminLayout = ({ user }) => {
         />
       )}
 
-      {/* 2. Main Body */}
-      <div className={`flex-1 flex flex-col min-w-0 transition-all duration-500 cubic-bezier(0.4, 0, 0.2, 1) ${isExpanded ? "lg:pl-0" : "lg:pl-0"}`}>
+      {/* 2. MAIN BODY */}
+      <div className={`flex-1 flex flex-col min-w-0 h-screen transition-all duration-500 
+        ${isExpanded ? "lg:ml-60" : "lg:ml-24"}`}>
 
-        {/* --- MOBILE ONLY HEADER --- */}
-        <header className="lg:hidden h-20 bg-[#1A1A1A] px-6 flex items-center justify-between sticky top-0 z-40 border-b border-white/5">
+        {/* --- MOBILE ONLY HEADER: RESTORED --- */}
+        <header className="lg:hidden h-20 bg-[#1A1A1A] px-6 flex items-center justify-between sticky top-0 z-40 border-b border-white/5 flex-shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-primary border-2 border-[#1A1A1A] overflow-hidden">
-              <img src="https://api.dicebear.com/7.x/bottts-neutral/svg?seed=Pepper&backgroundColor=f9a602" alt="pfp" />
+              <img src={`https://api.dicebear.com/7.x/bottts-neutral/svg?seed=Pepper&backgroundColor=f9a602`} alt="pfp" />
             </div>
           </div>
 
@@ -56,12 +62,12 @@ const AdminLayout = ({ user }) => {
         </header>
 
         {/* --- DESKTOP ONLY HEADER --- */}
-        <div className="hidden lg:block">
+        <div className="hidden lg:block flex-shrink-0">
           <AdminHeader user={user} />
         </div>
 
-        {/* 4. Content Area */}
-        <main className="p-4 md:p-10">
+        {/* 4. SCROLLABLE CONTENT AREA */}
+        <main className="flex-1 overflow-y-auto p-4 md:p-10">
           <div className="max-w-7xl mx-auto">
             <Outlet context={{ user }} />
           </div>
