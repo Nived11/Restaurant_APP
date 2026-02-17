@@ -1,9 +1,10 @@
-import React from 'react'
+import React from 'react';
+import { BannersPage } from '../../features/admin/banners';
 
 const Banners = () => {
   return (
-    <div>Banners</div>
-  )
-}
+    <BannersPage />
+  );
+};
 
-export default Banners
+export default Banners;

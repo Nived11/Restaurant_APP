@@ -1,7 +1,7 @@
-
+import { CustomerPage } from "../../features/admin/customer";
 const Customers = () => {
   return (
-    <div>Customers</div>
+    <div><CustomerPage/></div>
   )
 }
 

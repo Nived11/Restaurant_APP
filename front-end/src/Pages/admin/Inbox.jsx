@@ -1,8 +1,10 @@
 import React from 'react'
+import { MessagePage } from '../../features/admin/message';
+
 
 const Inbox = () => {
   return (
-    <div>Inbox</div>
+    <div><MessagePage /></div>
   )
 }
 
