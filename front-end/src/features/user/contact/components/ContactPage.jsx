@@ -9,15 +9,11 @@ function ContactPage() {
   return (
     <div className="min-h-screen bg-white flex font-sans selection:bg-[var(--color-primary)] selection:text-black">
       
-      {/* 1. LEFT SIDE: The Form (No changes) */}
+      {/* LEFT SIDE */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12 lg:p-24 bg-white relative">
-        
-        {/* Decor: Background Blob Left */}
         <div className="absolute top-[-10%] left-[-10%] w-64 h-64 bg-[var(--color-primary)]/10 rounded-full blur-3xl -z-10"></div>
         
         <div className="w-full max-w-md space-y-8">
-          
-          {/* Header */}
           <div className="text-left">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gray-100 text-xs font-bold uppercase tracking-wider mb-4 text-gray-600">
                <Sparkles size={14} className="text-[var(--color-primary)]" /> Craving something?
@@ -30,24 +26,23 @@ function ContactPage() {
             </p>
           </div>
 
-          {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-5">
             
-            {/* Name */}
+            {/* ✅ UPDATED NAME FIELD */}
             <div>
                <label className="block text-sm font-bold text-gray-700 mb-1">Full Name</label>
                <input
                 type="text"
-                name="name"
+                name="full_name" // ✅ Changed to full_name
                 required
-                value={formData.name}
+                value={formData.full_name} // ✅ Changed to full_name
                 onChange={handleChange}
                 placeholder="Ex. Adhil Muhammed"
                 className="w-full px-4 py-3.5 bg-gray-50 border-2 border-transparent rounded-xl focus:bg-white focus:border-black focus:ring-0 transition-all duration-300 outline-none font-medium placeholder:text-gray-400"
               />
             </div>
 
-            {/* Email */}
+            {/* Email (No Change) */}
             <div>
                <label className="block text-sm font-bold text-gray-700 mb-1">Email Address</label>
                <input
@@ -61,7 +56,7 @@ function ContactPage() {
               />
             </div>
 
-            {/* Subject */}
+            {/* Subject (No Change) */}
             <div>
                <label className="block text-sm font-bold text-gray-700 mb-1">Subject</label>
                <input
@@ -75,7 +70,7 @@ function ContactPage() {
               />
             </div>
 
-            {/* Message */}
+            {/* Message (No Change) */}
             <div>
                <label className="block text-sm font-bold text-gray-700 mb-1">Message</label>
                <textarea
@@ -101,17 +96,11 @@ function ContactPage() {
               `}
             >
               {status === 'submitting' ? (
-                <>
-                  <Loader2 className="animate-spin w-5 h-5" /> Processing...
-                </>
+                <> <Loader2 className="animate-spin w-5 h-5" /> Processing... </>
               ) : status === 'success' ? (
-                <>
-                  <CheckCircle className="w-5 h-5" /> Message Sent!
-                </>
+                <> <CheckCircle className="w-5 h-5" /> Message Sent! </>
               ) : (
-                <>
-                  Send Message <ArrowRight className="w-5 h-5" />
-                </>
+                <> Send Message <ArrowRight className="w-5 h-5" /> </>
               )}
             </button>
           </form>
@@ -119,36 +108,17 @@ function ContactPage() {
         </div>
       </div>
 
-      {/* 2. RIGHT SIDE: Pizza Image Top, Text Bottom (Fixed Overlap) */}
-      {/* Changed layout to flex-col so they stack vertically */}
+      {/* RIGHT SIDE (No Change) */}
       <div className="hidden lg:flex w-1/2 relative bg-white overflow-hidden flex-col items-center justify-center p-12 gap-8">
-        
-        {/* Decor: Background Blob Right (Optional balance) */}
         <div className="absolute bottom-[-10%] right-[-10%] w-64 h-64 bg-[var(--color-primary)]/5 rounded-full blur-3xl -z-0"></div>
-
-        {/* PIZZA IMAGE CONTAINER */}
-        {/* Gave it a fixed height area to float in */}
         <div className="relative w-full h-[45vh] flex items-center justify-center z-10">
-            <img 
-            src={pizzaImg} 
-            alt="Delicious Pizza" 
-            className="w-full h-full object-contain hover:scale-105 transition-transform duration-1000 drop-shadow-2xl"
-            />
+            <img src={pizzaImg} alt="Delicious Pizza" className="w-full h-full object-contain hover:scale-105 transition-transform duration-1000 drop-shadow-2xl"/>
         </div>
-        
-        {/* Text Content (Removed absolute, centered text) */}
         <div className="w-full flex flex-col items-center text-center z-10">
           <blockquote className="text-gray-900 max-w-lg">
-             <p className="text-4xl font-black leading-tight mb-4 tracking-tight">
-               "Love at first <br/> <span className="text-[var(--color-primary)]">Slice.</span>"
-             </p>
-             <p className="text-gray-600 text-lg mb-6 font-medium">
-                Freshly baked, topped with love, and served with a smile. That's the QuickKart promise.
-             </p>
-             {/* Centered Footer */}
-             <footer className="text-gray-500 font-bold text-xs uppercase tracking-widest flex items-center justify-center gap-2">
-                <div className="w-8 h-[2px] bg-[var(--color-primary)]"></div> The QuickKart Kitchen
-             </footer>
+             <p className="text-4xl font-black leading-tight mb-4 tracking-tight">"Love at first <br/> <span className="text-[var(--color-primary)]">Slice.</span>"</p>
+             <p className="text-gray-600 text-lg mb-6 font-medium">Freshly baked, topped with love, and served with a smile. That's the QuickKart promise.</p>
+             <footer className="text-gray-500 font-bold text-xs uppercase tracking-widest flex items-center justify-center gap-2"><div className="w-8 h-[2px] bg-[var(--color-primary)]"></div> The QuickKart Kitchen</footer>
           </blockquote>
         </div>
       </div>
@@ -157,4 +127,4 @@ function ContactPage() {
   )
 }
 
-export default ContactPage
+export default ContactPage;
