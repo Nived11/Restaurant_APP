@@ -24,9 +24,9 @@ function ContactPage() {
           {error && (
             <div className="bg-red-50 border-2 border-red-100 p-4 rounded-xl flex items-center gap-3 text-red-600">
               <AlertCircle size={20} />
-              <p className="text-sm font-bold">{error}</p>
+              <p className="text-xs sm:text-sm font-bold">{error}</p>
             </div>
-          )}
+          )}  
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
