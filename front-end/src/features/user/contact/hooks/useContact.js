@@ -61,6 +61,7 @@ export const useContact = () => {
         const errMsg = response.data.message || "Failed to send message.";
         setError(errMsg);
         toast.error(errMsg);
+        scrollTop();
       }
     } catch (err) {
       const cleanError = extractErrorMessages(err);
