@@ -1,8 +1,10 @@
 import React from 'react'
+import {OrdersPage} from '../../features/admin/order'
+
 
 const Orders = () => {
   return (
-    <div>Orders</div>
+    <div><OrdersPage/></div>
   )
 }
 

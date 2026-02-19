@@ -1,104 +1,50 @@
-import { useState } from 'react';
-import { jsPDF } from "jspdf";
-import autoTable from 'jspdf-autotable';
+import { useState, useEffect } from 'react';
 
 export const useCustomer = () => {
-  // Mock Data
-  const [customers, setCustomers] = useState([
-    {
-      id: 1,
-      name: "Arun Kumar",
-      email: "arun.kumar@example.com",
-      phone: "+91 98460 12345",
-      address: "MG Road, Kochi, Kerala",
-      orders: 12,
-      status: "Active",
-      joinDate: "Jan 12, 2024",
-      totalSpent: "₹4,500" // Added for bill look
-    },
-    {
-        id: 2,
-        name: "Fathima Beevi",
-        email: "fathima.b@example.com",
-        phone: "+91 97450 98765",
-        address: "Beach Road, Calicut, Kerala",
-        orders: 5,
-        status: "Active",
-        joinDate: "Feb 05, 2024",
-        totalSpent: "₹1,200"
-    },
-    // ... mattu customers
-  ]);
-
+  // 1. States
+  const [customers, setCustomers] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("All");
+  const [isLoading, setIsLoading] = useState(true);
 
-  const filteredCustomers = customers.filter(customer =>
-    customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    customer.phone.includes(searchTerm)
-  );
+  // 2. Mock API Call (Dummy Data Loading)
+  useEffect(() => {
+    const fetchDummyData = () => {
+      setIsLoading(true);
+      
+      // ഡാറ്റ ലോഡ് ആകുന്നത് പോലെ ഒരു ചെറിയ ഡിലേ (Simulated Delay)
+      setTimeout(() => {
+        const data = [
+          { id: 1, name: "Arun Kumar", email: "arun@gmail.com", phone: "+91 9876543210", status: "Active", joinDate: "2024-01-10", orders: 12 },
+          { id: 2, name: "Sneha Reddy", email: "sneha@gmail.com", phone: "+91 9876543211", status: "Inactive", joinDate: "2023-11-05", orders: 5 },
+          { id: 3, name: "Jithin Das", email: "jithin@gmail.com", phone: "+91 9876543212", status: "Active", joinDate: "2024-02-01", orders: 8 },
+          { id: 4, name: "Meera Nair", email: "meera@gmail.com", phone: "+91 9876543213", status: "Active", joinDate: "2023-12-15", orders: 15 },
+          { id: 5, name: "Rahul Varma", email: "rahul@gmail.com", phone: "+91 9876543214", status: "Inactive", joinDate: "2024-01-20", orders: 2 }
+        ];
+        
+        setCustomers(data);
+        setIsLoading(false);
+      }, 800); // 0.8 seconds delay
+    };
 
-  const deleteCustomer = (id) => {
-    setCustomers(customers.filter(c => c.id !== id));
-  };
+    fetchDummyData();
+  }, []);
 
-  // --- 📄 PDF GENERATION LOGIC ---
-  const downloadBill = (customer) => {
-    const doc = new jsPDF();
-
-    // 1. Header (Restaurant Details)
-    doc.setFillColor(10, 10, 10); // Black Header
-    doc.rect(0, 0, 220, 40, 'F');
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(22);
-    doc.setFont('helvetica', 'bold');
-    doc.text("THE CRUNCH", 14, 20);
-    doc.setFontSize(10);
-    doc.setFont('helvetica', 'normal');
-    doc.text("Kochi, Kerala, India | +91 9876543210", 14, 30);
-
-    // 2. Title
-    doc.setTextColor(0, 0, 0);
-    doc.setFontSize(16);
-    doc.setFont('helvetica', 'bold');
-    doc.text("CUSTOMER STATEMENT", 14, 60);
-
-    // 3. Customer Details Section
-    doc.setFontSize(11);
-    doc.setFont('helvetica', 'normal');
-    doc.setDrawColor(200, 200, 200);
-    doc.line(14, 65, 196, 65); // Line
-
-    doc.text(`Name:`, 14, 75);      doc.setFont('helvetica', 'bold'); doc.text(customer.name, 40, 75);
-    doc.setFont('helvetica', 'normal');
-    doc.text(`Phone:`, 14, 82);     doc.text(customer.phone, 40, 82);
-    doc.text(`Email:`, 14, 89);     doc.text(customer.email, 40, 89);
-    doc.text(`Address:`, 14, 96);   doc.text(customer.address, 40, 96);
+  // 3. Filter Logic
+  const filteredCustomers = customers.filter(customer => {
+    const matchesSearch = 
+      customer.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+      customer.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      customer.phone.includes(searchTerm);
     
-    // 4. Details Table (Fake Invoice Table)
-    autoTable(doc, {
-      startY: 110,
-      head: [['Description', 'Value']],
-      body: [
-        ['Customer ID', `#CUST-${customer.id}`],
-        ['Status', customer.status],
-        ['Joined Date', customer.joinDate],
-        ['Total Orders Placed', customer.orders],
-        ['Total Amount Spent', customer.totalSpent || "₹0.00"], // Use mock data
-      ],
-      theme: 'grid',
-      headStyles: { fillColor: [249, 166, 2], textColor: [0,0,0], fontStyle: 'bold' }, // Yellow Header
-      styles: { fontSize: 10, cellPadding: 4 },
-    });
+    const matchesStatus = statusFilter === "All" || customer.status === statusFilter;
 
-    // 5. Footer
-    const finalY = doc.lastAutoTable.finalY + 20;
-    doc.setFontSize(10);
-    doc.setTextColor(100, 100, 100);
-    doc.text("Thank you for dining with The Crunch!", 14, finalY);
-    doc.text("This is a system generated report.", 14, finalY + 6);
+    return matchesSearch && matchesStatus;
+  });
 
-    // Save File
-    doc.save(`${customer.name.replace(/\s+/g, '_')}_Bill.pdf`);
+  // 4. Delete Handler
+  const deleteCustomer = (id) => {
+    setCustomers(prev => prev.filter(c => c.id !== id));
   };
 
   return {
@@ -107,6 +53,8 @@ export const useCustomer = () => {
     searchTerm,
     setSearchTerm,
     deleteCustomer,
-    downloadBill // Exporting the function
+    statusFilter,
+    setStatusFilter,
+    isLoading
   };
 };

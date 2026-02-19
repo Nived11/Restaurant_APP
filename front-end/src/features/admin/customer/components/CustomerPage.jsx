@@ -1,157 +1,263 @@
-import React from 'react';
-import { Search, Mail, Phone, MapPin, Download, Trash2, FileText, Plus, Filter, Users, ChevronRight, Hash, Calendar } from 'lucide-react';
+import React, { useState } from 'react';
+import { Search, Download, Trash2, Filter, Calendar, AlertTriangle, Check, X } from 'lucide-react';
 import { useCustomer } from '../hooks/useCustomer';
 
 const CustomerPage = () => {
-  const { filteredCustomers, searchTerm, setSearchTerm, deleteCustomer, downloadBill, customers } = useCustomer();
+  // useCustomer ഹുക്കിൽ നിന്ന് ആവശ്യമായവ എടുക്കുന്നു
+  const { 
+    filteredCustomers, 
+    searchTerm, 
+    setSearchTerm, 
+    deleteCustomer, 
+    customers, 
+    statusFilter, 
+    setStatusFilter 
+  } = useCustomer();
+  
+  // States
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [customerToDelete, setCustomerToDelete] = useState(null);
+  const [isFilterOpen, setIsFilterOpen] = useState(false); // ഫിൽറ്റർ മെനു കൺട്രോൾ ചെയ്യാൻ
+
+  // CSV Export: എല്ലാ കസ്റ്റമർ ഡാറ്റയും ഡൗൺലോഡ് ചെയ്യാൻ
+  const exportAllToCSV = () => {
+    const headers = "ID,Name,Email,Phone,Status,Join Date,Orders\n";
+    const csvContent = customers.map(c => 
+      `${c.id},${c.name},${c.email},${c.phone},${c.status},${c.joinDate},${c.orders}`
+    ).join("\n");
+    
+    const blob = new Blob([headers + csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `Crunch_Customers_${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const confirmDelete = () => {
+    if (customerToDelete) {
+      deleteCustomer(customerToDelete);
+      setShowDeleteModal(false);
+      setCustomerToDelete(null);
+    }
+  };
 
   return (
-    <div className="w-full min-h-screen bg-white font-sans text-[#1A1A1A]">
+    // പുറത്ത് ക്ലിക്ക് ചെയ്താൽ ഫിൽറ്റർ മെനു ക്ലോസ് ചെയ്യാൻ onClick നൽകി
+    <div className="w-full min-h-screen bg-[#FAFAFA] font-sans text-[#1A1A1A]" onClick={() => setIsFilterOpen(false)}>
       
-      {/* --- TOP NAVIGATION BAR --- */}
-      <div className="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-gray-100 px-6 py-4">
+      {/* --- HEADER --- */}
+      <div className="sticky top-0 z-40 bg-white/80 backdrop-blur-xl border-b border-gray-100 px-4 md:px-10 py-5">
         <div className="max-w-[1400px] mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-black rounded-lg flex items-center justify-center">
-              <Users size={18} className="text-white"/>
-            </div>
-            <h1 className="text-xl font-bold tracking-tight">CRM Directory</h1>
+          <div>
+            <h1 className="text-2xl md:text-3xl font-black tracking-tighter text-gray-900">
+              CUSTOMERS<span className="text-[#FFC107]">.</span>
+            </h1>
+            <p className="text-[9px] font-black text-gray-400 uppercase tracking-[0.3em] leading-none">Management Portal</p>
           </div>
           
-          <div className="flex items-center gap-3">
-            <button className="p-2 text-gray-500 hover:bg-gray-50 rounded-lg transition-all">
-              <Download size={20}/>
-            </button>
-
-          </div>
+          <button 
+            onClick={exportAllToCSV}
+            className="flex items-center gap-2 px-4 md:px-6 py-3 bg-black text-[#FFC107] rounded-2xl text-[11px] font-black shadow-xl shadow-black/10 hover:scale-105 active:scale-95 transition-all"
+          >
+            <Download size={16}/> <span className="hidden sm:inline">EXPORT MASTER DATA</span>
+          </button>
         </div>
       </div>
 
-      <div className="max-w-[1400px] mx-auto p-6">
+      <div className="max-w-[1400px] mx-auto p-4 md:p-10">
         
-        {/* --- SMART FILTERS BAR --- */}
-        <div className="flex flex-col md:flex-row items-center gap-4 mb-8">
-          <div className="relative flex-1 group">
-            <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-black transition-colors"/>
+        {/* --- SEARCH & FILTERS --- */}
+        <div className="flex flex-col md:flex-row items-center gap-4 mb-10">
+          <div className="relative flex-1 w-full group">
+            <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-[#FFC107] transition-colors"/>
             <input 
               type="text" 
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Filter by name, email or phone number..." 
-              className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-black/5 focus:border-black transition-all"
+              placeholder="Search by name, contact or email..." 
+              className="w-full pl-12 pr-4 py-4 bg-white border border-gray-100 rounded-[1.5rem] text-sm outline-none shadow-sm focus:ring-4 focus:ring-[#FFC107]/5 focus:border-[#FFC107] transition-all"
             />
           </div>
-          <div className="flex items-center gap-2">
-            <button className="px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm font-bold flex items-center gap-2 hover:bg-gray-50 transition-all">
-              <Filter size={16}/> Status: All
+
+          {/* FILTER DROPDOWN CONTAINER */}
+          <div className="relative w-full md:w-auto" onClick={(e) => e.stopPropagation()}>
+            <button 
+              onClick={() => setIsFilterOpen(!isFilterOpen)}
+              className={`w-full md:w-auto px-6 py-4 border rounded-[1.5rem] text-sm font-bold flex items-center justify-center gap-2 transition-all shadow-sm
+              ${statusFilter !== 'All' ? 'bg-black text-[#FFC107] border-black' : 'bg-white text-gray-700 border-gray-100 hover:bg-gray-50'}`}
+            >
+              <Filter size={16}/> 
+              {statusFilter === 'All' ? 'Filter' : statusFilter}
+              {statusFilter !== 'All' && (
+                <X 
+                  size={14} 
+                  onClick={(e) => { e.stopPropagation(); setStatusFilter('All'); }} 
+                  className="ml-1 hover:text-white"
+                />
+              )}
             </button>
-            <div className="h-8 w-px bg-gray-200 mx-1"></div>
-            <p className="text-xs font-bold text-gray-400 uppercase tracking-widest px-2">
-              {filteredCustomers.length} Results
-            </p>
+
+            {/* Actual Dropdown Menu */}
+            {isFilterOpen && (
+              <div className="absolute right-0 top-full mt-2 w-48 bg-white border border-gray-100 rounded-2xl shadow-xl z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                <div className="p-1">
+                  {['All', 'Active', 'Inactive'].map((status) => (
+                    <button
+                      key={status}
+                      onClick={() => { setStatusFilter(status); setIsFilterOpen(false); }}
+                      className={`w-full text-left px-4 py-3 rounded-xl text-xs font-bold flex items-center justify-between transition-colors
+                      ${statusFilter === status ? 'bg-[#FFC107]/10 text-black' : 'text-gray-500 hover:bg-gray-50'}`}
+                    >
+                      {status}
+                      {statusFilter === status && <Check size={14} className="text-[#FFC107]"/>}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
+
+          <p className="hidden md:block text-[11px] font-black text-gray-300 uppercase tracking-widest ml-4 min-w-[120px] text-right">
+            {filteredCustomers.length} Records Found
+          </p>
         </div>
 
-        {/* --- CUSTOMER GRID (Desktop) --- */}
-        <div className="hidden lg:grid grid-cols-1 border border-gray-100 rounded-2xl overflow-hidden shadow-sm">
-          {/* Table Header */}
-          <div className="grid grid-cols-12 bg-gray-50/50 border-b border-gray-100 py-4 px-6 text-[11px] font-black text-gray-400 uppercase tracking-wider">
-            <div className="col-span-4">Customer Details</div>
-            <div className="col-span-2">Status</div>
-            <div className="col-span-2">Contact Info</div>
-            <div className="col-span-2 text-center text-black/40">Engagement</div>
-            <div className="col-span-2 text-right">Actions</div>
-          </div>
+        {/* --- DESKTOP TABLE --- */}
+        <div className="hidden lg:block bg-white border border-gray-100 rounded-[2.5rem] overflow-hidden shadow-2xl shadow-gray-200/40">
+          <table className="w-full text-left">
+            <thead>
+              <tr className="bg-gray-50/50 border-b border-gray-50">
+                <th className="py-6 px-10 text-[10px] font-black text-gray-400 uppercase tracking-widest">Client Profile</th>
+                <th className="py-6 px-6 text-[10px] font-black text-gray-400 uppercase tracking-widest">Status</th>
+                <th className="py-6 px-6 text-[10px] font-black text-gray-400 uppercase tracking-widest">Engagement</th>
+                <th className="py-6 px-10 text-[10px] font-black text-gray-400 uppercase tracking-widest text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-50">
+              {filteredCustomers.length > 0 ? (
+                filteredCustomers.map((customer) => (
+                  <tr key={customer.id} className="hover:bg-gray-50/30 transition-all">
+                    <td className="py-6 px-10">
+                      <div className="flex items-center gap-5">
+                        <div className="w-14 h-14 rounded-2xl bg-[#FFC107]/10 flex items-center justify-center font-black text-[#FFC107] text-xl border border-[#FFC107]/10">
+                          {customer.name.charAt(0)}
+                        </div>
+                        <div>
+                          <h3 className="font-bold text-gray-900 text-base">{customer.name}</h3>
+                          <p className="text-[11px] text-gray-400 font-medium">{customer.email}</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="py-6 px-6">
+                      <span className={`px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest border ${
+                        customer.status === 'Active' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-gray-50 text-gray-400 border-gray-100'
+                      }`}>
+                        {customer.status}
+                      </span>
+                    </td>
+                    <td className="py-6 px-6">
+                      <div className="flex flex-col">
+                        <span className="text-sm font-black text-gray-900">{customer.orders} Orders</span>
+                        <span className="text-[10px] text-gray-400 font-bold flex items-center gap-1 uppercase">
+                          <Calendar size={10}/> Joined {customer.joinDate}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="py-6 px-10 text-right">
+                      <button 
+                        onClick={() => {
+                          setCustomerToDelete(customer.id);
+                          setShowDeleteModal(true);
+                        }}
+                        className="h-12 w-12 bg-white border border-gray-100 rounded-2xl flex items-center justify-center text-gray-300 hover:text-red-500 hover:border-red-100 hover:shadow-xl hover:shadow-red-500/10 transition-all ml-auto"
+                      >
+                        <Trash2 size={20}/>
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="4" className="py-20 text-center text-gray-400 text-sm font-bold uppercase tracking-widest">
+                    No customers found matching the selected filters.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
 
-          {/* Table Body */}
-          <div className="divide-y divide-gray-50">
-            {filteredCustomers.map((customer) => (
-              <div key={customer.id} className="grid grid-cols-12 items-center py-5 px-6 hover:bg-gray-50/30 transition-all group">
-                {/* Profile */}
-                <div className="col-span-4 flex items-center gap-4">
-                  <div className="w-11 h-11 rounded-xl bg-[#F0F0F0] flex items-center justify-center font-bold text-gray-700 border border-gray-100">
+        {/* --- MOBILE CARDS --- */}
+        <div className="lg:hidden space-y-4">
+          {filteredCustomers.length > 0 ? (
+            filteredCustomers.map(customer => (
+              <div key={customer.id} className="bg-white border border-gray-100 rounded-[2rem] p-6 shadow-sm">
+                <div className="flex items-center gap-4 mb-6">
+                  <div className="w-14 h-14 rounded-2xl bg-[#FFC107]/10 flex items-center justify-center font-black text-[#FFC107] text-xl border border-[#FFC107]/20">
                     {customer.name.charAt(0)}
                   </div>
-                  <div>
-                    <h3 className="font-bold text-[15px]">{customer.name}</h3>
-                    <div className="flex items-center gap-2 text-xs text-gray-400 font-medium">
-                      <Hash size={10}/> ID-00{customer.id} <span className="text-gray-200">•</span> <Calendar size={10}/> {customer.joinDate}
-                    </div>
+                  <div className="flex-1">
+                    <h4 className="font-bold text-gray-900">{customer.name}</h4>
+                    <p className={`text-[10px] font-bold ${customer.status === 'Active' ? 'text-emerald-500' : 'text-gray-400'}`}>
+                      {customer.status} User
+                    </p>
                   </div>
-                </div>
-
-                {/* Status Badge */}
-                <div className="col-span-2">
-                  <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wide border ${
-                    customer.status === 'Active' 
-                    ? 'bg-white text-emerald-600 border-emerald-100 shadow-sm shadow-emerald-50' 
-                    : 'bg-white text-gray-400 border-gray-100'
-                  }`}>
-                    {customer.status}
-                  </span>
-                </div>
-
-                {/* Contact */}
-                <div className="col-span-2 space-y-1">
-                  <p className="text-sm font-medium text-gray-600 truncate">{customer.email}</p>
-                  <p className="text-[11px] text-gray-400 font-bold">{customer.phone}</p>
-                </div>
-
-                {/* Orders */}
-                <div className="col-span-2 text-center">
-                  <div className="inline-flex flex-col">
-                    <span className="text-lg font-black text-black">{customer.orders}</span>
-                    <span className="text-[9px] font-black text-gray-400 uppercase tracking-tighter">Orders</span>
-                  </div>
-                </div>
-
-                {/* Actions */}
-                <div className="col-span-2 flex items-center justify-end gap-2">
                   <button 
-                    onClick={() => downloadBill(customer)}
-                    className="h-10 w-10 bg-white border border-gray-200 rounded-xl flex items-center justify-center text-gray-400 hover:text-blue-600 hover:border-blue-100 transition-all"
+                    onClick={() => {
+                      setCustomerToDelete(customer.id);
+                      setShowDeleteModal(true);
+                    }}
+                    className="p-4 bg-red-50 text-red-500 rounded-2xl active:scale-90 transition-transform"
                   >
-                    <FileText size={18}/>
+                    <Trash2 size={20}/>
                   </button>
-                  <button 
-                    onClick={() => deleteCustomer(customer.id)}
-                    className="h-10 w-10 bg-white border border-gray-200 rounded-xl flex items-center justify-center text-gray-400 hover:text-red-500 hover:border-red-100 transition-all"
-                  >
-                    <Trash2 size={18}/>
-                  </button>
-
+                </div>
+                <div className="flex justify-between items-center py-4 border-t border-gray-50 text-xs font-bold text-gray-500">
+                  <span>{customer.orders} Orders Total</span>
+                  <span className="text-gray-300 tracking-widest uppercase text-[9px]">ID-00{customer.id}</span>
                 </div>
               </div>
-            ))}
+            ))
+          ) : (
+            <div className="text-center py-10 text-gray-400 font-bold uppercase tracking-widest text-xs">
+              No results found.
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* --- CUSTOM DELETE MODAL --- */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/40 backdrop-blur-md">
+          <div className="bg-white rounded-[2.5rem] p-10 max-w-sm w-full shadow-2xl animate-in zoom-in-95 duration-200">
+            <div className="w-20 h-20 bg-red-50 rounded-3xl flex items-center justify-center text-red-500 mb-8 mx-auto ring-8 ring-red-50/50">
+              <AlertTriangle size={40} />
+            </div>
+            <h3 className="text-2xl font-black text-gray-900 mb-3 text-center tracking-tight">Are you sure?</h3>
+            <p className="text-gray-500 text-sm mb-10 text-center leading-relaxed font-medium">
+              You are about to remove this customer from the directory. This action is <span className="text-red-500 font-bold underline">permanent</span>.
+            </p>
+            <div className="flex flex-col gap-3">
+              <button 
+                onClick={confirmDelete}
+                className="w-full py-4 bg-red-500 text-white font-black rounded-2xl shadow-xl shadow-red-500/30 hover:bg-red-600 transition-all active:scale-95"
+              >
+                YES, DELETE NOW
+              </button>
+              <button 
+                onClick={() => setShowDeleteModal(false)}
+                className="w-full py-4 bg-gray-50 text-gray-400 font-bold rounded-2xl hover:bg-gray-100 transition-all active:scale-95"
+              >
+                CANCEL
+              </button>
+            </div>
           </div>
         </div>
+      )}
 
-        {/* --- MOBILE: MINIMAL LIST --- */}
-        <div className="lg:hidden space-y-4">
-          {filteredCustomers.map(customer => (
-            <div key={customer.id} className="bg-white border border-gray-100 rounded-2xl p-5 shadow-sm">
-              <div className="flex justify-between items-center mb-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center font-bold">{customer.name.charAt(0)}</div>
-                  <h4 className="font-bold">{customer.name}</h4>
-                </div>
-                <span className={`text-[10px] font-black uppercase ${customer.status === 'Active' ? 'text-emerald-500' : 'text-gray-300'}`}>
-                  {customer.status}
-                </span>
-              </div>
-              <div className="flex items-center gap-4 text-xs text-gray-500 mb-5">
-                <div className="flex items-center gap-1"><MapPin size={12}/> {customer.address.split(',')[0]}</div>
-                <div className="flex items-center gap-1"><FileText size={12}/> {customer.orders} Orders</div>
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <button onClick={() => downloadBill(customer)} className="py-2.5 bg-gray-900 text-white rounded-xl text-xs font-bold">Download Bill</button>
-                <button onClick={() => deleteCustomer(customer.id)} className="py-2.5 border border-gray-200 rounded-xl text-xs font-bold">Delete</button>
-              </div>
-            </div>
-          ))}
-        </div>
-
-      </div>
     </div>
   );
 };
