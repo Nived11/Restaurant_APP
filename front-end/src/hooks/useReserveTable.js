@@ -58,7 +58,6 @@ export const useReserveTable = (onSuccess) => {
     if (formData.phone.length !== 10) {
       const phoneErr = "Phone number must be exactly 10 digits.";
       setError(phoneErr);
-      toast.error(phoneErr);
       return;
     }
 
@@ -66,7 +65,6 @@ export const useReserveTable = (onSuccess) => {
     const dateError = validateDateTime();
     if (dateError) {
       setError(dateError);
-      toast.error(dateError);
       return;
     }
 
@@ -93,12 +91,10 @@ export const useReserveTable = (onSuccess) => {
       } else {
         const errMsg = response.data.message || "Failed to book table.";
         setError(errMsg);
-        toast.error(errMsg);
       }
     } catch (err) {
       const cleanError = extractErrorMessages(err);
       setError(cleanError);
-      toast.error(cleanError);
     } finally {
       setLoading(false);
     }
