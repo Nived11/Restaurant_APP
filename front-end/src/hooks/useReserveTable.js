@@ -71,7 +71,7 @@ export const useReserveTable = (onSuccess) => {
     setLoading(true);
 
     try {
-      const response = await api.post('/bookings/book/', formData);
+      const response = await api.post('/bookings/create/', formData);
 
       if (response.data.status === "success" || response.data.status === true) {
         toast.success(response.data.message || "Table booked successfully!");
