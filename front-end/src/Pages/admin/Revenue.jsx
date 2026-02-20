@@ -20,7 +20,7 @@ const transactions = [
 
 const Revenue = ({ user }) => {
   // Guard clause for access
-  if (user?.role !== "SUPER_ADMIN") {
+  if (user?.role !== "admin") {
     return (
       <div className="h-[70vh] flex flex-col items-center justify-center space-y-4 px-4 text-center">
         <h2 className="text-2xl font-black uppercase text-gray-300 tracking-tighter">Superadmin Access Only</h2>

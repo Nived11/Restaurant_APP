@@ -1,25 +1,20 @@
-import { Route, Navigate } from "react-router-dom";
-import AdminLayout from "../Layouts/AdminLayout";
-import { Dashboard, Orders, Menu, Banners, Inbox, Customers, Revenue } from "../Pages/admin";
+// src/routes/AdminRoute.jsx
+import { Navigate, Outlet } from "react-router-dom";
 
 const AdminRoute = () => {
-  const user = { name: "Designer Mode", role: "SUPER_ADMIN" };
+  // We read this EVERY time the route changes
+  const token = localStorage.getItem("admin_token");
+  const role = localStorage.getItem("admin_role");
+  const username = localStorage.getItem("admin_user");
 
-  return (
-    <Route path="/admin" element={<AdminLayout user={user} />}>
-      <Route index element={<Navigate to="/admin/dashboard" replace />} />
+  if (!token) {
+    return <Navigate to="/admin/login" replace />;
+  }
 
-      <Route path="dashboard" element={<Dashboard user={user} />} />
-      <Route path="orders" element={<Orders user={user} />} />
-      <Route path="menu" element={<Menu user={user} />} />
-      <Route path="banners" element={<Banners user={user} />} />
-      <Route path="inbox" element={<Inbox user={user} />} />
-      <Route path="customers" element={<Customers user={user} />} />
-      <Route path="revenue" element={<Revenue user={user} />} />
+  const user = { name: username, role: role };
 
-      <Route path="*" element={<Navigate to="/admin/dashboard" replace />} />
-    </Route>
-  );
+  // Passing user through context is good, but ensure Layout receives it
+  return <Outlet context={{ user }} />;
 };
 
 export default AdminRoute;

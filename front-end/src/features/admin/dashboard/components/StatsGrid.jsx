@@ -1,13 +1,15 @@
 import React from "react";
+import { useOutletContext } from "react-router-dom";
 import { ShoppingBag, Clock, Users, DollarSign } from "lucide-react";
 
-export default function StatsGrid({ user }) {
-  const isSuperAdmin = user?.role === "SUPER_ADMIN";
+export default function StatsGrid() {
+  const { user } = useOutletContext();
+  const isAdmin = user?.role === "admin";
   const stats = [
     { title: "Total Orders", value: "8,245", icon: <ShoppingBag />, color: "bg-[#1A1A1A]", show: true },
     { title: "Pending Dispatch", value: "05", icon: <Clock />, color: "bg-rose-500", show: true },
     { title: "Active Customers", value: "1,240", icon: <Users />, color: "bg-blue-600", show: true },
-    { title: "Total Revenue", value: "₹ 1,18,450", icon: <DollarSign />, color: "bg-emerald-600", show: isSuperAdmin },
+    { title: "Total Revenue", value: "₹ 1,18,450", icon: <DollarSign />, color: "bg-emerald-600", show: isAdmin },
   ];
 
   return (

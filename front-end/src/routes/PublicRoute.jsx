@@ -1,16 +1,12 @@
-import { Route } from "react-router-dom";
+import { Outlet } from "react-router-dom";
 import PublicLayout from "../Layouts/PublicLayout";
-import { Home, Cart, Menu, About, Contact, Profile } from "../Pages/user";
 
-const PublicRoute = () => (
-  <Route path="/" element={<PublicLayout />}>
-    <Route index element={<Home />} />
-    <Route path="cart" element={<Cart />} />
-    <Route path="menu" element={<Menu />} />
-    <Route path="about" element={<About />} />
-    <Route path="contact" element={<Contact />} />
-    <Route path="profile" element={<Profile />} />
-  </Route>
-);
+const PublicRoute = () => {
+  return (
+    <Route path="/" element={<PublicLayout />}>
+       <Outlet />
+    </Route>
+  );
+};
 
-export default PublicRoute;
+// We will simplify this and put it directly in the index.jsx below

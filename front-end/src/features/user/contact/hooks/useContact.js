@@ -2,7 +2,6 @@ import { useState } from 'react';
 import api from '../../../../api/axios';
 import { toast } from 'sonner';
 import { extractErrorMessages } from '../../../../utils/extractErrorMessages';
-import ScrollToTop from '../../../../components/common/ScrollToTop';
 
 export const useContact = () => {
   const [formData, setFormData] = useState({

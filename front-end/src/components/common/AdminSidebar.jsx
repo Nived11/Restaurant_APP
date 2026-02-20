@@ -6,9 +6,12 @@ import {
 } from "lucide-react";
 import logoWeb from "../../assets/Logo-web.png";
 import logoCrunch from "../../assets/Logocrunch.png";
+import { useAdminLogout } from "../../hooks/useAdminLogout";
+
 
 const AdminSidebar = ({ isExpanded, setIsExpanded, user, isMobile, closeMobileMenu }) => {
-  const isSuperAdmin = user?.role === "SUPER_ADMIN";
+  const isAdmin = user?.role === "admin";
+  const { handleLogout } = useAdminLogout();
   
   const navLinks = [
     { name: "Dashboard", path: "/admin/dashboard", icon: <LayoutDashboard size={20} />, show: true },
@@ -16,12 +19,13 @@ const AdminSidebar = ({ isExpanded, setIsExpanded, user, isMobile, closeMobileMe
     { name: "Inventory", path: "/admin/menu", icon: <Utensils size={20} />, show: true },
     { name: "Banners & Ads", path: "/admin/banners", icon: <Image size={20} />, show: true },
     { name: "Messages", path: "/admin/inbox", icon: <Mail size={20} />, show: true }, 
-    { name: "Customers", path: "/admin/customers", icon: <Users size={20} />, show: isSuperAdmin },
-    { name: "Analytics", path: "/admin/revenue", icon: <DollarSign size={20} />, show: isSuperAdmin },
+    { name: "Customers", path: "/admin/customers", icon: <Users size={20} />, show: isAdmin },
+    { name: "Analytics", path: "/admin/revenue", icon: <DollarSign size={20} />, show: isAdmin },
   ];
 
   const isFull = isMobile || isExpanded;
 
+ 
   return (
     <aside className={`h-screen bg-[#1A1A1A] flex flex-col z-[100] transition-all duration-500 ease-in-out relative
       ${isFull ? "w-60" : "w-24"}`}>
@@ -92,7 +96,10 @@ const AdminSidebar = ({ isExpanded, setIsExpanded, user, isMobile, closeMobileMe
 
       {/* 4. LOGOUT SECTION */}
       <div className="p-4 border-t border-white/5 bg-[#1A1A1A] flex-shrink-0">
-        <button className={`
+        <button 
+          onClick={handleLogout}
+        
+        className={`
           flex items-center bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white 
           rounded-2xl transition-all duration-300 py-4 cursor-pointer relative group
           ${isFull ? "px-6 w-full gap-4" : "justify-center w-full"}

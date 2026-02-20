@@ -1,10 +1,11 @@
 import React, { useState } from "react";
-import { Outlet } from "react-router-dom";
+import { useOutletContext, Outlet } from "react-router-dom";
 import AdminSidebar from "../components/common/AdminSidebar";
 import AdminHeader from "../components/common/AdminHeader";
 import { Menu, Bell } from "lucide-react";
 
-const AdminLayout = ({ user }) => {
+const AdminLayout = () => {
+  const { user } = useOutletContext();
   const [isExpanded, setIsExpanded] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
