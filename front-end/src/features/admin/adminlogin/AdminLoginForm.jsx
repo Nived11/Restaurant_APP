@@ -23,7 +23,7 @@ const AdminLoginForm = () => {
         <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-primary/10 rounded-full blur-[120px] opacity-50" />
         
         <div className="relative z-10 w-full max-w-sm text-center lg:text-left">
-          <div className="mb-6">
+          <div className="mb-0">
             <img src={Logo} alt="Logo" className="h-20 w-auto" />
           </div>
           
@@ -70,7 +70,7 @@ const AdminLoginForm = () => {
         <div className="absolute bottom-10 left-12 flex items-center gap-6 opacity-30 font-mono">
             <div className="flex flex-col">
                 <span className="text-[7px] text-gray-400 uppercase tracking-tighter">Terminal</span>
-                <span className="text-[9px] text-white tracking-widest uppercase font-bold">NODE_01_ACTIVE</span>
+                <span className="text-[9px] text-white tracking-widest uppercase font-bold">$log</span>
             </div>
             <div className="flex flex-col border-l border-white/10 pl-6">
                 <span className="text-[7px] text-gray-400 uppercase tracking-tighter">Identity</span>
@@ -84,7 +84,7 @@ const AdminLoginForm = () => {
         
         {/* MOBILE ONLY LOGO TOP */}
         <div className="lg:hidden flex flex-col items-center mb-10 text-center">
-            <img src={Logo} alt="Logo" className="h-14 w-auto mb-4" />
+            <img src={Logo} alt="Logo" className="h-15 w-auto mb-0" />
             <h2 className="text-2xl font-black text-white uppercase tracking-tighter italic">The <span className="text-primary">Crunch</span></h2>
             <div className="w-8 h-[1px] bg-primary/50 mt-1" />
         </div>
