@@ -1,7 +1,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Phone, User, Mail, Loader2 } from "lucide-react";
 import Logo from "../../assets/Logo-web.png";
-import { useReserveTable } from "../../hooks/useReserveTable"; 
+import { useReserveTable } from "../../hooks/useReserveTable";
 
 const ReserveTable = ({ isOpen, onClose }) => {
   const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
@@ -51,7 +51,7 @@ const ReserveTable = ({ isOpen, onClose }) => {
               <h2 className="text-lg md:text-3xl font-black uppercase tracking-tight">
                 Table <span className="text-primary italic">Reservation</span>
               </h2>
-              
+
               {error && (
                 <motion.p initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="text-red-500 text-[10px] md:text-xs font-bold mt-2 bg-red-50 py-1 px-3 rounded-full inline-block">
                   {error}
@@ -73,16 +73,16 @@ const ReserveTable = ({ isOpen, onClose }) => {
                   <label className="text-[9px] md:text-[10px] font-black uppercase text-gray-400 ml-1">Phone (10 Digits)</label>
                   <div className="relative">
                     <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-primary" size={14} />
-                    <input 
-                      name="phone" 
-                      value={formData.phone} 
-                      onChange={handleChange} 
-                      required 
+                    <input
+                      name="phone"
+                      value={formData.phone}
+                      onChange={handleChange}
+                      required
                       type="text"
                       inputMode="numeric" // Mobile numeric keyboard
                       pattern="[0-9]*"   // Only numbers
-                      placeholder="Enter 10-digit phone number" 
-                      className="w-full pl-10 pr-4 py-2.5 md:py-3.5 bg-gray-50 border border-gray-100 rounded-xl focus:ring-2 focus:ring-primary/50 outline-none font-bold text-xs" 
+                      placeholder="Enter 10-digit phone number"
+                      className="w-full pl-10 pr-4 py-2.5 md:py-3.5 bg-gray-50 border border-gray-100 rounded-xl focus:ring-2 focus:ring-primary/50 outline-none font-bold text-xs"
                     />
                   </div>
                 </div>
@@ -126,11 +126,11 @@ const ReserveTable = ({ isOpen, onClose }) => {
               </div>
 
               <motion.button
-  whileHover={!loading ? { scale: 1.01 } : undefined}
-  whileTap={!loading ? { scale: 0.99 } : undefined}
-  disabled={loading}
-  type="submit"
-  className={`
+                whileHover={!loading ? { scale: 1.01 } : undefined}
+                whileTap={!loading ? { scale: 0.99 } : undefined}
+                disabled={loading}
+                type="submit"
+                className={`
     w-full md:max-w-xs mx-auto
     flex items-center justify-center gap-2
     bg-primary text-white
@@ -140,13 +140,13 @@ const ReserveTable = ({ isOpen, onClose }) => {
     shadow-lg shadow-primary/20
     transition-all
     ${loading
-      ? 'opacity-90 cursor-not-allowed brightness-90 pointer-events-none'
-      : 'hover:brightness-105 cursor-pointer'}
+                    ? 'opacity-90 cursor-not-allowed brightness-90 pointer-events-none'
+                    : 'hover:brightness-105 cursor-pointer'}
   `}
->
-  {loading && <Loader2 size={14} className="animate-spin" />}
-  {loading ? "Booking..." : "Confirm Booking"}
-</motion.button>
+              >
+                {loading && <Loader2 size={14} className="animate-spin" />}
+                {loading ? "Booking..." : "Confirm Booking"}
+              </motion.button>
             </form>
           </motion.div>
         </div>

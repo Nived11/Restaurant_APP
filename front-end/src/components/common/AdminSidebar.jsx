@@ -2,7 +2,7 @@ import { NavLink } from "react-router-dom";
 import { 
   LayoutDashboard, ShoppingBag, Utensils, 
   Image, Users, DollarSign, LogOut, Mail, 
-  ChevronLeft, ChevronRight, X 
+  ChevronLeft, ChevronRight, X ,BookIcon
 } from "lucide-react";
 import logoWeb from "../../assets/Logo-web.png";
 import logoCrunch from "../../assets/Logocrunch.png";
@@ -17,7 +17,7 @@ const AdminSidebar = ({ isExpanded, setIsExpanded, user, isMobile, closeMobileMe
     { name: "Dashboard", path: "/admin/dashboard", icon: <LayoutDashboard size={20} />, show: true },
     { name: "Live Orders", path: "/admin/orders", icon: <ShoppingBag size={20} />, show: true },
     { name: "Inventory", path: "/admin/menu", icon: <Utensils size={20} />, show: true },
-    { name: "Banners & Ads", path: "/admin/banners", icon: <Image size={20} />, show: true },
+    { name: "Bookings", path: "/admin/bookings", icon: <BookIcon size={20} />, show: true },
     { name: "Messages", path: "/admin/inbox", icon: <Mail size={20} />, show: true }, 
     { name: "Customers", path: "/admin/customers", icon: <Users size={20} />, show: isAdmin },
     { name: "Analytics", path: "/admin/revenue", icon: <DollarSign size={20} />, show: isAdmin },

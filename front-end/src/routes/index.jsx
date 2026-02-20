@@ -6,7 +6,7 @@ import PublicLayout from "../Layouts/PublicLayout";
 // Pages
 import { Login, Signup, Otp, AdminLogin } from "../Pages/auth";
 import { Home, Cart, Menu as UserMenu, About, Contact, Profile } from "../Pages/user";
-import { Dashboard, Orders, Menu as AdminMenu, Banners, Inbox, Customers, Revenue } from "../Pages/admin";
+import { Dashboard, Orders, Menu as AdminMenu, Bookings, Inbox, Customers, Revenue } from "../Pages/admin";
 import NotFound from "../Pages/NotFound.jsx";
 
 const AppRoutes = () => {
@@ -43,7 +43,7 @@ const AppRoutes = () => {
           <Route path="dashboard" element={<Dashboard user={user} />} />
           <Route path="orders" element={<Orders user={user} />} />
           <Route path="menu" element={<AdminMenu user={user} />} />
-          <Route path="banners" element={<Banners user={user} />} />
+          <Route path="bookings" element={<Bookings user={user} />} />
           <Route path="inbox" element={<Inbox user={user} />} />
 
           {/* Role Protection: Only "admin" can enter these paths */}

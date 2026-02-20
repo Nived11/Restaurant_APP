@@ -1,7 +1,7 @@
 export {default as Dashboard}from "./Dashboard"
 export {default as Orders}from "./Orders"
 export {default as Menu}from "./Menu"
-export {default as Banners}from "./Banners"
+export {default as Bookings}from "./Bookings"
 export {default as Inbox}from "./Inbox"
 export {default as Customers}from "./Customers"
 export {default as Revenue}from "./Revenue"
