@@ -8,10 +8,8 @@ const MenuFilters = ({
   onAddCategoryClick, 
   onAddClick 
 }) => (
-  /* lg:relative: ഡെസ്ക്ടോപ്പിൽ സെർച്ച് ബാർ മുകളിലേക്ക് മാറ്റാൻ ഇത് ആവശ്യമാണ് */
   <div className="relative flex flex-col gap-4">
     
-    {/* 1. Add Buttons: മൊബൈലിൽ ഏറ്റവും മുകളിൽ വരാൻ ഇതിനെ ആദ്യത്തെ ഡിവാക്കി */}
     <div className="flex flex-nowrap items-center gap-2 w-full md:justify-end lg:hidden">
       <button 
         onClick={onAddCategoryClick} 
@@ -27,14 +25,13 @@ const MenuFilters = ({
       </button>
     </div>
 
-    {/* 2. Search Bar: മൊബൈലിൽ ബട്ടണുകൾക്ക് താഴെ വരും, ഡെസ്ക്ടോപ്പിൽ മുകളിൽ (Header-ന്റെ വശത്ത്) പോകും */}
     <div className="lg:absolute lg:-top-[76px] lg:right-0 w-full lg:w-96">
       <div className="relative">
         <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={18} />
         <input 
           type="text" 
           placeholder="Search products..."
-          className="w-full bg-white border border-primary rounded-2xl py-3.5 pl-12 pr-4 text-sm font-bold shadow-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+          className="w-full bg-white border border-primary rounded-2xl py-3 pl-12 pr-4 text-sm font-bold shadow-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
         />

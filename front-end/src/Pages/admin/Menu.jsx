@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Filter, ArrowLeft } from "lucide-react";
-import { MenuHeader, MenuGrid, MenuFilters, MenuFormModal , CategoryFormModal} from "../../features/admin/menu";
+import { MenuHeader, MenuGrid, MenuFilters, MenuFormModal, CategoryFormModal } from "../../features/admin/menu";
 import { useMenu } from "../../features/admin/menu/hooks/useMenu";
 import { useCategory } from "../../features/admin/menu/hooks/useCategory";
 
@@ -14,21 +14,6 @@ const Menu = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const sections = ["All", "Banner", "Combo Menu", "Best Seller", "Today's Special", "Others"];
 
-  const handleFormSubmit = (e) => {
-    handleSubmit(e);
-    setView("list");
-  };
-
-  const handleEditItem = (item) => {
-    handleEdit(item);
-    setView("add");
-  };
-
-  const handleBack = () => {
-    resetForm();
-    setView("list");
-  };
-
   const filteredItems = items.filter(item => {
     const matchesSection = activeSection === "All" || item.section === activeSection;
     const matchesCategory = activeCategory === "All" || item.category === activeCategory;
@@ -36,67 +21,38 @@ const Menu = () => {
     return matchesSection && matchesCategory && matchesSearch;
   });
 
-  if (view === "add") {
-    return (
-      <div className="max-w-full min-h-screen bg-white rounded-t-[2rem] pb-20 px-4 sm:px-8 animate-in slide-in-from-right duration-300">
-        <div className="pt-8">
-          <button 
-            onClick={handleBack}
-            className="flex items-center gap-2 text-slate-500 hover:text-slate-900 font-black uppercase text-[10px] tracking-widest transition-all mb-6"
-          >
+  return (
+    <div className="max-w-full min-h-screen bg-white rounded-t-[2rem] pb-20 px-4 sm:px-8">
+      {view === "list" ? (
+        <>
+          <div className="pt-8 flex flex-col gap-8">
+            <MenuHeader />
+            <MenuFilters 
+              sections={sections} activeSection={activeSection} setActiveSection={setActiveSection}
+              categories={categories} activeCategory={activeCategory} setActiveCategory={setActiveCategory}
+              searchQuery={searchQuery} setSearchQuery={setSearchQuery}
+              onAddCategoryClick={() => setIsCatModalOpen(true)}
+              onAddClick={() => setView("add")}
+            />
+          </div>
+          <MenuGrid items={filteredItems} onEdit={(item) => { handleEdit(item); setView("add"); }} onDelete={handleDelete} />
+        </>
+      ) : (
+        <div className="pt-8 animate-in slide-in-from-right duration-300">
+          <button onClick={() => { resetForm(); setView("list"); }} className="flex items-center gap-2 text-slate-500 font-black uppercase text-[10px] mb-6">
             <ArrowLeft size={18} /> Back to Menu
           </button>
-          
-          <div className="mb-10">
-            <h2 className="text-2xl sm:text-3xl font-black uppercase tracking-tight text-slate-900">
-              {editingId ? "Edit" : "Add New"} <span className="text-primary">Product</span>
-            </h2>
-            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em]">Product Details & Configuration</p>
-          </div>
-
           <MenuFormModal 
-            isPage={true} 
             formData={formData} setFormData={setFormData} editingId={editingId}
             sections={sections} categories={categories} fileInputRef={fileInputRef}
-            handleImageChange={handleImageChange} onClose={handleBack} onSubmit={handleFormSubmit}
+            handleImageChange={handleImageChange} onClose={() => setView("list")} 
+            onSubmit={(e) => { handleSubmit(e); setView("list"); }}
           />
         </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="max-w-full min-h-screen bg-white rounded-t-[2rem] pb-20 px-4 sm:px-8 animate-in fade-in duration-300">
-      <div className="pt-8 flex flex-col gap-8">
-        <MenuHeader />
-        
-        <MenuFilters 
-          sections={sections} 
-          activeSection={activeSection} 
-          setActiveSection={setActiveSection}
-          categories={categories} 
-          activeCategory={activeCategory} 
-          setActiveCategory={setActiveCategory}
-          searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
-          onAddCategoryClick={() => setIsCatModalOpen(true)}
-          onAddClick={() => setView("add")}
-        />
-      </div>
-
-      <div className="mt-10">
-        {filteredItems.length > 0 ? (
-          <MenuGrid items={filteredItems} onEdit={handleEditItem} onDelete={handleDelete} />
-        ) : (
-          <div className="flex flex-col items-center justify-center py-40">
-              <Filter className="text-gray-300 mb-4" size={60} />
-              <p className="text-md font-black text-gray-400 uppercase tracking-widest">No products found</p>
-          </div>
-        )}
-      </div>
+      )}
 
       {isCatModalOpen && (
-        <CategoryFormModal onClose={() => setIsCatModalOpen(false)} onSave={addCategory} />
+        <CategoryFormModal onClose={() => setIsCatModalOpen(false)} />
       )}
     </div>
   );
