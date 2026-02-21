@@ -1,117 +1,98 @@
-import React, { useState, useRef } from "react";
-import { Filter } from "lucide-react";
-import { MenuHeader, InventoryGrid, MenuFormModal } from "../../features/admin/menu";
+import React, { useState } from "react";
+import { Filter, ArrowLeft } from "lucide-react";
+import { MenuHeader, MenuGrid, MenuFilters, MenuFormModal , CategoryFormModal} from "../../features/admin/menu"; // Note: MenuFormModal is now used as a page content
+import { useMenu } from "../../features/admin/menu/hooks/useMenu";
+import { useCategory } from "../../features/admin/menu/hooks/useCategory";
 
 const Menu = () => {
-  const [items, setItems] = useState([]);
-  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [view, setView] = useState("list"); // 'list' or 'add'
+  const { items, formData, setFormData, editingId, fileInputRef, handleImageChange, handleSubmit, handleEdit, handleDelete, resetForm } = useMenu();
+  const { categories, isCatModalOpen, setIsCatModalOpen, addCategory } = useCategory();
+
   const [activeSection, setActiveSection] = useState("All");
+  const [activeCategory, setActiveCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
-  const [editingId, setEditingId] = useState(null);
-  const fileInputRef = useRef(null);
+  const sections = ["All", "Banner", "Combo Menu", "Best Seller", "Today's Special", "Others"];
 
-  // Configuration
-  const sections = ["All","Banner", "Combo Menu", "Best Seller", "Today's Special", "Others"];
-  const categories = ["Burger", "Pizza", "Cake", "Loaded Fries", "Beverages", "Sides", "Pasta"];
-
-  // Form State
-  const [formData, setFormData] = useState({
-    name: "",
-    description: "",
-    section: "Today's Special",
-    category: "Burger",
-    actualPrice: "",
-    discountPrice: "",
-    quantity: "",
-    image: null,
-    previewUrl: null,
-    isVeg: true,
-  });
-
-  // Handlers
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setFormData({
-        ...formData,
-        image: file,
-        previewUrl: URL.createObjectURL(file)
-      });
-    }
+  // Form handling with View change
+  const handleFormSubmit = (e) => {
+    handleSubmit(e);
+    setView("list");
   };
 
-  const resetForm = () => {
-    setFormData({ 
-      name: "", description: "", section: "Today's Special", 
-      category: "Burger", actualPrice: "", discountPrice: "", 
-      quantity: "", image: null, previewUrl: null, isVeg: true 
-    });
-    setEditingId(null);
-    setIsFormOpen(false);
+  const handleEditItem = (item) => {
+    handleEdit(item);
+    setView("add");
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const newItem = { ...formData, id: editingId || Date.now() };
-    if (editingId) {
-      setItems(items.map(item => item.id === editingId ? newItem : item));
-    } else {
-      setItems([...items, newItem]);
-    }
+  const handleBack = () => {
     resetForm();
+    setView("list");
   };
 
-  const handleEdit = (item) => {
-    setFormData(item);
-    setEditingId(item.id);
-    setIsFormOpen(true);
-  };
-
-  const handleDelete = (id) => setItems(items.filter(i => i.id !== id));
-
-  // Filtering Logic
   const filteredItems = items.filter(item => {
     const matchesSection = activeSection === "All" || item.section === activeSection;
-    const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          item.category.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesSection && matchesSearch;
+    const matchesCategory = activeCategory === "All" || item.category === activeCategory;
+    const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesSection && matchesCategory && matchesSearch;
   });
 
+  // --- VIEW 1: ADD/EDIT ITEM PAGE ---
+  if (view === "add") {
+    return (
+      <div className="max-w-full min-h-screen bg-white rounded-t-[2rem] pb-20 px-4 sm:px-8 animate-in slide-in-from-right duration-300">
+        <div className="pt-8">
+          <button 
+            onClick={handleBack}
+            className="flex items-center gap-2 text-slate-500 hover:text-slate-900 font-black uppercase text-[10px] tracking-widest transition-all mb-6"
+          >
+            <ArrowLeft size={18} /> Back to Menu
+          </button>
+          
+          <div className="mb-10">
+            <h2 className="text-2xl sm:text-3xl font-black uppercase tracking-tight text-slate-900">
+              {editingId ? "Edit" : "Add New"} <span className="text-primary">Product</span>
+            </h2>
+            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em]">Product Details & Configuration</p>
+          </div>
+
+          <MenuFormModal 
+            isPage={true} // New prop to handle page styling
+            formData={formData} setFormData={setFormData} editingId={editingId}
+            sections={sections} categories={categories} fileInputRef={fileInputRef}
+            handleImageChange={handleImageChange} onClose={handleBack} onSubmit={handleFormSubmit}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  // --- VIEW 2: MENU LIST PAGE ---
   return (
-    <div className="max-w-full min-h-screen bg-white rounded-tl-[2rem] rounded-tr-[2rem] pb-20 font-sans px-4 sm:px-8">
-      <div className="pt-8">
-        <MenuHeader 
-          searchQuery={searchQuery} 
-          setSearchQuery={setSearchQuery} 
-          onAddClick={() => setIsFormOpen(true)} 
-          sections={sections}             
-          activeSection={activeSection}   
-          setActiveSection={setActiveSection} 
+    <div className="max-w-full min-h-screen bg-white rounded-t-[2rem] pb-20 px-4 sm:px-8 animate-in fade-in duration-300">
+      <div className="pt-8 flex flex-col gap-6">
+        <MenuHeader searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+        
+        <MenuFilters 
+          sections={sections} activeSection={activeSection} setActiveSection={setActiveSection}
+          categories={categories} activeCategory={activeCategory} setActiveCategory={setActiveCategory}
+          onAddCategoryClick={() => setIsCatModalOpen(true)}
+          onAddClick={() => setView("add")}
         />
       </div>
 
       {filteredItems.length > 0 ? (
-        <InventoryGrid items={filteredItems} onEdit={handleEdit} onDelete={handleDelete} />
+        <MenuGrid items={filteredItems} onEdit={handleEditItem} onDelete={handleDelete} />
       ) : (
         <div className="flex flex-col items-center justify-center py-40">
-           <Filter className="mx-auto text-gray-400 mb-4" size={60} />
-           <p className="text-md sm:text-2xl font-black text-gray-400 uppercase tracking-widest">No matching products</p>
+           <Filter className="text-gray-300 mb-4" size={60} />
+           <p className="text-md font-black text-gray-400 uppercase tracking-widest">No products found</p>
         </div>
       )}
 
-      {/* FIXED: Passing all required props to the Modal */}
-      {isFormOpen && (
-        <MenuFormModal 
-          formData={formData}
-          setFormData={setFormData}
-          editingId={editingId}
-          sections={sections}
-          categories={categories}
-          fileInputRef={fileInputRef}
-          handleImageChange={handleImageChange}
-          onClose={resetForm}
-          onSubmit={handleSubmit}
-        />
+      {/* Category Modal stays as a popup as it's a small action */}
+      {isCatModalOpen && (
+        <CategoryFormModal onClose={() => setIsCatModalOpen(false)} onSave={addCategory} />
       )}
     </div>
   );

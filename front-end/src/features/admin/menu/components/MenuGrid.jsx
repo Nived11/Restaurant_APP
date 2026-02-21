@@ -119,7 +119,7 @@ const ProductCard = ({ item, onEdit, onDelete }) => {
   );
 };
 
-const InventoryGrid = ({ items, onEdit, onDelete }) => {
+const MenuGrid = ({ items, onEdit, onDelete }) => {
   if (items.length === 0) {
     return (
       <div className="mt-12 text-center py-24 bg-slate-50 rounded-[3rem] border-2 border-slate-200 border-dashed mx-4">
@@ -144,4 +144,4 @@ const InventoryGrid = ({ items, onEdit, onDelete }) => {
   );
 };
 
-export default InventoryGrid;
+export default MenuGrid;

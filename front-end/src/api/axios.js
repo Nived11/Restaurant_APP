@@ -33,6 +33,7 @@ api.interceptors.response.use(
         }
       } catch (refreshError) {
         localStorage.clear();
+        toast.error('Session expired. Please login again.');
         window.location.href = '/admin/login';
       }
     }
