@@ -20,7 +20,7 @@ const AdminSidebar = ({ isExpanded, setIsExpanded, user, isMobile, closeMobileMe
     { name: "Bookings", path: "/admin/bookings", icon: <BookIcon size={20} />, show: true },
     { name: "Messages", path: "/admin/inbox", icon: <Mail size={20} />, show: true }, 
     { name: "Customers", path: "/admin/customers", icon: <Users size={20} />, show: isAdmin },
-    { name: "Analytics", path: "/admin/revenue", icon: <DollarSign size={20} />, show: isAdmin },
+    { name: "Revenue", path: "/admin/revenue", icon: <DollarSign size={20} />, show: isAdmin },
   ];
 
   const isFull = isMobile || isExpanded;

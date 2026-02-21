@@ -11,7 +11,7 @@ const Menu = () => {
   const fileInputRef = useRef(null);
 
   // Configuration
-  const sections = ["All", "Combo Menu", "Best Seller", "Today's Special", "Others"];
+  const sections = ["All","Banner", "Combo Menu", "Best Seller", "Today's Special", "Others"];
   const categories = ["Burger", "Pizza", "Cake", "Loaded Fries", "Beverages", "Sides", "Pasta"];
 
   // Form State
