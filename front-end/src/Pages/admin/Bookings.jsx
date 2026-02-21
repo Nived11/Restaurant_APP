@@ -185,7 +185,7 @@ const Bookings = () => {
                   </tr>
                 )}
               </tbody>
-            </table>
+            </table>  
           </div>
         </div>
 
