@@ -1,9 +1,7 @@
 import React, { useState, useRef } from "react";
 import { X, Upload } from "lucide-react";
-import { useCategory } from "../hooks/useCategory"; // ഹുക്ക് ഇമ്പോർട്ട് ചെയ്യുക
 
-const CategoryFormModal = ({ onClose }) => {
-  const { addCategory, loading, error } = useCategory(); // ഹുക്കിൽ നിന്ന് സ്റ്റേറ്റുകൾ എടുക്കുക
+const CategoryFormModal = ({ onClose, onSave, loading, error }) => {
   const [catName, setCatName] = useState("");
   const [image, setImage] = useState(null);
   const [preview, setPreview] = useState(null);
@@ -19,10 +17,7 @@ const CategoryFormModal = ({ onClose }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // ഹുക്കിലെ ഫംഗ്‌ഷൻ നേരിട്ട് കോൾ ചെയ്യുന്നു
-    await addCategory({ name: catName, image });
-    // സക്സസ് ആണെങ്കിൽ മാത്രം ക്ലോസ് ചെയ്യും (ഹുക്കിൽ setIsCatModalOpen(false) ഉള്ളതിനാൽ ഇത് ഓപ്ഷണലാണ്)
-    if (!error) onClose();
+    await onSave({ name: catName, image });
   };
 
   return (

@@ -9,7 +9,6 @@ export const useCategory = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // 1. Fetch Categories (GET)
   const fetchCategories = async () => {
     try {
       const response = await api.get('/inventory/categories/');
@@ -23,8 +22,11 @@ export const useCategory = () => {
     fetchCategories();
   }, []);
 
-  // 2. Add Category (POST)
   const addCategory = async (newCat) => {
+    if (!newCat.name.trim()) {
+      setError("Category name is required");
+      return false;
+    }
     setLoading(true);
     setError("");
     try {
@@ -38,7 +40,7 @@ export const useCategory = () => {
 
       if (response.status === 201 || response.data) {
         toast.success("Category added successfully!");
-        setCategories((prev) => [...prev, response.data]); // Update list immediately
+        setCategories((prev) => [...prev, response.data]);
         setIsCatModalOpen(false);
         return true;
       }

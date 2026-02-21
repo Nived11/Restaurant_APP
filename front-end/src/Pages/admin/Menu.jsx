@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Filter, ArrowLeft } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { MenuHeader, MenuGrid, MenuFilters, MenuFormModal, CategoryFormModal } from "../../features/admin/menu";
 import { useMenu } from "../../features/admin/menu/hooks/useMenu";
 import { useCategory } from "../../features/admin/menu/hooks/useCategory";
@@ -7,7 +7,7 @@ import { useCategory } from "../../features/admin/menu/hooks/useCategory";
 const Menu = () => {
   const [view, setView] = useState("list"); 
   const { items, formData, setFormData, editingId, fileInputRef, handleImageChange, handleSubmit, handleEdit, handleDelete, resetForm } = useMenu();
-  const { categories, isCatModalOpen, setIsCatModalOpen, addCategory } = useCategory();
+  const { categories, isCatModalOpen, setIsCatModalOpen, addCategory, loading, error } = useCategory();
 
   const [activeSection, setActiveSection] = useState("All");
   const [activeCategory, setActiveCategory] = useState("All");
@@ -20,6 +20,11 @@ const Menu = () => {
     const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesSection && matchesCategory && matchesSearch;
   });
+
+  const handleProductSubmit = async (e) => {
+    const success = await handleSubmit(e);
+    if (success !== false) setView("list");
+  };
 
   return (
     <div className="max-w-full min-h-screen bg-white rounded-t-[2rem] pb-20 px-4 sm:px-8">
@@ -46,13 +51,18 @@ const Menu = () => {
             formData={formData} setFormData={setFormData} editingId={editingId}
             sections={sections} categories={categories} fileInputRef={fileInputRef}
             handleImageChange={handleImageChange} onClose={() => setView("list")} 
-            onSubmit={(e) => { handleSubmit(e); setView("list"); }}
+            onSubmit={handleProductSubmit}
           />
         </div>
       )}
 
       {isCatModalOpen && (
-        <CategoryFormModal onClose={() => setIsCatModalOpen(false)} />
+        <CategoryFormModal 
+          onClose={() => setIsCatModalOpen(false)} 
+          onSave={addCategory}
+          loading={loading}
+          error={error}
+        />
       )}
     </div>
   );
