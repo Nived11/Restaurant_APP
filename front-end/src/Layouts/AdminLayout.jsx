@@ -1,47 +1,34 @@
 import React, { useState, useEffect } from "react";
-import { useOutletContext, Outlet, useNavigate } from "react-router-dom";
+import { useOutletContext, Outlet, useNavigate,useLocation } from "react-router-dom";
 import AdminSidebar from "../components/common/AdminSidebar";
 import AdminHeader from "../components/common/AdminHeader";
 import { Menu, Bell } from "lucide-react";
-import { checkTokenExpiry } from "../utils/auth"; 
+import  api  from "../api/axios";
 
 const AdminLayout = () => {
   const { user } = useOutletContext();
   const [isExpanded, setIsExpanded] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const navigate = useNavigate();
 
-  // --- STRICT AUTO LOGOUT TIMER ---
+  const location = useLocation();
+
   useEffect(() => {
-    checkTokenExpiry();
-
-    const interval = setInterval(() => {
+    const verifySession = async () => {
       const token = localStorage.getItem('admin_token');
-      
       if (!token) {
-        navigate('/admin/login');
+        window.location.href = '/admin/login';
         return;
       }
 
       try {
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        const expiryTime = payload.exp * 1000;
-        const currentTime = Date.now();
-
-        // Expire aayal udane pazhaya token clear cheythu purathakkunnu
-        if (currentTime >= expiryTime) {
-          localStorage.clear(); 
-          navigate('/admin/login');
-        }
+        await api.get('/auth/verify-session/'); 
       } catch (error) {
-        localStorage.clear();
-        navigate('/admin/login');
-      }
-    }, 5000);
 
-    return () => clearInterval(interval);
-  }, [navigate]);
-  // ------------------------------------
+      }
+    };
+
+    verifySession();
+  }, [location.pathname]);
 
   return (
     <div className="flex h-screen overflow-hidden bg-[#F8F8F8] text-[#1A1A1A] font-sans antialiased">

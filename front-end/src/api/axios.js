@@ -1,37 +1,40 @@
 import axios from 'axios';
 
-const baseURL = import.meta.env.VITE_API_URL || 'https://thechrunch-backend.onrender.com/api';
-
 const api = axios.create({
-  baseURL: baseURL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
+  baseURL: import.meta.env.VITE_API_URL || 'https://thechrunch-backend.onrender.com/api',
 });
 
-// Request Interceptor
-api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('admin_token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('admin_token');
+  if (token) config.headers.Authorization = `Bearer ${token}`;
+  return config;
+});
 
-// Response Interceptor (No refresh, just logout on 401)
 api.interceptors.response.use(
-  (response) => {
-    return response;
-  },
-  (error) => {
-    if (error.response && error.response.status === 401) {
-      localStorage.clear();
-      window.location.href = '/admin/login';
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+
+      try {
+        const refreshToken = localStorage.getItem('admin_refresh');
+        
+        const res = await axios.post(`${api.defaults.baseURL}/token/refresh/`, {
+          refresh: refreshToken,
+        });
+
+        if (res.status === 200) {
+          localStorage.setItem('admin_token', res.data.access);
+          
+          originalRequest.headers.Authorization = `Bearer ${res.data.access}`;
+          return api(originalRequest);
+        }
+      } catch (refreshError) {
+        localStorage.clear();
+        window.location.href = '/admin/login';
+      }
     }
     return Promise.reject(error);
   }
