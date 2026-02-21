@@ -1,7 +1,11 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { ChefHat, Leaf, ShieldCheck, Award, Heart } from 'lucide-react';
-import BurgerImg from "../../../assets/Chicken-Burger.jpg";
+import soup from "../../../assets/soup.jpg";
+import Rice from "../../../assets/Rice.jpg";
+
+import Food from "../../../assets/Food.webp";
+
 
 
 const FirstAbout = () => {
@@ -29,11 +33,11 @@ const FirstAbout = () => {
         {/* Mobile Story */}
         <section className="px-5 pb-12">
           <div className="flex gap-2 overflow-hidden mb-8">
-            <img src={BurgerImg} alt="Cooking" className="w-2/3 h-56 object-cover rounded-lg border border-gray-100" />
+            <img src={Rice} alt="Cooking" className="w-2/3 h-56 object-cover rounded-lg border border-gray-100" />
             <div className="w-1/3 flex flex-col gap-2">
-              <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=400&auto=format&fit=crop" alt="Food" className="h-24 object-cover rounded-lg border border-gray-100" />
+              <img src={Food} alt="Food" className="h-24 object-cover rounded-lg border border-gray-100" />
               <div className="h-full  rounded-lg flex items-center justify-center">
-                <img src={BurgerImg} alt="Cooking" className="object-cover rounded-lg border border-gray-100" />
+                <img src={soup} alt="Cooking" className="object-cover rounded-lg border border-gray-100" />
               </div>
             </div>
           </div>
@@ -99,8 +103,8 @@ const FirstAbout = () => {
           <div className="flex flex-col gap-10">
             <div className="relative">
               <div className="grid grid-cols-2 gap-4">
-                <img src="https://images.unsplash.com/photo-1556910103-1c02745a30bf?q=80&w=800&auto=format&fit=crop" alt="Chefs" className="rounded-2xl h-56 w-full object-cover shadow-md" />
-                <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=800&auto=format&fit=crop" alt="Ingredients" className="rounded-2xl h-56 w-full object-cover shadow-md mt-6" />
+                <img src={soup} alt="Chefs" className="rounded-2xl h-56 w-full object-cover shadow-md" />
+                <img src={Rice}  alt="Ingredients" className="rounded-2xl h-56 w-full object-cover shadow-md mt-6" />
               </div>
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white p-3 rounded-full shadow-lg">
                 <Heart className="w-6 h-6 text-red-500 fill-current" />
@@ -173,8 +177,8 @@ const FirstAbout = () => {
           <div className="grid grid-cols-2 gap-20 items-center">
             <div className="relative">
               <div className="grid grid-cols-2 gap-4">
-                <img src="https://images.unsplash.com/photo-1556910103-1c02745a30bf?q=80&w=1000&auto=format&fit=crop" alt="Chefs" className="rounded-2xl h-64 w-full object-cover shadow-lg hover:scale-105 transition-transform duration-500" />
-                <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=1000&auto=format&fit=crop" alt="Ingredients" className="rounded-2xl h-64 w-full object-cover shadow-lg mt-8 hover:scale-105 transition-transform duration-500" />
+                <img src={soup} alt="Chefs" className="rounded-2xl h-64 w-full object-cover shadow-lg hover:scale-105 transition-transform duration-500" />
+                <img src={Rice} alt="Ingredients" className="rounded-2xl h-64 w-full object-cover shadow-lg mt-8 hover:scale-105 transition-transform duration-500" />
               </div>
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white p-4 rounded-full shadow-xl">
                 <Heart className="w-8 h-8 text-red-500 fill-current" />
