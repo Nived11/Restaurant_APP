@@ -16,11 +16,11 @@ const AdminSidebar = ({ isExpanded, setIsExpanded, user, isMobile, closeMobileMe
   const navLinks = [
     { name: "Dashboard", path: "/admin/dashboard", icon: <LayoutDashboard size={20} />, show: true },
     { name: "Live Orders", path: "/admin/orders", icon: <ShoppingBag size={20} />, show: true },
-    { name: "Inventory", path: "/admin/menu", icon: <Utensils size={20} />, show: true },
+    { name: "Menu", path: "/admin/menu", icon: <Utensils size={20} />, show: true },
     { name: "Bookings", path: "/admin/bookings", icon: <BookIcon size={20} />, show: true },
     { name: "Messages", path: "/admin/inbox", icon: <Mail size={20} />, show: true }, 
     { name: "Customers", path: "/admin/customers", icon: <Users size={20} />, show: isAdmin },
-    { name: "Analytics", path: "/admin/revenue", icon: <DollarSign size={20} />, show: isAdmin },
+    { name: "Revenue", path: "/admin/revenue", icon: <DollarSign size={20} />, show: isAdmin },
   ];
 
   const isFull = isMobile || isExpanded;

@@ -1,10 +1,9 @@
 import React from 'react';
 import { Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react';
 import logoImg from '../../../assets/Logo-web.png'; 
-import useLogin from './useLogin'; // Hook Import ചെയ്യുന്നു
+import useLogin from './useLogin'; 
 
 const Login = () => {
-  // Hook-ൽ നിന്ന് data destructure ചെയ്യുന്നു
   const {
     email,
     setEmail,

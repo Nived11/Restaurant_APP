@@ -1,28 +1,16 @@
-import React, { useState } from "react";
-import { Search, Calendar, Clock, Phone, Mail, ChevronDown, ChevronUp, Users, AlignLeft, FilterX } from "lucide-react";
+import React from "react";
+import { BookingFilters, BookingTable, useBookings } from "../../features/admin/bookings";
 
 const Bookings = () => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filterDate, setFilterDate] = useState("");
-  const [expandedRow, setExpandedRow] = useState(null);
-
-  const bookingData = [
-    { id: 1, name: "Rahul Sharma", phone: "9876543210", email: "rahul@example.com", date: "2026-02-22", time: "07:30 PM", guests: 4, notes: "Window seat preferred for anniversary celebration. Will need extra napkins." },
-    { id: 2, name: "Anjali Nair", phone: "9988776655", email: "anjali@test.com", date: "2026-02-23", time: "01:00 PM", guests: 2, notes: "Need a high chair for a toddler and away from the speakers." },
-    { id: 3, name: "John Doe", phone: "9944332211", email: "john@crunch.com", date: "2026-02-22", time: "09:00 PM", guests: 6, notes: "Allergic to peanuts. Please inform the chef immediately." },
-    { id: 4, name: "Emily Davis", phone: "9898989898", email: "emily@web.com", date: "2026-02-24", time: "08:15 PM", guests: 3, notes: "" },
-  ];
-
-  const filteredBookings = bookingData.filter(item => 
-    (item.name.toLowerCase().includes(searchTerm.toLowerCase()) || item.phone.includes(searchTerm) || item.email.toLowerCase().includes(searchTerm.toLowerCase())) &&
-    (filterDate === "" || item.date === filterDate)
-  );
+  const {
+    searchTerm, setSearchTerm, expandedRow, toggleRow,
+    bookings, clearFilters, loading, loadingMore,
+    hasNextPage, loadMore, showLess, currentPage, error, refresh
+  } = useBookings();
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6 md:p-10 font-sans text-[#0A0A0A]">
+    <div className="min-h-screen mt-4 sm:mt-0 px-2 md:p-6 lg:p-8 font-sans text-[#0A0A0A] ">
       <div className="max-w-7xl mx-auto space-y-8">
-        
-        {/* --- HEADER SECTION --- */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
           <div>
             <h1 className="text-3xl font-black tracking-tight">Reservations</h1>
@@ -185,10 +173,26 @@ const Bookings = () => {
                   </tr>
                 )}
               </tbody>
-            </table>  
+            </table>
           </div>
+          <BookingFilters searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
         </div>
 
+        <BookingTable 
+          bookings={bookings}
+          expandedRow={expandedRow}
+          toggleRow={toggleRow}
+          clearFilters={clearFilters}
+          isFiltered={!!searchTerm} 
+          loading={loading}
+          loadingMore={loadingMore}
+          hasNextPage={hasNextPage}
+          onLoadMore={loadMore}
+          onShowLess={showLess}
+          currentPage={currentPage}
+          error={error}
+          onRetry={refresh}
+        />
       </div>
     </div>
   );
