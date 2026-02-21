@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Search, Calendar, User, Clock, Phone, Mail, Users, ChevronDown, ChevronUp, StickyNote } from "lucide-react";
+import { Search, Calendar, Clock, Phone, Mail, ChevronDown, ChevronUp, Users, AlignLeft, FilterX } from "lucide-react";
 
 const Bookings = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -10,6 +10,7 @@ const Bookings = () => {
     { id: 1, name: "Rahul Sharma", phone: "9876543210", email: "rahul@example.com", date: "2026-02-22", time: "07:30 PM", guests: 4, notes: "Window seat preferred for anniversary celebration. Will need extra napkins." },
     { id: 2, name: "Anjali Nair", phone: "9988776655", email: "anjali@test.com", date: "2026-02-23", time: "01:00 PM", guests: 2, notes: "Need a high chair for a toddler and away from the speakers." },
     { id: 3, name: "John Doe", phone: "9944332211", email: "john@crunch.com", date: "2026-02-22", time: "09:00 PM", guests: 6, notes: "Allergic to peanuts. Please inform the chef immediately." },
+    { id: 4, name: "Emily Davis", phone: "9898989898", email: "emily@web.com", date: "2026-02-24", time: "08:15 PM", guests: 3, notes: "" },
   ];
 
   const filteredBookings = bookingData.filter(item => 
@@ -18,134 +19,168 @@ const Bookings = () => {
   );
 
   return (
-    <div className="p-8 bg-[#F8F9FA] min-h-screen font-sans">
-      <div className="max-w-full mx-auto space-y-6">
+    <div className="min-h-screen bg-gray-50 p-6 md:p-10 font-sans text-[#0A0A0A]">
+      <div className="max-w-7xl mx-auto space-y-8">
         
-        {/* --- MINIMALIST HEADER --- */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b border-slate-200">
+        {/* --- HEADER SECTION --- */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
           <div>
-            <h1 className="text-xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
-              Reservation Management
-            </h1>
-            <p className="text-slate-500 text-xs font-medium mt-1 uppercase tracking-widest">Administrative Control Panel</p>
+            <h1 className="text-3xl font-black tracking-tight">Reservations</h1>
+            <p className="text-sm text-gray-500 mt-1 font-medium">Manage and view your restaurant bookings.</p>
           </div>
 
-          <div className="flex items-center gap-3">
-            <div className="relative">
-              <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={15} />
+          {/* Filters */}
+          <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
+            {/* Date Picker */}
+            <div className="relative group">
+              <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#f9a602] transition-colors" size={16} />
               <input
                 type="date"
-                className="pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-lg text-xs font-semibold text-slate-700 outline-none focus:border-primary transition-all shadow-sm"
+                className="w-full sm:w-[180px] pl-10 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-sm font-semibold text-[#0A0A0A] outline-none focus:border-[#f9a602] focus:ring-1 focus:ring-[#f9a602] transition-all shadow-sm cursor-pointer"
                 onChange={(e) => setFilterDate(e.target.value)}
               />
             </div>
 
-            <div className="relative w-72">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={15} />
+            {/* Search Bar */}
+            <div className="relative group w-full sm:w-[320px]">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#f9a602] transition-colors" size={16} />
               <input
                 type="text"
-                placeholder="Search guest registry..."
-                className="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-lg text-xs font-medium outline-none focus:border-primary transition-all shadow-sm"
+                placeholder="Search guests by name or phone..."
+                className="w-full pl-10 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-sm font-medium outline-none focus:border-[#f9a602] focus:ring-1 focus:ring-[#f9a602] transition-all shadow-sm placeholder:text-gray-400"
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
           </div>
         </div>
 
-        {/* --- ADMIN DATA TABLE --- */}
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+        {/* --- MAIN TABLE SECTION --- */}
+        <div className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
+              
+              {/* Table Header */}
               <thead>
-                <tr className="bg-slate-50/50 border-b border-slate-200">
-                  <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-wider">Guest Name</th>
-                  <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-wider">Mobile</th>
-                  <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-wider">Email Address</th>
-                  <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-wider">Date</th>
-                  <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-wider">Time</th>
-                  <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-wider text-center">Party</th>
-                  <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-wider text-right">Notes</th>
+                <tr className="bg-gray-50 border-b border-gray-200">
+                  <th className="px-8 py-5 text-[11px] font-black uppercase tracking-wider text-gray-500">Guest Name</th>
+                  <th className="px-8 py-5 text-[11px] font-black uppercase tracking-wider text-gray-500">Contact</th>
+                  <th className="px-8 py-5 text-[11px] font-black uppercase tracking-wider text-gray-500">Date & Time</th>
+                  <th className="px-8 py-5 text-[11px] font-black uppercase tracking-wider text-gray-500 text-center">Party Size</th>
+                  <th className="px-8 py-5 text-[11px] font-black uppercase tracking-wider text-gray-500 text-right">Details</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
-                {filteredBookings.length > 0 ? filteredBookings.map((booking) => (
-                  <React.Fragment key={booking.id}>
-                    <tr 
-                      onClick={() => setExpandedRow(expandedRow === booking.id ? null : booking.id)}
-                      className={`group cursor-pointer transition-colors duration-150 ${expandedRow === booking.id ? 'bg-slate-50' : 'hover:bg-slate-50/50'}`}
-                    >
-                      {/* NAME */}
-                      <td className="px-6 py-4">
-                        <span className="font-bold text-slate-900 text-sm tracking-tight">{booking.name}</span>
-                      </td>
 
-                      {/* MOBILE */}
-                      <td className="px-6 py-4">
-                        <span className="text-xs font-medium text-slate-600 flex items-center gap-2">
-                          <Phone size={12} className="text-slate-400" /> {booking.phone}
-                        </span>
-                      </td>
-
-                      {/* EMAIL */}
-                      <td className="px-6 py-4">
-                        <span className="text-xs font-medium text-slate-600 flex items-center gap-2">
-                          <Mail size={12} className="text-slate-400" /> {booking.email}
-                        </span>
-                      </td>
-
-                      {/* DATE */}
-                      <td className="px-6 py-4 text-xs font-bold text-slate-700">
-                        {booking.date}
-                      </td>
-
-                      {/* TIME */}
-                      <td className="px-6 py-4">
-                        <span className="text-xs font-bold text-slate-700 flex items-center gap-2">
-                          <Clock size={12} className="text-slate-400" /> {booking.time}
-                        </span>
-                      </td>
-
-                      {/* PARTY */}
-                      <td className="px-6 py-4 text-center">
-                        <span className="inline-block px-2 py-1 bg-slate-100 rounded text-[10px] font-bold text-slate-700">
-                          {booking.guests} PAX
-                        </span>
-                      </td>
-
-                      {/* NOTES TOGGLE */}
-                      <td className="px-6 py-4 text-right">
-                        <div className="flex items-center justify-end gap-3">
-                          {booking.notes && <StickyNote size={14} className="text-primary" />}
-                          {expandedRow === booking.id ? <ChevronUp size={16} className="text-slate-400" /> : <ChevronDown size={16} className="text-slate-400" />}
-                        </div>
-                      </td>
-                    </tr>
-
-                    {/* EXPANDED NOTE SECTION */}
-                    {expandedRow === booking.id && (
-                      <tr>
-                        <td colSpan="7" className="bg-slate-50/40 px-6 py-0">
-                          <div className="py-4 animate-in fade-in slide-in-from-top-1 duration-200">
-                            <div className="bg-white border border-slate-200 rounded-lg p-4 shadow-sm flex items-start gap-3">
-                              <div className="mt-0.5 text-primary">
-                                <StickyNote size={16} />
+              {/* Table Body */}
+              <tbody className="divide-y divide-gray-100">
+                {filteredBookings.length > 0 ? (
+                  filteredBookings.map((booking) => {
+                    const isExpanded = expandedRow === booking.id;
+                    
+                    return (
+                      <React.Fragment key={booking.id}>
+                        {/* Standard Row */}
+                        <tr 
+                          onClick={() => setExpandedRow(isExpanded ? null : booking.id)}
+                          className={`group hover:bg-[#f9a602]/5 transition-colors cursor-pointer ${isExpanded ? 'bg-[#f9a602]/10' : 'bg-white'}`}
+                        >
+                          {/* Name */}
+                          <td className="px-8 py-5">
+                            <div className="flex items-center gap-3">
+                              <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-black transition-colors ${isExpanded ? 'bg-[#0A0A0A] text-white' : 'bg-gray-100 text-[#0A0A0A] group-hover:bg-[#f9a602] group-hover:text-[#0A0A0A]'}`}>
+                                {booking.name.charAt(0)}
                               </div>
-                              <div>
-                                <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Guest Special Requests</h4>
-                                <p className="text-slate-700 text-xs font-medium leading-relaxed italic">
-                                  "{booking.notes || "No special notes recorded."}"
-                                </p>
+                              <span className="font-bold text-sm text-[#0A0A0A]">{booking.name}</span>
+                            </div>
+                          </td>
+
+                          {/* Contact */}
+                          <td className="px-8 py-5">
+                            <div className="flex flex-col gap-1.5">
+                              <div className="flex items-center gap-2 text-xs font-medium text-gray-600">
+                                <Phone size={13} className="text-gray-400" /> {booking.phone}
+                              </div>
+                              <div className="flex items-center gap-2 text-xs font-medium text-gray-500">
+                                <Mail size={13} className="text-gray-400" /> {booking.email}
                               </div>
                             </div>
-                          </div>
-                        </td>
-                      </tr>
-                    )}
-                  </React.Fragment>
-                )) : (
+                          </td>
+
+                          {/* Schedule */}
+                          <td className="px-8 py-5">
+                            <div className="flex flex-col gap-1.5">
+                              <div className="flex items-center gap-2 text-sm font-bold text-[#0A0A0A]">
+                                <Calendar size={14} className="text-[#f9a602]" /> {booking.date}
+                              </div>
+                              <div className="flex items-center gap-2 text-xs font-semibold text-gray-500">
+                                <Clock size={13} className="text-gray-400" /> {booking.time}
+                              </div>
+                            </div>
+                          </td>
+
+                          {/* Party Size */}
+                          <td className="px-8 py-5 text-center">
+                            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gray-100 text-xs font-bold text-[#0A0A0A]">
+                              <Users size={14} className="text-gray-500" /> {booking.guests} Guests
+                            </div>
+                          </td>
+
+                          {/* Actions */}
+                          <td className="px-8 py-5 text-right">
+                            <div className="flex items-center justify-end gap-4">
+                              {booking.notes && (
+                                <span className="flex items-center gap-1 text-[10px] font-black uppercase tracking-widest text-[#0A0A0A] bg-[#f9a602]/20 px-2.5 py-1 rounded-md">
+                                  Notes
+                                </span>
+                              )}
+                              <div className={`p-1.5 rounded-full transition-colors ${isExpanded ? 'bg-[#0A0A0A] text-white' : 'bg-gray-100 text-gray-400 group-hover:bg-gray-200 group-hover:text-[#0A0A0A]'}`}>
+                                {isExpanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+                              </div>
+                            </div>
+                          </td>
+                        </tr>
+
+                        {/* Expanded Notes Section */}
+                        {isExpanded && (
+                          <tr className="bg-[#f9a602]/5 border-b border-[#f9a602]/20">
+                            <td colSpan="5" className="p-0">
+                              <div className="px-8 py-6 animate-in fade-in slide-in-from-top-2 duration-300">
+                                <div className="flex items-start gap-4 p-5 bg-white border border-gray-100 rounded-xl shadow-sm">
+                                  <div className="mt-0.5 p-2 bg-[#f9a602]/10 rounded-lg text-[#f9a602]">
+                                    <AlignLeft size={18} />
+                                  </div>
+                                  <div>
+                                    <h4 className="text-xs font-black uppercase tracking-widest text-gray-400 mb-2">Special Requests & Notes</h4>
+                                    <p className="text-sm font-medium text-[#0A0A0A] leading-relaxed italic">
+                                      {booking.notes ? `"${booking.notes}"` : <span className="text-gray-400">"No special instructions provided."</span>}
+                                    </p>
+                                  </div>
+                                </div>
+                              </div>
+                            </td>
+                          </tr>
+                        )}
+                      </React.Fragment>
+                    );
+                  })
+                ) : (
+                  /* Empty State */
                   <tr>
-                    <td colSpan="7" className="py-20 text-center text-slate-400 text-xs font-bold uppercase tracking-widest italic">
-                      No matching records found
+                    <td colSpan="5">
+                      <div className="flex flex-col items-center justify-center py-24 text-center">
+                        <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4">
+                          <FilterX size={24} className="text-gray-400" />
+                        </div>
+                        <h3 className="text-base font-bold text-[#0A0A0A]">No bookings found</h3>
+                        <p className="text-sm font-medium text-gray-500 mt-1 max-w-sm">We couldn't find any reservations matching your current search criteria.</p>
+                        {(searchTerm || filterDate) && (
+                          <button 
+                            onClick={() => { setSearchTerm(""); setFilterDate(""); }}
+                            className="mt-6 px-6 py-2.5 bg-[#0A0A0A] text-white text-xs font-bold uppercase tracking-wider rounded-lg hover:bg-[#f9a602] hover:text-[#0A0A0A] transition-colors"
+                          >
+                            Clear Filters
+                          </button>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 )}
@@ -153,6 +188,7 @@ const Bookings = () => {
             </table>
           </div>
         </div>
+
       </div>
     </div>
   );
