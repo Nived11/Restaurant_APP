@@ -7,8 +7,8 @@
     const [categories, setCategories] = useState([]);
     const [isCatModalOpen, setIsCatModalOpen] = useState(false);
     const [editingCategory, setEditingCategory] = useState(null);
-    const [fetching, setFetching] = useState(true); // Initial data loading
-    const [loading, setLoading] = useState(false);  // Form submission loading
+    const [fetching, setFetching] = useState(true);
+    const [loading, setLoading] = useState(false);  
     const [error, setError] = useState("");
 
     const fetchCategories = async () => {
@@ -35,7 +35,6 @@
         const formData = new FormData();
         formData.append("name", newCat.name);
         
-        // പുതിയ ഫയൽ ഉണ്ടെങ്കിൽ മാത്രം ചേർക്കുക (PATCH നു വേണ്ടി)
         if (newCat.image instanceof File) {
           formData.append("image", newCat.image);
         }

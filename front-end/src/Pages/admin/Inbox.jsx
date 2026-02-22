@@ -1,4 +1,4 @@
-import { MessagePage } from '../../features/admin/message';
+import { MessagePage } from '../../features/admin/inbox';
 
 
 const Inbox = () => {
