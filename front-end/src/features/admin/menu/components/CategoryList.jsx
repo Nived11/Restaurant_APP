@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Edit2, Trash2, AlertTriangle, X } from "lucide-react";
 
-const CategoryList = ({ categories, onEdit, onDelete, fetching }) => {
+const CategoryList = ({ categories, onEdit, onDelete, fetching , error}) => {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [confirmDelete, setConfirmDelete] = useState(null);
   const [skeletonCount, setSkeletonCount] = useState(10);
@@ -35,6 +35,18 @@ const CategoryList = ({ categories, onEdit, onDelete, fetching }) => {
           ))}
         </div>
       </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <>
+      <div className="w-full mt-4 px-2"></div>
+        <div className=" text-red-600 rounded-lg p-4 text-center">
+          <AlertTriangle size={20} className="mx-auto mb-2" />
+          <p className="text-sm font-medium">{error}</p>
+        </div>  
+        </>
     );
   }
 

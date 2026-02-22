@@ -10,6 +10,7 @@
     const [fetching, setFetching] = useState(true);
     const [loading, setLoading] = useState(false);  
     const [error, setError] = useState("");
+    const [fetchError, setFetchError] = useState("");
 
     const fetchCategories = async () => {
       setFetching(true);
@@ -17,8 +18,7 @@
         const response = await api.get('/inventory/categories/');
         setCategories(response.data);
       } catch (err) {
-        console.error("Fetch Error:", extractErrorMessages(err));
-        toast.error("Failed to load categories");
+        setFetchError(extractErrorMessages(err));
       } finally {
         setFetching(false);
       }
@@ -89,6 +89,6 @@
     return { 
       categories, isCatModalOpen, setIsCatModalOpen, 
       addCategory, deleteCategory, handleEditCategory,
-      editingCategory, closeModal, loading, fetching, error 
+      editingCategory, closeModal, loading, fetching, error, fetchError
     };
   };

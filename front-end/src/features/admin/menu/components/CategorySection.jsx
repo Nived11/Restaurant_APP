@@ -8,7 +8,7 @@ const CategorySection = () => {
   const { 
     categories, isCatModalOpen, setIsCatModalOpen, 
     addCategory, deleteCategory, handleEditCategory, 
-    editingCategory, closeModal, loading, fetching, error 
+    editingCategory, closeModal, loading, fetching, error , fetchError
   } = useCategory();
 
   return (
@@ -29,6 +29,7 @@ const CategorySection = () => {
         categories={categories} 
         onEdit={handleEditCategory} 
         onDelete={deleteCategory} 
+        error={fetchError}
         fetching={fetching} // Pass fetching state for skeleton
       />
 
