@@ -10,7 +10,6 @@ const MenuHeader = () => (
         Inventory Control
       </p>
     </div>
-    {/* വലതുവശം കാലിയായി വിടുന്നു, അവിടെ ഫിൽട്ടറിലെ സെർച്ച് ബാർ വരും */}
     <div className="hidden lg:block w-96 h-12"></div>
   </div>
 );
