@@ -18,7 +18,7 @@ const AdminSidebar = ({ isExpanded, setIsExpanded, user, isMobile, closeMobileMe
     { name: "Live Orders", path: "/admin/orders", icon: <ShoppingBag size={20} />, show: true },
     { name: "Menu", path: "/admin/menu", icon: <Utensils size={20} />, show: true },
     { name: "Bookings", path: "/admin/bookings", icon: <BookIcon size={20} />, show: true },
-    { name: "Messages", path: "/admin/inbox", icon: <Mail size={20} />, show: true }, 
+    { name: "Inbox", path: "/admin/inbox", icon: <Mail size={20} />, show: true }, 
     { name: "Customers", path: "/admin/customers", icon: <Users size={20} />, show: isAdmin },
     { name: "Revenue", path: "/admin/revenue", icon: <DollarSign size={20} />, show: isAdmin },
   ];
