@@ -16,7 +16,7 @@ const BookingTable = ({
       ========================================== */}
       <div className="block md:hidden">
         {/* Added border, removed rounded and shadow */}
-        <div className="bg-white border border-gray-200 w-full overflow-hidden">
+        <div className="bg-white border border-gray-200 rounded-lg w-full overflow-hidden">
           <table className="w-full text-left border-collapse table-fixed">
             <thead>
               <tr className="bg-gray-50 border-b border-gray-200">
@@ -205,7 +205,7 @@ const MobileBookingRow = ({ booking, isExpanded, onToggle }) => (
       </td>
 
       {/* 3. ICON COLUMN */}
-      <td className="px-2 sm:px-3 py-3 text-right align-middle">
+      <td className="px-1 sm:px-3 py-3 text-right align-middle">
         <div className="p-1 rounded-full bg-gray-100 inline-block text-gray-500 transition-colors">
           {isExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
         </div>
