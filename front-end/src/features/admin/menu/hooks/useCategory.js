@@ -41,7 +41,6 @@
 
         let response;
         if (editingCategory) {
-          // PATCH method for partial updates
           response = await api.patch(`/inventory/categories/${editingCategory.id}/`, formData);
           setCategories(prev => prev.map(c => c.id === editingCategory.id ? response.data : c));
           fetchCategories(); 
@@ -89,6 +88,6 @@
     return { 
       categories, isCatModalOpen, setIsCatModalOpen, 
       addCategory, deleteCategory, handleEditCategory,
-      editingCategory, closeModal, loading, fetching, error, fetchError
+      editingCategory, closeModal, loading, fetching, error, fetchError,fetchCategories
     };
   };

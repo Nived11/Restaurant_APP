@@ -30,7 +30,7 @@ const CategorySection = () => {
         onEdit={handleEditCategory} 
         onDelete={deleteCategory} 
         error={fetchError}
-        fetching={fetching} // Pass fetching state for skeleton
+        fetching={fetching}
       />
 
       {isCatModalOpen && (

@@ -84,16 +84,15 @@ const CategoryList = ({ categories, onEdit, onDelete, fetching, error }) => {
               exit="exit"
               transition={{ type: "spring", damping: 28, stiffness: 220 }}
               drag={isMobile ? "y" : false}
-              dragConstraints={{ top: 0, bottom: 0 }} // Limits drag
+              dragConstraints={{ top: 0, bottom: 0 }} 
               dragElastic={{ top: 0, bottom: 0.5 }}
               onDragEnd={(_, info) => {
-                // If dragged down more than 100px OR velocity is high
                 if (info.offset.y > 100 || info.velocity.y > 500) {
                   setSelectedCategory(null);
                 }
               }}
               className="relative bg-white w-full sm:max-w-sm rounded-t-[2.5rem] sm:rounded-[2.5rem] shadow-2xl overflow-hidden touch-none sm:touch-auto"
-              onClick={(e) => e.stopPropagation()} // Prevents closing when clicking inside
+              onClick={(e) => e.stopPropagation()}
             >
               <div className="pt-6 px-6 flex flex-col items-center">
                 <div className="h-1.5 w-12 bg-slate-200 rounded-full mb-4 sm:hidden" />
