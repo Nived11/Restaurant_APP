@@ -35,7 +35,7 @@ export const useMenu = (filters) => {
         page: isLoadMore ? currentPage + 1 : 1
       };
 
-      const response = await api.get("/inventory/admin/menu-items/", { params });
+      const response = await api.get("/inventory/admin/menu-items/",   );
       const newData = response.data.results || response.data;
       
       if (isLoadMore) {

@@ -52,7 +52,6 @@ const MessagePage = () => {
         setReplyText("");
       }, 1500);
     } else {
-      alert("Failed to send reply. Check console for error.");
     }
   };
 
