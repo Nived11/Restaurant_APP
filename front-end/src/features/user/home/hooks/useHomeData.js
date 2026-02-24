@@ -7,7 +7,8 @@ const useHomeData = () => {
     banners: [],
     combos: [],
     bestSellers: [],
-    specials: []
+    specials: [],
+    categories: []
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -15,21 +16,22 @@ const useHomeData = () => {
   const fetchAllHomeData = useCallback(async () => {
     setLoading(true);
     try {
-      const [bannersRes, combosRes, bestSellersRes, specialsRes] = await Promise.all([
+      const [bannersRes, combosRes, bestSellersRes, specialsRes, categoriesRes] = await Promise.all([
         api.get("/inventory/public/menu-items/?section=BANNER"),
         api.get("/inventory/public/menu-items/?section=COMBO MENU"),
         api.get("/inventory/public/menu-items/?section=BEST SELLER"),
-        api.get("/inventory/public/menu-items/?section=TODAY'S SPECIAL")
+        api.get("/inventory/public/menu-items/?section=TODAY'S SPECIAL"),
+        api.get("/inventory/categories/") 
       ]);
 
-      // Helper function to extract array from response
       const getItems = (res) => (Array.isArray(res.data) ? res.data : res.data.results || []);
 
       setData({
         banners: getItems(bannersRes),
         combos: getItems(combosRes),
         bestSellers: getItems(bestSellersRes),
-        specials: getItems(specialsRes)
+        specials: getItems(specialsRes),
+        categories: getItems(categoriesRes) 
       });
       setError(null);
     } catch (err) {
