@@ -187,24 +187,33 @@ const MenuFormModal = ({
 
         {/* Footer */}
         <div className="px-8 py-5 border-t border-slate-200 flex gap-4 bg-slate-50 shrink-0">
-          <button 
-            disabled={loading} 
-            type="button" 
-            onClick={onClose} 
-            className="cursor-pointer px-8 py-3.5 rounded-xl text-[11px] font-black uppercase text-slate-600 hover:bg-slate-200 transition-colors border border-slate-300 bg-white"
-          >
-            Cancel
-          </button>
-          <button 
-            disabled={loading} 
-            form="product-form" 
-            type="submit" 
-            className="cursor-pointer flex-1 bg-slate-900 text-white py-3.5 rounded-xl font-black uppercase text-[11px] shadow-lg hover:bg-black disabled:opacity-70 flex items-center justify-center gap-2 transition-all active:scale-95"
-          >
-            {loading && <Loader2 size={16} className="animate-spin" />}
-            {editingId ? 'Save Changes' : 'Create New Item'}
-          </button>
-        </div>
+  <button 
+    disabled={loading} 
+    type="button" 
+    onClick={onClose} 
+    className={`px-8 py-3.5 rounded-xl text-[11px] font-black uppercase text-slate-600 transition-colors border border-slate-300 bg-white 
+      ${loading ? 'opacity-50 pointer-events-none' : 'hover:bg-slate-200 cursor-pointer'}`}
+  >
+    Cancel
+  </button>
+  
+  <button 
+    disabled={loading} 
+    form="product-form" 
+    type="submit" 
+    className={`flex-1 bg-slate-900 text-white py-3.5 rounded-xl font-black uppercase text-[11px] shadow-lg flex items-center justify-center gap-2 transition-all 
+      ${loading ? 'opacity-70 pointer-events-none' : 'hover:bg-black active:scale-95 cursor-pointer'}`}
+  >
+    {loading ? (
+      <>
+        <Loader2 size={16} className="animate-spin" />
+        {editingId ? 'Updating...' : 'Creating...'}
+      </>
+    ) : (
+      editingId ? 'Save Changes' : 'Create New Item'
+    )}
+  </button>
+</div>
       </motion.div>
     </div>
   );

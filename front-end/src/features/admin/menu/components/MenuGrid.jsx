@@ -4,7 +4,7 @@ import ProductCard from "./ProductCard";
 const MenuGrid = ({ items, onEdit, onDelete }) => {
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 px-4 sm:px-0">
+    <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 ">
       {items && items.length > 0 ? (
         items.map((item) => (
           <ProductCard 

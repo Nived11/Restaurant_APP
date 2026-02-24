@@ -50,7 +50,6 @@ const ProductCard = ({ item, onEdit, onDelete }) => {
           <p className="text-[9px] text-slate-500 line-clamp-1 mb-2">{item?.description || "No description"}</p>
 
           <div className="mt-auto pt-2 border-t border-slate-50">
-            {/* Price Section - Mobile-ൽ താഴെ താഴെ വരാൻ flex-col ഉപയോഗിച്ചു */}
             <div className="flex flex-col sm:flex-row sm:items-center gap-0.5 sm:gap-2 mb-2">
               <span className="text-xs sm:text-base font-black text-slate-900 leading-none">
                 ₹{item?.offer_price}
@@ -73,25 +72,20 @@ const ProductCard = ({ item, onEdit, onDelete }) => {
       {/* Confirmation Modal */}
       {showConfirm && (
   <div className="fixed inset-0 z-[3000] flex items-center justify-center p-4 backdrop-blur-sm bg-slate-900/40">
-    {/* max-w-[450px] ആക്കി കൂട്ടി, പാഡിംഗ് p-8 ആക്കി */}
     <div className="bg-white w-full  max-w-[450px] rounded-[2rem] shadow-2xl p-8 text-center animate-in fade-in zoom-in duration-200">
       
-      {/* ഐക്കൺ ബോക്സ് അല്പം വലുതാക്കി */}
       <div className="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-5">
         <AlertTriangle size={32} />
       </div>
       
-      {/* ഹെഡിംഗ് സൈസ് കൂട്ടി */}
       <h3 className="text-lg font-black text-slate-900 mb-2 uppercase tracking-tight">
         Delete Item?
       </h3>
       
-      {/* ഡിസ്ക്രിപ്ഷൻ സൈസ് കൂട്ടി */}
       <p className="text-slate-500 text-xs mb-8">
         Are you sure you want to remove <b>"{item?.name}"</b> 
       </p>
       
-      {/* ബട്ടണുകൾ കൂടുതൽ വ്യക്തമാക്കി */}
       <div className="flex gap-4">
         <button 
           onClick={() => setShowConfirm(false)} 

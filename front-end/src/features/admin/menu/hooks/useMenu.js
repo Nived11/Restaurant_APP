@@ -1,15 +1,18 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import api from "../../../../api/axios";
 import { toast } from "sonner";
 import { extractErrorMessages } from "../../../../utils/extractErrorMessages";
 
-export const useMenu = () => {
+export const useMenu = (filters) => {
   const [items, setItems] = useState([]);
   const [editingId, setEditingId] = useState(null);
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(true);
-  const [error, setError] = useState(null); 
+  const [error, setError] = useState(null);
   const fileInputRef = useRef(null);
+
+  const [nextPage, setNextPage] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const [formData, setFormData] = useState({
     name: "", description: "", section: "OTHERS", category: "",
@@ -17,33 +20,50 @@ export const useMenu = () => {
     image: null, previewUrl: null, dietary_preference: "VEG", is_available: true,
   });
 
-  const fetchMenuItems = async () => {
-    setFetching(true);
-    setError(null); 
+  const fetchMenuItems = useCallback(async (isLoadMore = false) => {
+    if (!isLoadMore) {
+      setFetching(true);
+      setItems([]); 
+    }
+    setError(null);
+
     try {
-      const response = await api.get("/inventory/admin/menu-items/");
-      const data = response.data.results || response.data;
-      setItems(Array.isArray(data) ? data : []);
+      const params = {
+        search: filters.searchQuery || undefined,
+        category: filters.activeCategory !== "All" ? filters.activeCategory : undefined,
+        section: filters.activeSection !== "All" ? filters.activeSection : undefined,
+        page: isLoadMore ? currentPage + 1 : 1
+      };
+
+      const response = await api.get("/inventory/admin/menu-items/", { params });
+      const newData = response.data.results || response.data;
+      
+      if (isLoadMore) {
+        setItems(prev => [...prev, ...newData]);
+        setCurrentPage(prev => prev + 1);
+      } else {
+        setItems(Array.isArray(newData) ? newData : []);
+        setCurrentPage(1);
+      }
+      setNextPage(response.data.next);
     } catch (err) {
       setError(extractErrorMessages(err));
     } finally {
       setFetching(false);
     }
-  };
+  }, [filters, currentPage]);
 
   useEffect(() => {
-    fetchMenuItems();
-  }, []);
-
+    const delayDebounceFn = setTimeout(() => {
+      fetchMenuItems(false);
+    }, 500);
+    return () => clearTimeout(delayDebounceFn);
+  }, [filters.searchQuery, filters.activeCategory, filters.activeSection]);
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setFormData({ 
-        ...formData, 
-        image: file, 
-        previewUrl: URL.createObjectURL(file) 
-      });
+      setFormData({ ...formData, image: file, previewUrl: URL.createObjectURL(file) });
     }
   };
 
@@ -59,17 +79,11 @@ export const useMenu = () => {
   const handleSubmit = async (e) => {
     if (e) e.preventDefault();
     setLoading(true);
-
     const data = new FormData();
     Object.keys(formData).forEach(key => {
-      if (key !== 'previewUrl' && key !== 'image') {
-        data.append(key, formData[key]);
-      }
+      if (key !== 'previewUrl' && key !== 'image') data.append(key, formData[key]);
     });
-
-    if (formData.image instanceof File) {
-      data.append("image", formData.image);
-    }
+    if (formData.image instanceof File) data.append("image", formData.image);
 
     try {
       if (editingId) {
@@ -79,7 +93,7 @@ export const useMenu = () => {
         await api.post("/inventory/admin/menu-items/", data);
         toast.success("Item added!");
       }
-      fetchMenuItems();
+      fetchMenuItems(false);
       resetForm();
       return true;
     } catch (err) {
@@ -92,11 +106,7 @@ export const useMenu = () => {
 
   const handleEdit = (item) => {
     setEditingId(item.id);
-    setFormData({
-      ...item,
-      previewUrl: item.image,
-      image: null
-    });
+    setFormData({ ...item, previewUrl: item.image, image: null, category: item.category });
   };
 
   const handleDelete = async (id) => {
@@ -110,7 +120,8 @@ export const useMenu = () => {
   };
 
   return {
-    items, formData, setFormData, editingId, loading, fetching,error,
-    fileInputRef, handleImageChange, handleSubmit, handleEdit, handleDelete, resetForm
+    items, formData, setFormData, editingId, loading, fetching, error,
+    fileInputRef, handleImageChange, handleSubmit, handleEdit, handleDelete, 
+    resetForm, nextPage, fetchMenuItems
   };
 };

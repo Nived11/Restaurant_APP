@@ -14,6 +14,7 @@
 
     const fetchCategories = async () => {
       setFetching(true);
+      setFetchError("");
       try {
         const response = await api.get('/inventory/categories/');
         setCategories(response.data);

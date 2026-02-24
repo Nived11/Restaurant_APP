@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import placeholder from "../../../../assets/placeholder.jpg";
 import { Edit2, Trash2, AlertTriangle, X } from "lucide-react";
 
 const CategoryList = ({ categories, onEdit, onDelete, fetching, error }) => {
@@ -53,7 +54,7 @@ const CategoryList = ({ categories, onEdit, onDelete, fetching, error }) => {
             className="group flex flex-col items-center gap-3 cursor-pointer min-w-fit"
           >
             <div className="relative w-20 h-20 rounded-full border-4 border-white shadow-md overflow-hidden bg-white transition-all duration-300 sm:group-hover:scale-110 active:scale-90">
-              <img src={cat.image || "/placeholder-food.png"} alt={cat.name} className="w-full h-full object-cover transition-transform duration-500 sm:group-hover:blur-[2px]" />
+              <img src={cat.image || placeholder} loading="lazy" alt={cat.name} className="w-full h-full object-cover transition-transform duration-500 sm:group-hover:blur-[2px]" />
               <div className="absolute inset-0 bg-slate-900/40 opacity-0 sm:group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
                 <span className="text-[10px] font-black text-white uppercase tracking-widest">Click</span>
               </div>
