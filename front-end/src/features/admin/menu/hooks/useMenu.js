@@ -35,7 +35,7 @@ export const useMenu = (filters) => {
         page: isLoadMore ? currentPage + 1 : 1
       };
 
-      const response = await api.get("/inventory/admin/menu-items/",   );
+      const response = await api.get("/inventory/admin/menu-items/", { params });
       const newData = response.data.results || response.data;
       
       if (isLoadMore) {
@@ -78,6 +78,17 @@ export const useMenu = (filters) => {
 
   const handleSubmit = async (e) => {
     if (e) e.preventDefault();
+
+    // --- Price Validation Logic ---
+    const mrp = parseFloat(formData.actual_price);
+    const offer = parseFloat(formData.offer_price);
+
+    if (offer > mrp) {
+      toast.error("Invalid Pricing: Offer price must be less than or equal to MRP");
+      return false; 
+    }
+    // ------------------------------
+
     setLoading(true);
     const data = new FormData();
     Object.keys(formData).forEach(key => {

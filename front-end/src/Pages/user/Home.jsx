@@ -26,7 +26,7 @@ const Home = () => {
   return (
     <div className="pb-20">
       <BannerSection data={data.banners} loading={loading} />
-      <CategorySection /> 
+      <CategorySection data={data.categories} loading={loading} />
       <DailySpecials data={data.specials} loading={loading} />
       <BestSellers data={data.bestSellers} loading={loading} />
       <ComboSection data={data.combos} loading={loading} />
