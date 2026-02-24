@@ -3,7 +3,8 @@ import { Search, Trash2, Reply, AlertCircle, ArrowLeft, Send, Loader2, CheckCirc
 import { useMessage } from '../hooks/useMessage';
 
 const MessagePage = () => {
-  const { messages, expandedId, toggleMessage, deleteMessage } = useMessage();
+  // ✅ പുതുക്കിയ ഹുക്ക് ഡാറ്റകൾ എടുക്കുന്നു
+  const { messages, expandedId, isLoading, error, toggleMessage, deleteMessage, sendReply } = useMessage();
   const [deleteId, setDeleteId] = useState(null);
   const [mobileViewMsg, setMobileViewMsg] = useState(null);
   
@@ -23,21 +24,25 @@ const MessagePage = () => {
     }
   };
 
-  // --- ANIMATED SEND LOGIC (Updated to save reply) ---
-  const handleSendAnimation = (msgId) => {
+  // --- YATHARTHA SEND LOGIC (REAL API CALL) ---
+  const handleSendReply = async (msgId) => {
     if (!replyText.trim()) return;
     
     setIsSending(true);
     
-    setTimeout(() => {
-      setIsSending(false);
+    // API വഴി റിപ്ലൈ അയക്കുന്നു
+    const isSuccess = await sendReply(msgId, replyText);
+    
+    setIsSending(false);
+
+    if (isSuccess) {
       setIsSent(true);
       
       setSentReplies(prev => ({
         ...prev,
         [msgId]: {
           text: replyText,
-          date: "Just now"
+          date: "Just now" // ഇത് വേണമെങ്കിൽ ശരിക്കുള്ള സമയം ആക്കാം
         }
       }));
       
@@ -46,7 +51,16 @@ const MessagePage = () => {
         setShowReplyBox(false);
         setReplyText("");
       }, 1500);
-    }, 2000);
+    } else {
+      alert("Failed to send reply. Check console for error.");
+    }
+  };
+
+  // Helper function to format date from API
+  const formatDate = (dateString) => {
+    if (!dateString) return "N/A";
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
   };
 
   return (
@@ -66,10 +80,10 @@ const MessagePage = () => {
               <h1 className="text-xl font-black mb-6 leading-tight text-[#0A0A0A]">{mobileViewMsg.subject}</h1>
               <div className="flex items-center gap-4 mb-6">
                  <div className="w-12 h-12 rounded-full bg-[#f9a602] text-black flex items-center justify-center text-lg font-bold shrink-0 shadow-sm">
-                    {mobileViewMsg.fullName.charAt(0)}
+                    {mobileViewMsg.full_name?.charAt(0) || "U"}
                  </div>
                  <div className="min-w-0">
-                    <h3 className="font-bold text-base truncate">{mobileViewMsg.fullName}</h3>
+                    <h3 className="font-bold text-base truncate">{mobileViewMsg.full_name}</h3>
                     <p className="text-sm text-gray-500 truncate">{mobileViewMsg.email}</p>
                  </div>
               </div>
@@ -96,7 +110,7 @@ const MessagePage = () => {
                      className="w-full p-4 bg-white border-2 border-[#f9a602] rounded-2xl outline-none min-h-[150px] text-sm font-medium shadow-sm"
                    />
                    <button 
-                     onClick={() => handleSendAnimation(mobileViewMsg.id)}
+                     onClick={() => handleSendReply(mobileViewMsg.id)} // ✅ Changed Function here
                      disabled={isSending || isSent}
                      className={`w-full py-4 rounded-xl font-black flex items-center justify-center gap-2 transition-all ${isSent ? 'bg-green-500 text-white' : 'bg-black text-[#f9a602]'}`}
                    >
@@ -130,22 +144,32 @@ const MessagePage = () => {
             <Search className="absolute left-3 top-2.5 text-gray-400" size={16}/>
             <input type="text" placeholder="Search..." className="w-full pl-10 py-2 bg-white rounded-xl border-none shadow-sm text-sm outline-none focus:ring-1 focus:ring-[#f9a602]/30"/>
           </div>
-          <div className="space-y-3">
-            {messages.map((msg) => (
-               <div key={msg.id} onClick={() => setMobileViewMsg(msg)} className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 active:scale-95 transition-transform cursor-pointer">
-                  <div className="flex items-center gap-3 mb-2">
-                     <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${!msg.isRead ? 'bg-[#f9a602] text-black' : 'bg-gray-100 text-gray-500'}`}>
-                        {msg.fullName.charAt(0)}
-                     </div>
-                     <div className="flex-1 min-w-0">
-                        <h4 className="font-bold text-sm truncate">{msg.fullName}</h4>
-                        <p className="text-[10px] text-gray-400">{msg.date}</p>
-                     </div>
-                  </div>
-                  <p className="text-xs text-gray-500 line-clamp-1">{msg.subject}</p>
-               </div>
-            ))}
-          </div>
+          
+          {/* ✅ LOADING & ERROR STATES FOR MOBILE */}
+          {isLoading ? (
+            <div className="flex justify-center p-10"><Loader2 className="animate-spin text-[#f9a602]" size={30}/></div>
+          ) : error ? (
+            <div className="p-5 text-center text-red-500">{error}</div>
+          ) : messages.length === 0 ? (
+            <div className="p-10 text-center text-gray-400">No messages found.</div>
+          ) : (
+            <div className="space-y-3">
+              {messages.map((msg) => (
+                 <div key={msg.id} onClick={() => setMobileViewMsg(msg)} className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 active:scale-95 transition-transform cursor-pointer">
+                    <div className="flex items-center gap-3 mb-2">
+                       <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold bg-[#f9a602] text-black`}>
+                          {msg.full_name?.charAt(0) || "U"}
+                       </div>
+                       <div className="flex-1 min-w-0">
+                          <h4 className="font-bold text-sm truncate">{msg.full_name}</h4>
+                          <p className="text-[10px] text-gray-400">{formatDate(msg.created_at)}</p>
+                       </div>
+                    </div>
+                    <p className="text-xs text-gray-500 line-clamp-1">{msg.subject}</p>
+                 </div>
+              ))}
+            </div>
+          )}
       </div>
       )}
 
@@ -169,29 +193,37 @@ const MessagePage = () => {
                <div className="col-span-2 text-right">Date</div>
                <div className="col-span-1 text-center">Action</div>
             </div>
+            
+            {/* ✅ LOADING & ERROR STATES FOR DESKTOP */}
+            {isLoading ? (
+              <div className="flex justify-center p-20"><Loader2 className="animate-spin text-[#f9a602]" size={40}/></div>
+            ) : error ? (
+              <div className="p-10 text-center text-red-500 font-bold">{error}</div>
+            ) : messages.length === 0 ? (
+              <div className="p-20 text-center text-gray-400 font-bold text-lg">No messages found.</div>
+            ) : (
             <div className="divide-y divide-gray-50">
                {messages.map((msg) => (
                   <div key={msg.id} className="group bg-white hover:bg-gray-50/50">
                      <div onClick={() => { toggleMessage(msg.id); setShowReplyBox(false); }} className={`grid grid-cols-12 gap-4 px-6 py-4 items-center cursor-pointer relative transition-all duration-300 ${expandedId === msg.id ? 'bg-[#f9a602]/5' : ''}`}>
                         {expandedId === msg.id && <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#f9a602]"></div>}
                         <div className="col-span-3 flex items-center gap-4 pl-2">
-                           <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold shrink-0 ${!msg.isRead ? 'bg-[#0A0A0A] text-white' : 'bg-gray-100 text-gray-500'}`}>
-                              {msg.fullName.charAt(0)}
+                           <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold shrink-0 bg-[#0A0A0A] text-white`}>
+                              {msg.full_name?.charAt(0) || "U"}
                            </div>
                            <div className="min-w-0">
-                              <h4 className={`text-sm truncate ${!msg.isRead ? 'font-bold text-[#0A0A0A]' : 'font-medium text-gray-700'}`}>{msg.fullName}</h4>
+                              <h4 className={`text-sm truncate font-medium text-gray-700`}>{msg.full_name}</h4>
                               <p className="text-xs text-gray-400 truncate">{msg.email}</p>
                            </div>
                         </div>
                         <div className="col-span-6 pr-4">
                            <div className="flex items-center gap-2">
-                              <span className={`text-sm truncate ${!msg.isRead ? 'font-bold text-[#0A0A0A]' : 'font-medium text-gray-600'}`}>{msg.subject}</span>
-                              {!msg.isRead && <span className="w-2 h-2 rounded-full bg-[#f9a602]"></span>}
+                              <span className={`text-sm truncate font-medium text-gray-600`}>{msg.subject}</span>
                            </div>
                            <p className="text-xs text-gray-400 truncate mt-0.5 max-w-md">{msg.message}</p>
                         </div>
                         <div className="col-span-2 text-right">
-                           <span className={`text-xs ${!msg.isRead ? 'font-bold text-[#0A0A0A]' : 'font-medium text-gray-400'}`}>{msg.date}</span>
+                           <span className={`text-xs font-medium text-gray-400`}>{formatDate(msg.created_at)}</span>
                         </div>
                         <div className="col-span-1 flex justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                            <button onClick={(e) => { e.stopPropagation(); setDeleteId(msg.id); }} className="p-2 text-gray-400 hover:text-red-500 transition-colors">
@@ -237,13 +269,13 @@ const MessagePage = () => {
                                         autoFocus
                                         value={replyText}
                                         onChange={(e) => setReplyText(e.target.value)}
-                                        placeholder={`Send a reply to ${msg.fullName}...`}
+                                        placeholder={`Send a reply to ${msg.full_name}...`}
                                         className="w-full p-6 bg-white border-2 border-[#f9a602] rounded-3xl outline-none min-h-[180px] text-sm font-medium shadow-xl shadow-yellow-500/10"
                                       />
                                       <div className="absolute bottom-4 right-4 flex gap-2">
                                          <button onClick={() => setShowReplyBox(false)} className="px-5 py-2.5 text-xs font-bold text-gray-400 hover:bg-gray-100 rounded-xl transition-colors">Cancel</button>
                                          <button 
-                                           onClick={() => handleSendAnimation(msg.id)}
+                                           onClick={() => handleSendReply(msg.id)} // ✅ Changed function here
                                            disabled={isSending || isSent}
                                            className={`px-8 py-2.5 rounded-xl text-xs font-black flex items-center gap-2 transition-all ${isSent ? 'bg-green-500 text-white' : 'bg-black text-[#f9a602] hover:scale-105 shadow-lg active:scale-95'}`}
                                          >
@@ -259,6 +291,7 @@ const MessagePage = () => {
                   </div>
                ))}
             </div>
+            )}
          </div>
       </div>
 
