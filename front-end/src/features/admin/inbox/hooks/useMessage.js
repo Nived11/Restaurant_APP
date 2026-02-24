@@ -11,6 +11,10 @@ export const useMessage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // ✅ SEARCH & PAGINATION STATES MOVED TO HOOK
+  const [searchQuery, setSearchQuery] = useState("");
+  const [visibleCount, setVisibleCount] = useState(12);
+
   // 1. Fetch Messages from Backend
   const fetchMessages = useCallback(async () => {
     setIsLoading(true);
@@ -31,13 +35,38 @@ export const useMessage = () => {
     fetchMessages();
   }, [fetchMessages]);
 
+  // ✅ Reset pagination when search query changes
+  useEffect(() => {
+    setVisibleCount(12);
+  }, [searchQuery]);
+
+  // ✅ FILTER LOGIC
+  const filteredMessages = messages?.filter(msg => {
+    const query = searchQuery.toLowerCase();
+    return (
+      (msg.full_name && msg.full_name.toLowerCase().includes(query)) ||
+      (msg.email && msg.email.toLowerCase().includes(query))
+    );
+  }) || [];
+
+  // ✅ PAGINATION LOGIC
+  const visibleMessages = filteredMessages.slice(0, visibleCount);
+  const hasMore = filteredMessages.length > visibleCount;
+
+  const handleSeeMore = () => {
+    setVisibleCount(prev => prev + 12);
+  };
+
+  const handleShowLess = () => {
+    setVisibleCount(12);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const toggleMessage = (id) => {
     setExpandedId(expandedId === id ? null : id);
   };
 
-
-
-  // 4. Send Reply Logic (New addition based on your API)
+  // 4. Send Reply Logic
   const sendReply = async (id, replyText) => {
     try {
       await api.post(`/admin/contacts/${id}/reply/`, {
@@ -51,7 +80,15 @@ export const useMessage = () => {
   };
 
   return { 
-    messages, 
+    messages, // Raw messages
+    filteredMessages, // All filtered messages (for count)
+    visibleMessages, // Paginated messages (for rendering)
+    searchQuery,
+    setSearchQuery,
+    hasMore,
+    visibleCount,
+    handleSeeMore,
+    handleShowLess,
     expandedId, 
     isLoading, 
     error, 
