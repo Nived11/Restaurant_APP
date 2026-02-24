@@ -1,5 +1,5 @@
 import React from "react";
-import { Phone, Mail, Calendar, Clock, Users, ChevronUp, ChevronDown, AlignLeft, FilterX, Loader2, ChevronsUp, User } from "lucide-react";
+import { Phone, Mail, Calendar, Clock, Users, ChevronUp, ChevronDown, AlignLeft, FilterX, Loader2, ChevronsUp } from "lucide-react";
 import BookingSkeleton from "./BookingSkeleton";
 import ErrorState from "./ErrorState";
 
@@ -11,11 +11,9 @@ const BookingTable = ({
     <div className="space-y-6">
       
       {/* ==========================================
-          1. MOBILE VIEW (< 768px)
-          ✅ Updated: Border YES, Shadow NO, Curve NO
+          1. MOBILE VIEW (< 768px) - 3 Columns
       ========================================== */}
       <div className="block md:hidden">
-        {/* Added border, removed rounded and shadow */}
         <div className="bg-white border border-gray-200 rounded-lg w-full overflow-hidden">
           <table className="w-full text-left border-collapse table-fixed">
             <thead>
@@ -29,7 +27,8 @@ const BookingTable = ({
               {loading ? (
                 [...Array(5)].map((_, i) => <BookingSkeleton key={i} />)
               ) : error ? (
-                <tr><td colSpan="3"><ErrorState message={error} onRetry={onRetry} /></td></tr>
+                /* Mobile-ൽ 3 കോളങ്ങൾ ഉള്ളതിനാൽ colSpan 3 നൽകുന്നു */
+                <ErrorState message={error} onRetry={onRetry} colSpan={3} />
               ) : bookings.length > 0 ? (
                 bookings.map((booking) => (
                   <MobileBookingRow
@@ -40,7 +39,7 @@ const BookingTable = ({
                   />
                 ))
               ) : (
-                <EmptyState onClear={clearFilters} isFiltered={isFiltered} colSpan="3" />
+                <EmptyState onClear={clearFilters} isFiltered={isFiltered} colSpan={3} />
               )}
             </tbody>
           </table>
@@ -48,7 +47,7 @@ const BookingTable = ({
       </div>
 
       {/* ==========================================
-          2. TABLET VIEW (768px - 1023px) 
+          2. TABLET VIEW (768px - 1023px) - 4 Columns
       ========================================== */}
       <div className="hidden md:block lg:hidden">
         <div className="bg-white border border-gray-200 rounded-2xl shadow-md overflow-hidden">
@@ -65,7 +64,8 @@ const BookingTable = ({
               {loading ? (
                 [...Array(5)].map((_, i) => <BookingSkeleton key={i} />)
               ) : error ? (
-                <tr><td colSpan="4"><ErrorState message={error} onRetry={onRetry} /></td></tr>
+                /* Tablet-ൽ 4 കോളങ്ങൾ ഉള്ളതിനാൽ colSpan 4 നൽകുന്നു */
+                <ErrorState message={error} onRetry={onRetry} colSpan={4} />
               ) : bookings.length > 0 ? (
                 bookings.map((booking) => (
                   <TabletBookingRow
@@ -76,7 +76,7 @@ const BookingTable = ({
                   />
                 ))
               ) : (
-                <EmptyState onClear={clearFilters} isFiltered={isFiltered} colSpan="4" />
+                <EmptyState onClear={clearFilters} isFiltered={isFiltered} colSpan={4} />
               )}
             </tbody>
           </table>
@@ -84,7 +84,7 @@ const BookingTable = ({
       </div>
 
       {/* ==========================================
-          3. LAPTOP/DESKTOP VIEW (≥ 1024px)
+          3. LAPTOP/DESKTOP VIEW (≥ 1024px) - 7 Columns
       ========================================== */}
       <div className="hidden lg:block">
         <div className="bg-white border border-gray-200 rounded-3xl shadow-md overflow-hidden">
@@ -104,7 +104,8 @@ const BookingTable = ({
               {loading ? (
                 [...Array(5)].map((_, i) => <BookingSkeleton key={i} />)
               ) : error ? (
-                <tr><td colSpan="7"><ErrorState message={error} onRetry={onRetry} /></td></tr>
+                /* Desktop-ൽ 7 കോളങ്ങൾ ഉള്ളതിനാൽ colSpan 7 നൽകുന്നു */
+                <ErrorState message={error} onRetry={onRetry} colSpan={7} />
               ) : bookings.length > 0 ? (
                 bookings.map((booking) => (
                   <DesktopBookingRow
@@ -115,16 +116,14 @@ const BookingTable = ({
                   />
                 ))
               ) : (
-                <EmptyState onClear={clearFilters} isFiltered={isFiltered} colSpan="7" />
+                <EmptyState onClear={clearFilters} isFiltered={isFiltered} colSpan={7} />
               )}
             </tbody>
           </table>
         </div>
       </div>
 
-      {/* ==========================================
-          PAGINATION ACTIONS (Common)
-      ========================================== */}
+      {/* PAGINATION ACTIONS */}
       <div className="flex flex-row justify-center items-center gap-4 pb-12 pt-4">
         {hasNextPage && (
           <button
@@ -132,15 +131,7 @@ const BookingTable = ({
             disabled={loadingMore}
             className="cursor-pointer flex items-center gap-2 px-8 py-3 bg-[#0A0A0A] text-white text-[10px] font-black rounded-2xl uppercase tracking-[0.2em] hover:bg-[#f9a602] hover:text-[#0A0A0A] transition-all shadow-xl active:scale-95 disabled:opacity-50"
           >
-            {loadingMore ? (
-              <Loader2 size={16} className="animate-spin" />
-            ) : (
-              <>
-                See More
-                <ChevronDown size={14} className="ml-1" />
-              </>
-            )}
-            {loadingMore && "Loading..."}
+            {loadingMore ? <Loader2 size={16} className="animate-spin" /> : <>See More <ChevronDown size={14} className="ml-1" /></>}
           </button>
         )}
 
@@ -149,8 +140,7 @@ const BookingTable = ({
             onClick={onShowLess}
             className="cursor-pointer flex items-center gap-2 px-8 py-3 bg-black text-white border-2 border-[#f9a602] text-[10px] font-black rounded-2xl uppercase tracking-[0.2em] hover:bg-[#f9a602] hover:text-[#0A0A0A] transition-all active:scale-95"
           >
-            <ChevronsUp size={14} />
-            Show Less
+            <ChevronsUp size={14} /> Show Less
           </button>
         )}
       </div>
@@ -159,71 +149,42 @@ const BookingTable = ({
 };
 
 // ==========================================
-// UTILITY FUNCTIONS
+// UTILITY & ROW COMPONENTS
 // ==========================================
+
 const formatIST = (timeStr) => {
   if (!timeStr) return "N/A";
   try {
     const [hours, minutes] = timeStr.split(':');
     const date = new Date();
     date.setHours(parseInt(hours), parseInt(minutes));
-    return date.toLocaleTimeString('en-IN', {
-      hour: '2-digit', minute: '2-digit', hour12: true
-    }).toUpperCase();
+    return date.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true }).toUpperCase();
   } catch (e) { return timeStr; }
 };
 
-// ==========================================
-// MOBILE COMPONENT (Compact Table Row)
-// ==========================================
 const MobileBookingRow = ({ booking, isExpanded, onToggle }) => (
   <React.Fragment>
     <tr onClick={onToggle} className={`group hover:bg-[#f9a602]/5 transition-colors cursor-pointer ${isExpanded ? 'bg-[#f9a602]/10' : 'bg-white'}`}>
-      
-      {/* 1. GUEST COLUMN (Name, Phone, Email) */}
       <td className="px-2 sm:px-3 py-3 align-top overflow-hidden">
         <div className="font-bold text-xs text-[#0A0A0A] mb-1 truncate">{booking.full_name}</div>
-        <div className="text-[10px] font-bold text-gray-600 flex items-center gap-1.5 mb-1">
-          <Phone size={10} className="text-gray-400 shrink-0"/> <span className="truncate">{booking.phone}</span>
-        </div>
-        <div className="text-[10px] font-medium text-gray-500 flex items-center gap-1.5">
-          <Mail size={10} className="text-gray-400 shrink-0"/> <span className="truncate">{booking.email || "N/A"}</span>
-        </div>
+        <div className="text-[10px] font-bold text-gray-600 flex items-center gap-1.5 mb-1"><Phone size={10} className="text-gray-400 shrink-0"/> <span className="truncate">{booking.phone}</span></div>
+        <div className="text-[10px] font-medium text-gray-500 flex items-center gap-1.5"><Mail size={10} className="text-gray-400 shrink-0"/> <span className="truncate">{booking.email || "N/A"}</span></div>
       </td>
-
-      {/* 2. BOOKING COLUMN */}
       <td className="px-2 sm:px-3 py-3 align-top overflow-hidden">
-        <div className="text-[10px] font-bold text-[#0A0A0A] flex items-center gap-1.5 mb-1.5 truncate">
-          <Calendar size={10} className="text-[#f9a602] shrink-0"/> <span className="truncate">{booking.date}</span>
-        </div>
-        <div className="text-[9px] font-black text-gray-500 flex items-center gap-1.5 mb-1.5">
-          <Clock size={10} className="text-gray-400 shrink-0"/> {formatIST(booking.time)}
-        </div>
-        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-gray-100 text-[9px] font-black text-[#0A0A0A]">
-          <Users size={10} className="shrink-0" /> {booking.guests}
-        </span>
+        <div className="text-[10px] font-bold text-[#0A0A0A] flex items-center gap-1.5 mb-1.5 truncate"><Calendar size={10} className="text-[#f9a602] shrink-0"/> <span className="truncate">{booking.date}</span></div>
+        <div className="text-[9px] font-black text-gray-500 flex items-center gap-1.5 mb-1.5"><Clock size={10} className="text-gray-400 shrink-0"/> {formatIST(booking.time)}</div>
+        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-gray-100 text-[9px] font-black text-[#0A0A0A]"><Users size={10} className="shrink-0" /> {booking.guests}</span>
       </td>
-
-      {/* 3. ICON COLUMN */}
       <td className="px-1 sm:px-3 py-3 text-right align-middle">
-        <div className="p-1 rounded-full bg-gray-100 inline-block text-gray-500 transition-colors">
-          {isExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-        </div>
+        <div className="p-1 rounded-full bg-gray-100 inline-block text-gray-500">{isExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}</div>
       </td>
     </tr>
-
-    {/* EXPANDED SECTION */}
     {isExpanded && (
       <tr className="bg-[#f9a602]/5">
         <td colSpan="3" className="px-2 sm:px-3 py-4 border-t border-[#f9a602]/10">
-          {/* Removed rounded borders and shadow here as well */}
           <div className="bg-white p-3 border border-[#f9a602]/20">
-            <h4 className="text-[9px] font-black uppercase text-[#f9a602] mb-1.5 tracking-widest flex items-center gap-1.5">
-              <AlignLeft size={10} /> Special Requests
-            </h4>
-            <p className="text-xs font-medium text-gray-700 italic leading-relaxed whitespace-normal break-words">
-              {booking.notes || "No special instructions provided."}
-            </p>
+            <h4 className="text-[9px] font-black uppercase text-[#f9a602] mb-1.5 tracking-widest flex items-center gap-1.5"><AlignLeft size={10} /> Special Requests</h4>
+            <p className="text-xs font-medium text-gray-700 italic leading-relaxed whitespace-normal break-words">{booking.notes || "No special instructions provided."}</p>
           </div>
         </td>
       </tr>
@@ -231,38 +192,23 @@ const MobileBookingRow = ({ booking, isExpanded, onToggle }) => (
   </React.Fragment>
 );
 
-// ==========================================
-// TABLET COMPONENT (4 Columns, Equal Width)
-// ==========================================
 const TabletBookingRow = ({ booking, isExpanded, onToggle }) => (
   <React.Fragment>
     <tr onClick={onToggle} className={`group hover:bg-[#f9a602]/5 transition-colors cursor-pointer ${isExpanded ? 'bg-[#f9a602]/10' : 'bg-white'}`}>
       <td className="px-4 py-4 align-top overflow-hidden">
         <div className="font-bold text-sm text-[#0A0A0A] mb-1.5 truncate">{booking.full_name}</div>
-        <div className="text-[11px] font-bold text-gray-600 flex items-center gap-1.5 mb-1.5">
-          <Phone size={12} className="text-gray-400 shrink-0"/> <span className="truncate">{booking.phone}</span>
-        </div>
-        <div className="text-[11px] font-medium text-gray-500 flex items-center gap-1.5 truncate">
-          <Mail size={12} className="text-gray-400 shrink-0"/> <span className="truncate">{booking.email || "N/A"}</span>
-        </div>
+        <div className="text-[11px] font-bold text-gray-600 flex items-center gap-1.5 mb-1.5"><Phone size={12} className="text-gray-400 shrink-0"/> {booking.phone}</div>
+        <div className="text-[11px] font-medium text-gray-500 flex items-center gap-1.5 truncate"><Mail size={12} className="text-gray-400 shrink-0"/> {booking.email || "N/A"}</div>
       </td>
       <td className="px-4 py-4 align-top">
-        <div className="text-xs font-bold text-[#0A0A0A] flex items-center gap-1.5 mb-1.5">
-          <Calendar size={12} className="text-[#f9a602] shrink-0"/>{booking.date}
-        </div>
-        <div className="text-[10px] font-black text-gray-500 flex items-center gap-1.5">
-          <Clock size={12} className="text-gray-400 shrink-0"/>{formatIST(booking.time)}
-        </div>
+        <div className="text-xs font-bold text-[#0A0A0A] flex items-center gap-1.5 mb-1.5"><Calendar size={12} className="text-[#f9a602] shrink-0"/>{booking.date}</div>
+        <div className="text-[10px] font-black text-gray-500 flex items-center gap-1.5"><Clock size={12} className="text-gray-400 shrink-0"/>{formatIST(booking.time)}</div>
       </td>
       <td className="px-4 py-4 text-center align-top">
-        <span className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-gray-100 text-xs font-black text-[#0A0A0A]">
-          <Users size={12} className="shrink-0" /> {booking.guests}
-        </span>
+        <span className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-gray-100 text-xs font-black text-[#0A0A0A]"><Users size={12} className="shrink-0" /> {booking.guests}</span>
       </td>
       <td className="px-4 py-4 text-right align-top">
-        <div className="p-1.5 rounded-full bg-gray-100 inline-block text-gray-500 group-hover:bg-gray-200 transition-colors">
-          {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-        </div>
+        <div className="p-1.5 rounded-full bg-gray-100 inline-block text-gray-500 group-hover:bg-gray-200">{isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}</div>
       </td>
     </tr>
     {isExpanded && (
@@ -281,35 +227,16 @@ const TabletBookingRow = ({ booking, isExpanded, onToggle }) => (
   </React.Fragment>
 );
 
-// ==========================================
-// DESKTOP COMPONENT (Responsive Full Row)
-// ==========================================
 const DesktopBookingRow = ({ booking, isExpanded, onToggle }) => (
   <React.Fragment>
     <tr onClick={onToggle} className={`group hover:bg-[#f9a602]/5 transition-colors cursor-pointer ${isExpanded ? 'bg-[#f9a602]/10' : 'bg-white'}`}>
       <td className="px-3 lg:px-4 xl:px-8 py-4 whitespace-nowrap font-bold text-[11px] xl:text-sm text-[#0A0A0A]">{booking.full_name}</td>
-      <td className="px-3 lg:px-4 xl:px-8 py-4 whitespace-nowrap">
-        <div className="flex items-center gap-1.5 text-[10px] xl:text-xs font-bold text-gray-700"><Phone size={13} className="text-gray-400" /> {booking.phone}</div>
-      </td>
-      <td className="px-3 lg:px-4 xl:px-8 py-4 whitespace-nowrap">
-        <div className="flex items-center gap-1.5 text-[10px] xl:text-xs font-medium text-gray-600 max-w-[140px] xl:max-w-none truncate"><Mail size={13} className="text-gray-400 shrink-0" /> <span className="truncate">{booking.email || "N/A"}</span></div>
-      </td>
-      <td className="px-3 lg:px-4 xl:px-8 py-4 whitespace-nowrap font-bold text-[11px] xl:text-sm text-[#0A0A0A]">
-        <Calendar size={13} className="inline mr-1.5 text-[#f9a602]" /> {booking.date}
-      </td>
-      <td className="px-3 lg:px-4 xl:px-8 py-4 whitespace-nowrap text-[10px] xl:text-xs font-black text-gray-500 uppercase">
-        <Clock size={13} className="inline mr-1 text-gray-400" /> {formatIST(booking.time)}
-      </td>
-      <td className="px-3 lg:px-4 xl:px-8 py-4 text-center">
-        <div className="whitespace-nowrap inline-flex items-center gap-1.5 px-2 xl:px-3 py-1 rounded-lg bg-gray-100 text-[10px] xl:text-xs font-black text-[#0A0A0A]">
-          <Users size={13} /> {booking.guests}
-        </div>
-      </td>
-      <td className="px-3 lg:px-4 xl:px-8 py-4 text-right">
-        <div className="p-1.5 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors inline-block text-gray-600">
-          {isExpanded ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
-        </div>
-      </td>
+      <td className="px-3 lg:px-4 xl:px-8 py-4 whitespace-nowrap"><div className="flex items-center gap-1.5 text-[10px] xl:text-xs font-bold text-gray-700"><Phone size={13} className="text-gray-400" /> {booking.phone}</div></td>
+      <td className="px-3 lg:px-4 xl:px-8 py-4 whitespace-nowrap"><div className="flex items-center gap-1.5 text-[10px] xl:text-xs font-medium text-gray-600 max-w-[140px] xl:max-w-none truncate"><Mail size={13} className="text-gray-400 shrink-0" /> <span className="truncate">{booking.email || "N/A"}</span></div></td>
+      <td className="px-3 lg:px-4 xl:px-8 py-4 whitespace-nowrap font-bold text-[11px] xl:text-sm text-[#0A0A0A]"><Calendar size={13} className="inline mr-1.5 text-[#f9a602]" /> {booking.date}</td>
+      <td className="px-3 lg:px-4 xl:px-8 py-4 whitespace-nowrap text-[10px] xl:text-xs font-black text-gray-500 uppercase"><Clock size={13} className="inline mr-1 text-gray-400" /> {formatIST(booking.time)}</td>
+      <td className="px-3 lg:px-4 xl:px-8 py-4 text-center"><div className="whitespace-nowrap inline-flex items-center gap-1.5 px-2 xl:px-3 py-1 rounded-lg bg-gray-100 text-[10px] xl:text-xs font-black text-[#0A0A0A]"><Users size={13} /> {booking.guests}</div></td>
+      <td className="px-3 lg:px-4 xl:px-8 py-4 text-right"><div className="p-1.5 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors inline-block text-gray-600">{isExpanded ? <ChevronUp size={15} /> : <ChevronDown size={15} />}</div></td>
     </tr>
     {isExpanded && (
       <tr className="bg-[#f9a602]/5">
@@ -327,9 +254,6 @@ const DesktopBookingRow = ({ booking, isExpanded, onToggle }) => (
   </React.Fragment>
 );
 
-// ==========================================
-// SHARED COMPONENTS
-// ==========================================
 const EmptyState = ({ onClear, isFiltered, colSpan = 7 }) => (
   <tr>
     <td colSpan={colSpan} className="py-20 text-center">

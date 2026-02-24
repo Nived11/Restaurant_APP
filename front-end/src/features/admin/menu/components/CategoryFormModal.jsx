@@ -10,7 +10,7 @@ const CategoryFormModal = ({ onClose, onSave, loading, error, editingCategory })
   useEffect(() => {
     if (editingCategory) {
       setCatName(editingCategory.name);
-      setPreview(editingCategory.image); // നിലവിലുള്ള ഇമേജ് കാണിക്കാൻ
+      setPreview(editingCategory.image); 
     } else {
       setCatName("");
       setPreview(null);

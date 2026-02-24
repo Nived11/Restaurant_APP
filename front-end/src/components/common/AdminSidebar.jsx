@@ -2,7 +2,7 @@ import { NavLink } from "react-router-dom";
 import { 
   LayoutDashboard, ShoppingBag, Utensils, 
   Image, Users, DollarSign, LogOut, Mail, 
-  ChevronLeft, ChevronRight, X ,BookIcon
+  ChevronLeft, ChevronRight, X ,BookIcon,Settings
 } from "lucide-react";
 import logoWeb from "../../assets/Logo-web.png";
 import logoCrunch from "../../assets/Logocrunch.png";
@@ -21,6 +21,7 @@ const AdminSidebar = ({ isExpanded, setIsExpanded, user, isMobile, closeMobileMe
     { name: "Inbox", path: "/admin/inbox", icon: <Mail size={20} />, show: true }, 
     { name: "Customers", path: "/admin/customers", icon: <Users size={20} />, show: isAdmin },
     { name: "Revenue", path: "/admin/revenue", icon: <DollarSign size={20} />, show: isAdmin },
+    { name: "Settings", path: "/admin/settings", icon: <Settings size={20} />, show: isAdmin },
   ];
 
   const isFull = isMobile || isExpanded;
@@ -64,14 +65,14 @@ const AdminSidebar = ({ isExpanded, setIsExpanded, user, isMobile, closeMobileMe
       )}
 
       {/* 3. NAVIGATION LINKS */}
-      <nav className={`flex-1 px-4 py-6 space-y-2 sm:space-y-4 overflow-y-auto no-scrollbar ${!isFull ? "overflow-x-visible" : "overflow-x-hidden"}`}>
+      <nav className={`flex-1 px-4 py-4 space-y-2 sm:space-y-4 overflow-y-auto no-scrollbar ${!isFull ? "overflow-x-visible" : "overflow-x-hidden"}`}>
         {navLinks.map((link) => link.show && (
           <NavLink 
             key={link.path} 
             to={link.path} 
             onClick={() => isMobile && closeMobileMenu()} 
             className={({ isActive }) => `
-              flex items-center transition-all duration-300 relative group rounded-2xl py-4 cursor-pointer
+              flex items-center transition-all duration-300 relative group rounded-2xl py-3 cursor-pointer
               ${isActive ? "bg-primary text-[#1A1A1A] shadow-xl" : "text-gray-400 hover:text-white hover:bg-white/5"} 
               ${isFull ? "px-6 gap-4" : "justify-center"}
             `}

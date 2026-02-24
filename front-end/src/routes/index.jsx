@@ -6,7 +6,7 @@ import PublicLayout from "../Layouts/PublicLayout";
 // Pages
 import { Login, Signup, Otp, AdminLogin } from "../Pages/auth";
 import { Home, Cart, Menu as UserMenu, About, Contact, Profile } from "../Pages/user";
-import { Dashboard, Orders, Menu as AdminMenu, Bookings, Inbox, Customers, Revenue } from "../Pages/admin";
+import { Dashboard, Orders, Menu as AdminMenu, Bookings, Inbox, Customers, Revenue , Settings} from "../Pages/admin";
 import NotFound from "../Pages/NotFound.jsx";
 
 const AppRoutes = () => {
@@ -54,6 +54,10 @@ const AppRoutes = () => {
           <Route 
             path="revenue" 
             element={role === "admin" ? <Revenue user={user} /> : <Navigate to="/admin/dashboard" replace />} 
+          />
+          <Route 
+            path="settings" 
+            element={role === "admin" ? <Settings user={user} /> : <Navigate to="/admin/dashboard" replace />} 
           />
         </Route>
       </Route>
