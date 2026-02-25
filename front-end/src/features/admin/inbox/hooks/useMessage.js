@@ -9,56 +9,78 @@ export const useMessage = () => {
   
   // API loading states
   const [isLoading, setIsLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState(null);
 
-  // ✅ SEARCH & PAGINATION STATES MOVED TO HOOK
+  // SERVER-SIDE SEARCH & PAGINATION STATES
   const [searchQuery, setSearchQuery] = useState("");
-  const [visibleCount, setVisibleCount] = useState(12);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(false);
+  const [totalItems, setTotalItems] = useState(0);
 
-  // 1. Fetch Messages from Backend
-  const fetchMessages = useCallback(async () => {
-    setIsLoading(true);
+  // 1. Fetch Messages from Backend (Handles both first load and load more)
+  const fetchMessages = useCallback(async (currentPage = 1, query = "", isLoadMore = false) => {
+    if (isLoadMore) {
+      setLoadingMore(true);
+    } else {
+      setIsLoading(true);
+    }
     setError(null);
+
     try {
-      const response = await api.get('/admin/contacts/');
-      const data = response.data.data || response.data;
-      setMessages(data);
+      const response = await api.get('/admin/contacts/', {
+        params: {
+          page: currentPage,
+          search: query
+        }
+      });
+      
+      const responseData = response.data;
+      const newMessages = responseData.data || [];
+
+      if (isLoadMore) {
+        // Append new messages to existing ones
+        setMessages(prev => [...prev, ...newMessages]);
+      } else {
+        // Replace messages for new search or initial load
+        setMessages(newMessages);
+      }
+
+      // Check if there is a next page based on backend response
+      setHasMore(!!responseData.next_page_url);
+      setTotalItems(responseData.total_items || 0);
+
     } catch (err) {
       toast.error("Failed to load messages. Please try again."); 
       setError(extractErrorMessages(err));
     } finally {
       setIsLoading(false);
+      setLoadingMore(false);
     }
   }, []);
 
+  // 2. Initial Load & Search Effect (With Debounce to avoid spamming API)
   useEffect(() => {
-    fetchMessages();
-  }, [fetchMessages]);
+    setPage(1); // Reset to page 1 on new search
+    const delayDebounceFn = setTimeout(() => {
+      fetchMessages(1, searchQuery, false);
+    }, 500); // Waits 500ms after user stops typing before making API call
 
-  // ✅ Reset pagination when search query changes
-  useEffect(() => {
-    setVisibleCount(12);
-  }, [searchQuery]);
+    return () => clearTimeout(delayDebounceFn);
+  }, [searchQuery, fetchMessages]);
 
-  // ✅ FILTER LOGIC
-  const filteredMessages = messages?.filter(msg => {
-    const query = searchQuery.toLowerCase();
-    return (
-      (msg.full_name && msg.full_name.toLowerCase().includes(query)) ||
-      (msg.email && msg.email.toLowerCase().includes(query))
-    );
-  }) || [];
-
-  // ✅ PAGINATION LOGIC
-  const visibleMessages = filteredMessages.slice(0, visibleCount);
-  const hasMore = filteredMessages.length > visibleCount;
-
+  // 3. Pagination Handlers
   const handleSeeMore = () => {
-    setVisibleCount(prev => prev + 12);
+    if (!hasMore || loadingMore) return;
+    const nextPage = page + 1;
+    setPage(nextPage);
+    fetchMessages(nextPage, searchQuery, true);
   };
 
   const handleShowLess = () => {
-    setVisibleCount(12);
+    setPage(1);
+    setMessages(prev => prev.slice(0, 12)); // Keep only first 12 items locally
+    setHasMore(true); // Re-enable "See More" since we know there are more
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -72,6 +94,14 @@ export const useMessage = () => {
       await api.post(`/admin/contacts/${id}/reply/`, {
         reply_message: replyText
       });
+      
+      // Update the message in the list instantly on success
+      setMessages(prevMsgs => prevMsgs.map(msg => 
+        msg.id === id 
+          ? { ...msg, reply_message: replyText, replied_at: new Date().toISOString() } 
+          : msg
+      ));
+      
       return true; // Success
     } catch (err) {
       toast.error("Failed to send reply. Please try again.");
@@ -80,13 +110,13 @@ export const useMessage = () => {
   };
 
   return { 
-    messages, // Raw messages
-    filteredMessages, // All filtered messages (for count)
-    visibleMessages, // Paginated messages (for rendering)
+    messages, 
     searchQuery,
     setSearchQuery,
     hasMore,
-    visibleCount,
+    loadingMore,
+    page,
+    totalItems,
     handleSeeMore,
     handleShowLess,
     expandedId, 

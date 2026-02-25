@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
-import { Search, Reply, ArrowLeft, Send, Loader2, CheckCircle, UserCheck, ChevronDown, ChevronsUp, Trash2, AlertCircle } from 'lucide-react';
+import { Search, Reply, ArrowLeft, Send, Loader2, CheckCircle, UserCheck, ChevronDown, ChevronsUp } from 'lucide-react';
 import { useMessage } from '../hooks/useMessage';
 
 const MessagePage = () => {
-  // ✅ All logic, search, and pagination are now coming directly from the custom hook!
   const { 
-    visibleMessages, 
-    filteredMessages, 
+    messages, // Raw messages mapped to UI
     searchQuery, 
     setSearchQuery, 
     hasMore, 
-    visibleCount, 
+    loadingMore,
+    page,
+    totalItems, // Extracted from hook for accurate count
     handleSeeMore, 
     handleShowLess, 
     expandedId, 
@@ -28,8 +28,6 @@ const MessagePage = () => {
   const [isSending, setIsSending] = useState(false);
   const [isSent, setIsSent] = useState(false);
 
-  const [sentReplies, setSentReplies] = useState({});
-
   // --- REAL SEND LOGIC (API CALL) ---
   const handleSendReply = async (msgId) => {
     if (!replyText.trim()) return;
@@ -40,18 +38,15 @@ const MessagePage = () => {
 
     if (isSuccess) {
       setIsSent(true);
-      setSentReplies(prev => ({
-        ...prev,
-        [msgId]: {
-          text: replyText,
-          date: "Just now"
-        }
-      }));
-      
       setTimeout(() => {
         setIsSent(false);
         setShowReplyBox(false);
         setReplyText("");
+        
+        // Update mobile view state if it's currently open
+        if(mobileViewMsg) {
+          setMobileViewMsg(prev => ({ ...prev, reply_message: replyText, replied_at: new Date().toISOString() }));
+        }
       }, 1500);
     }
   };
@@ -59,7 +54,7 @@ const MessagePage = () => {
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute:'2-digit' });
   };
 
   // ✅ SKELETON COMPONENTS
@@ -131,16 +126,21 @@ const MessagePage = () => {
                  {mobileViewMsg.message}
               </div>
 
-              {sentReplies[mobileViewMsg.id] && (
+              {/* SHOW REPLY FROM BACKEND IF EXISTS */}
+              {mobileViewMsg.reply_message && (
                 <div className="p-5 bg-emerald-50 border border-emerald-100 rounded-2xl animate-in fade-in slide-in-from-top-2">
-                   <div className="flex items-center gap-2 mb-2 text-emerald-700 font-black text-[10px] uppercase tracking-wider">
-                      <UserCheck size={14}/> Your Reply
+                   <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2 text-emerald-700 font-black text-[10px] uppercase tracking-wider">
+                        <UserCheck size={14}/> Your Reply
+                      </div>
+                      <span className="text-[9px] text-emerald-600/70 font-bold">{formatDate(mobileViewMsg.replied_at)}</span>
                    </div>
-                   <p className="text-sm text-emerald-900 leading-relaxed italic">"{sentReplies[mobileViewMsg.id].text}"</p>
+                   <p className="text-sm text-emerald-900 leading-relaxed italic">"{mobileViewMsg.reply_message}"</p>
                 </div>
               )}
 
-              {showReplyBox && (
+              {/* MOBILE REPLY TEXT BOX */}
+              {showReplyBox && !mobileViewMsg.reply_message && (
                 <div className="space-y-3 animate-in fade-in slide-in-from-bottom-4 duration-300">
                    <textarea 
                      value={replyText}
@@ -159,7 +159,7 @@ const MessagePage = () => {
               )}
            </div>
            
-           {!showReplyBox && !isSent && (
+           {!showReplyBox && !isSent && !mobileViewMsg.reply_message && (
              <div className="p-4 border-t border-gray-100 bg-white flex gap-3">
                 <button onClick={() => setShowReplyBox(true)} className="w-full py-3 rounded-xl bg-[#0A0A0A] text-white font-bold flex items-center justify-center gap-2 active:scale-95 transition-all">
                    <Reply size={18}/> Reply
@@ -174,7 +174,7 @@ const MessagePage = () => {
       <div className="md:hidden p-5">
           <div className="mb-5">
             <h1 className="text-2xl font-black text-[#0A0A0A]">INB<span className='text-[#f9a602]'>OX.</span></h1>
-            <p className="text-xs text-gray-500">Showing <span className="font-bold text-[#f9a602]">{filteredMessages.length}</span> messages</p>
+            <p className="text-xs text-gray-500">Showing <span className="font-bold text-[#f9a602]">{totalItems}</span> messages</p>
           </div>
           <div className="relative mb-5">
             <Search className="absolute left-3 top-2.5 text-gray-400" size={16}/>
@@ -187,18 +187,21 @@ const MessagePage = () => {
             />
           </div>
           
-          {isLoading ? (
+          {isLoading && page === 1 ? (
             <MobileSkeleton />
           ) : error ? (
             <div className="p-5 text-center text-red-500">{error}</div>
-          ) : filteredMessages.length === 0 ? (
+          ) : messages.length === 0 ? (
             <div className="p-10 text-center text-gray-400">
               {searchQuery ? "No matching messages found." : "No messages found."}
             </div>
           ) : (
             <div className="space-y-3 pb-6">
-              {visibleMessages.map((msg) => (
-                 <div key={msg.id} onClick={() => setMobileViewMsg(msg)} className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 active:scale-95 transition-transform cursor-pointer">
+              {messages.map((msg) => (
+                 <div key={msg.id} onClick={() => setMobileViewMsg(msg)} className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 active:scale-95 transition-transform cursor-pointer relative overflow-hidden">
+                    {/* Indicator if replied */}
+                    {msg.reply_message && <div className="absolute top-0 right-0 w-2 h-2 bg-green-500 rounded-bl-lg"></div>}
+                    
                     <div className="flex items-center gap-3 mb-2">
                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold bg-[#f9a602] text-black`}>
                           {msg.full_name?.charAt(0) || "U"}
@@ -212,14 +215,15 @@ const MessagePage = () => {
                  </div>
               ))}
 
-              {(hasMore || visibleCount > 12) && (
+              {/* API PAGINATION BUTTONS */}
+              {(hasMore || page > 1) && (
                 <div className="flex flex-col gap-3 pt-4">
                   {hasMore && (
-                    <button onClick={handleSeeMore} className="w-full py-3 bg-[#0A0A0A] text-white text-[10px] font-black rounded-xl uppercase tracking-widest flex items-center justify-center gap-2 active:scale-95 transition-transform">
-                      See More <ChevronDown size={14} />
+                    <button onClick={handleSeeMore} disabled={loadingMore} className="w-full py-3 bg-[#0A0A0A] text-white text-[10px] font-black rounded-xl uppercase tracking-widest flex items-center justify-center gap-2 active:scale-95 transition-transform disabled:opacity-50">
+                      {loadingMore ? <Loader2 size={14} className="animate-spin" /> : <>See More <ChevronDown size={14} /></>}
                     </button>
                   )}
-                  {visibleCount > 12 && (
+                  {page > 1 && !loadingMore && (
                     <button onClick={handleShowLess} className="w-full py-3 bg-white text-[#0A0A0A] border border-gray-200 text-[10px] font-black rounded-xl uppercase tracking-widest flex items-center justify-center gap-2 active:scale-95 transition-transform">
                       <ChevronsUp size={14} /> Show Less
                     </button>
@@ -236,7 +240,7 @@ const MessagePage = () => {
          <div className="flex justify-between items-center mb-8">
             <div>
                <h1 className="text-4xl font-black text-[#0A0A0A] tracking-tight">INB<span className='text-[#f9a602]'>OX.</span></h1>
-               <p className="text-sm text-gray-500 mt-1">Showing <span className="font-bold text-[#f9a602]">{filteredMessages.length}</span> messages</p>
+               <p className="text-sm text-gray-500 mt-1">Showing <span className="font-bold text-[#f9a602]">{totalItems}</span> messages</p>
             </div>
             <div className="relative group">
                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#f9a602] transition-colors" size={18}/>
@@ -257,23 +261,25 @@ const MessagePage = () => {
                <div className="col-span-3 text-right pr-4">Date</div>
             </div>
             
-            {isLoading ? (
+            {isLoading && page === 1 ? (
               <DesktopSkeleton />
             ) : error ? (
               <div className="p-10 text-center text-red-500 font-bold">{error}</div>
-            ) : filteredMessages.length === 0 ? (
+            ) : messages.length === 0 ? (
               <div className="p-20 text-center text-gray-400 font-bold text-lg">
                 {searchQuery ? "No matching messages found." : "No messages found."}
               </div>
             ) : (
             <div className="divide-y divide-gray-50">
-               {visibleMessages.map((msg) => (
+               {messages.map((msg) => (
                   <div key={msg.id} className="group bg-white hover:bg-gray-50/50">
                      <div onClick={() => { toggleMessage(msg.id); setShowReplyBox(false); }} className={`grid grid-cols-12 gap-4 px-6 py-4 items-center cursor-pointer relative transition-all duration-300 ${expandedId === msg.id ? 'bg-[#f9a602]/5' : ''}`}>
                         {expandedId === msg.id && <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#f9a602]"></div>}
                         <div className="col-span-3 flex items-center gap-4 pl-2">
-                           <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold shrink-0 bg-[#0A0A0A] text-white`}>
+                           <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold shrink-0 bg-[#0A0A0A] text-white relative`}>
                               {msg.full_name?.charAt(0) || "U"}
+                              {/* Indicator if replied */}
+                              {msg.reply_message && <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></div>}
                            </div>
                            <div className="min-w-0">
                               <h4 className={`text-sm truncate font-medium text-gray-700`}>{msg.full_name}</h4>
@@ -296,7 +302,9 @@ const MessagePage = () => {
                            <div className="bg-gray-50/50 border-t border-gray-100 px-20 py-8">
                               <div className="flex justify-between items-start mb-6">
                                  <h2 className="text-xl font-black text-[#0A0A0A]">{msg.subject}</h2>
-                                 {!showReplyBox && (
+                                 
+                                 {/* HIDE REPLY BUTTON IF ALREADY REPLIED */}
+                                 {!showReplyBox && !msg.reply_message && (
                                    <button 
                                       onClick={() => setShowReplyBox(true)} 
                                       className="flex items-center gap-2 px-6 py-2.5 bg-black text-white rounded-xl text-xs font-bold shadow-lg hover:bg-[#f9a602] hover:text-black transition-all active:scale-95"
@@ -309,17 +317,21 @@ const MessagePage = () => {
                                  {msg.message}
                               </div>
 
-                              {sentReplies[msg.id] && (
+                              {/* SHOW REPLY FROM BACKEND IF EXISTS */}
+                              {msg.reply_message && (
                                 <div className="mb-6 p-6 bg-emerald-50 border border-emerald-100 rounded-2xl animate-in slide-in-from-left-4 duration-500">
-                                   <div className="flex items-center gap-2 mb-3 text-emerald-700 font-black text-[10px] uppercase tracking-widest">
-                                      <UserCheck size={16}/> Your Official Reply
+                                   <div className="flex items-center justify-between mb-3">
+                                      <div className="flex items-center gap-2 text-emerald-700 font-black text-[10px] uppercase tracking-widest">
+                                        <UserCheck size={16}/> Your Official Reply
+                                      </div>
+                                      <span className="text-[10px] text-emerald-600/70 font-bold tracking-tight">{formatDate(msg.replied_at)}</span>
                                    </div>
-                                   <p className="text-sm text-emerald-900 italic font-medium leading-relaxed">"{sentReplies[msg.id].text}"</p>
-                                   <p className="text-[10px] text-emerald-600/50 mt-2 font-bold tracking-tight">{sentReplies[msg.id].date}</p>
+                                   <p className="text-sm text-emerald-900 italic font-medium leading-relaxed">"{msg.reply_message}"</p>
                                 </div>
                               )}
 
-                              {showReplyBox && (
+                              {/* SHOW TEXT BOX ONLY IF NOT REPLIED YET */}
+                              {showReplyBox && !msg.reply_message && (
                                 <div className="space-y-4 animate-in slide-in-from-top-4 duration-300">
                                    <div className="relative">
                                       <textarea 
@@ -348,14 +360,15 @@ const MessagePage = () => {
                   </div>
                ))}
 
-               {(hasMore || visibleCount > 12) && (
+               {/* API PAGINATION BUTTONS */}
+               {(hasMore || page > 1) && (
                  <div className="flex justify-center items-center gap-4 py-8 border-t border-gray-100 bg-gray-50/30">
                     {hasMore && (
-                      <button onClick={handleSeeMore} className="flex items-center gap-2 px-8 py-3 bg-[#0A0A0A] text-white text-[10px] font-black rounded-2xl uppercase tracking-[0.2em] hover:bg-[#f9a602] hover:text-[#0A0A0A] transition-all shadow-xl active:scale-95">
-                        See More <ChevronDown size={14} />
+                      <button onClick={handleSeeMore} disabled={loadingMore} className="flex items-center gap-2 px-8 py-3 bg-[#0A0A0A] text-white text-[10px] font-black rounded-2xl uppercase tracking-[0.2em] hover:bg-[#f9a602] hover:text-[#0A0A0A] transition-all shadow-xl active:scale-95 disabled:opacity-50">
+                        {loadingMore ? <Loader2 size={14} className="animate-spin" /> : <>See More <ChevronDown size={14} /></>}
                       </button>
                     )}
-                    {visibleCount > 12 && (
+                    {page > 1 && !loadingMore && (
                       <button onClick={handleShowLess} className="flex items-center gap-2 px-8 py-3 bg-white text-[#0A0A0A] border-2 border-[#f9a602] text-[10px] font-black rounded-2xl uppercase tracking-[0.2em] hover:bg-[#f9a602] transition-all active:scale-95">
                         <ChevronsUp size={14} /> Show Less
                       </button>
