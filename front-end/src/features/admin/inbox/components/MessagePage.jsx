@@ -99,7 +99,7 @@ const MessagePage = () => {
   );
 
   return (
-    <div className="w-full min-h-screen bg-[#F8F9FA] font-sans text-[#0A0A0A]">
+    <div className="w-full min-h-screen bg-white font-sans text-[#0A0A0A]">
       
       {/* 📱 MOBILE VIEW OVERLAY */}
       {mobileViewMsg && (

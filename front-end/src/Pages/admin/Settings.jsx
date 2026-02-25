@@ -1,8 +1,9 @@
 import React from 'react'
+import {SettingsPage} from '../../features/admin/settings'
 
 const Settings = () => {
   return (
-    <div>Settings</div>
+    <div><SettingsPage/></div>
   )
 }
 
