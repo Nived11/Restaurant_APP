@@ -101,6 +101,7 @@ export const useMessage = () => {
           ? { ...msg, reply_message: replyText, replied_at: new Date().toISOString() } 
           : msg
       ));
+      toast.success("Reply sent successfully!");
       
       return true; // Success
     } catch (err) {

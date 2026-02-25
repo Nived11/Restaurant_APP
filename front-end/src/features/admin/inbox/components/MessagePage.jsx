@@ -99,7 +99,7 @@ const MessagePage = () => {
   );
 
   return (
-    <div className="w-full min-h-screen bg-[#F8F9FA] font-sans text-[#0A0A0A]">
+    <div className="w-full min-h-screen  font-sans text-[#0A0A0A]">
       
       {/* 📱 MOBILE VIEW OVERLAY */}
       {mobileViewMsg && (
@@ -177,13 +177,13 @@ const MessagePage = () => {
             <p className="text-xs text-gray-500">Showing <span className="font-bold text-[#f9a602]">{totalItems}</span> messages</p>
           </div>
           <div className="relative mb-5">
-            <Search className="absolute left-3 top-2.5 text-gray-400" size={16}/>
+            <Search className="absolute left-3 top-2.5 text-gray-500" size={16}/>
             <input 
               type="text" 
               placeholder="Search by name or email..." 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 py-2 bg-white rounded-xl border-none shadow-sm text-sm outline-none focus:ring-1 focus:ring-[#f9a602]/30"
+              className="w-full pl-10 py-2 bg-white border border-primary/60 rounded-xl text-sm font-medium outline-none focus:border-[#f9a602] focus:ring-1 focus:ring-[#f9a602] transition-all shadow-xl placeholder:text-gray-500"
             />
           </div>
           
@@ -243,13 +243,13 @@ const MessagePage = () => {
                <p className="text-sm text-gray-500 mt-1">Showing <span className="font-bold text-[#f9a602]">{totalItems}</span> messages</p>
             </div>
             <div className="relative group">
-               <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#f9a602] transition-colors" size={18}/>
+               <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-[#f9a602] transition-colors" size={18}/>
                <input 
                  type="text" 
                  placeholder="Search by name or email..." 
                  value={searchQuery}
                  onChange={(e) => setSearchQuery(e.target.value)}
-                 className="pl-12 pr-4 py-3 w-80 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#f9a602]/20 focus:border-[#f9a602] transition-all text-sm font-medium"
+                 className="pl-12 pr-4 py-3 w-80 bg-white border border-primary/60 rounded-xl text-sm font-medium outline-none focus:border-[#f9a602] focus:ring-1 focus:ring-[#f9a602] transition-all shadow-xl placeholder:text-gray-500"
                />
             </div>
          </div>
