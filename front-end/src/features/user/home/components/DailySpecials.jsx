@@ -3,7 +3,7 @@ import { RiFireFill, RiInboxLine } from "react-icons/ri";
 
 
 
-const DailySpecials = ({ data: specials = []}) => {
+const DailySpecials = ({ data: specials = [],onItemClick}) => {
   
   if (specials.length === 0) return null;
 
@@ -34,6 +34,7 @@ const DailySpecials = ({ data: specials = []}) => {
               return (
                 <div 
                   key={item.id} 
+                
                   className="relative h-56 md:h-72 rounded-[1.5rem] md:rounded-[2rem] overflow-hidden group cursor-pointer shadow-md"
                 >
                   <img 
@@ -71,7 +72,7 @@ const DailySpecials = ({ data: specials = []}) => {
                           ₹{Math.round(offer)}
                         </span>
                       </div>
-                      <button className="bg-white text-black px-4 md:px-6 py-2 md:py-2.5 rounded-xl md:rounded-2xl text-[9px] md:text-[11px] font-black hover:bg-primary transition-all active:scale-95">
+                      <button   onClick={() => onItemClick?.(item)} className="bg-white text-black px-4 md:px-6 py-2 md:py-2.5 rounded-xl md:rounded-2xl text-[9px] md:text-[11px] font-black hover:bg-primary transition-all active:scale-95">
                         ADD TO CART
                       </button>
                     </div>

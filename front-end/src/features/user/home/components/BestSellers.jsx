@@ -1,96 +1,111 @@
 import React from "react";
 import { RiAddLine, RiInboxLine } from "react-icons/ri";
 
-
-const BestSellers = ({ data: bestSellers = [] }) => {
-  
-
+const BestSellers = ({ data: bestSellers = [], onItemClick }) => {
   return (
     <section className="py-12 bg-white">
       <div className="max-w-[1440px] mx-auto px-4 md:px-10">
         
-        {/* Header */}
+        {/* Header Section */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-2">
           <div>
-            <h2 className="text-2xl md:text-3xl font-black uppercase text-gray-900">
+            <h2 className="text-xl md:text-2xl font-black uppercase text-slate-900 tracking-tight">
               Our <span className="text-primary">Best</span> Sellers
             </h2>
-            <div className="h-1 w-10 bg-primary mt-1 rounded-full" />
+            <div className="h-1 w-8 bg-primary mt-1 rounded-full" />
           </div>
-          <p className="text-gray-400 font-bold text-[10px] md:text-xs uppercase tracking-[0.2em]">
+          <p className="text-slate-400 font-bold text-[9px] md:text-xs uppercase tracking-[0.2em]">
             Community Favorites
           </p>
         </div>
 
         {bestSellers.length > 0 ? (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-4 gap-y-8 md:gap-x-8 md:gap-y-12">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-5">
             {bestSellers.map((item) => {
-              // --- Discount Percentage Calculation ---
               const actual = parseFloat(item.actual_price);
               const offer = parseFloat(item.offer_price);
+              const isVeg = item?.dietary_preference === "VEG";
+              
               let discountPercent = 0;
               if (actual > offer) {
                 discountPercent = Math.round(((actual - offer) / actual) * 100);
               }
 
               return (
-                <div key={item.id} className="group will-change-transform">
-                  
-                  {/* Image Container */}
-                  <div className="relative aspect-square rounded-[1.5rem] md:rounded-[2.5rem] overflow-hidden bg-gray-50 mb-3 md:mb-5 shadow-sm transform-gpu">
+                <div 
+                  key={item.id} 
+                  className="group bg-white rounded-xl border border-slate-200 overflow-hidden hover:shadow-md transition-all duration-300 flex flex-col h-full relative"
+                >
+                  {/* Discount Badge */}
+                  {discountPercent > 0 && (
+                    <div className="absolute top-2 left-2 z-10">
+                      <span className="bg-primary text-black text-[7px] md:text-[9px] font-black px-1.5 py-0.5 rounded shadow-sm uppercase">
+                        {discountPercent}% OFF
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Image - Admin Card style (Square/Video aspect) */}
+                  <div className="relative aspect-square overflow-hidden bg-slate-50 shrink-0">
                     <img 
                       src={item.image} 
                       alt={item.name}
-                      loading="lazy"
-                      decoding="async"
-                      className="w-full h-full object-cover md:group-hover:scale-110 transition-transform duration-500 ease-out" 
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" 
                     />
-
-                    {/* Discount Badge */}
-                    {discountPercent > 0 && (
-                      <div className="absolute top-3 left-3 md:top-5 md:left-5">
-                        <span className="bg-primary text-black text-[9px] md:text-[11px] font-black px-2 md:px-3 py-1 rounded-lg shadow-lg uppercase">
-                          {discountPercent}% OFF
-                        </span>
-                      </div>
-                    )}
-                    
-                    {/* + Plus Button */}
-                    <button className="absolute bottom-3 right-3 md:bottom-5 md:right-5 bg-white/90 backdrop-blur-md text-black size-8 md:size-12 cursor-pointer rounded-md md:rounded-xl flex items-center justify-center shadow-xl transition-all duration-300 md:hover:bg-primary active:scale-90 z-10">
-                      <RiAddLine size={24} className="md:size-8 font-bold" />
-                    </button>
-                  </div>
-
-                  {/* Content Area */}
-                  <div className="px-1">
-                    <h3 className="font-black text-gray-900 text-[14px] md:text-lg leading-tight mb-1 truncate">
-                      {item.name}
-                    </h3>
-                    <p className="text-[10px] md:text-xs text-gray-500 font-medium line-clamp-1 mb-2">
-                      {item.description}
-                    </p>
-                    
-                    <div className="flex flex-col">
-                      {actual > offer && (
-                        <span className="text-gray-400 text-[10px] md:text-xs line-through font-bold">
-                          ₹{Math.round(actual)}
-                        </span>
-                      )}
-                      <span className="font-black text-black text-base md:text-xl leading-none">
-                        ₹{Math.round(offer)}
+                    <div className="absolute bottom-2 left-2">
+                      <span className="bg-white/90 backdrop-blur-sm text-slate-900 text-[7px] md:text-[8px] font-black px-1.5 py-0.5 rounded shadow-sm uppercase">
+                        {item?.category_name || "General"}
                       </span>
                     </div>
                   </div>
 
+                  {/* Content Area */}
+                  <div className="p-2 md:p-3 flex flex-col flex-1">
+                    {/* Veg/Non-Veg Tag */}
+                    <div className="flex items-center gap-1 mb-1">
+                      <div className={`w-1.5 h-1.5 rounded-full ${isVeg ? 'bg-green-500' : 'bg-red-500'}`} />
+                      <span className={`text-[8px] font-bold uppercase ${isVeg ? 'text-green-600' : 'text-red-600'}`}>
+                        {isVeg ? 'Veg' : 'Non-Veg'}
+                      </span>
+                    </div>
+
+                    <h3 className="text-[11px] md:text-sm font-bold text-slate-900 truncate mb-0.5 leading-tight group-hover:text-primary transition-colors">
+                      {item?.name}
+                    </h3>
+                    <p className="text-[9px] md:text-[10px] text-slate-500 line-clamp-1 mb-3">
+                      {item?.description || "No description"}
+                    </p>
+
+                    {/* Price & Add Button */}
+                    <div className="mt-auto pt-2 border-t border-slate-50 flex items-center justify-between">
+                      <div className="flex flex-col">
+                        <span className="text-[11px] md:text-[15px] font-black text-slate-900 leading-none">
+                          ₹{Math.round(offer)}
+                        </span>
+                        {actual > offer && (
+                          <span className="text-[8px] md:text-[10px] font-medium text-slate-400 line-through leading-none mt-1">
+                            ₹{Math.round(actual)}
+                          </span>
+                        )}
+                      </div>
+
+                      <button 
+                        onClick={() => onItemClick?.(item)}
+                        className="cursor-pointer bg-slate-900 text-white p-1.5 md:p-2 rounded-lg hover:bg-primary hover:text-black transition-all active:scale-90"
+                      >
+                        <RiAddLine size={16} className="md:size-5" />
+                      </button>
+                    </div>
+                  </div>
                 </div>
               );
             })}
           </div>
         ) : (
           /* Empty State */
-          <div className="w-full py-12 flex flex-col items-center justify-center border-2 border-dashed border-gray-100 rounded-[2.5rem]">
-             <RiInboxLine size={40} className="text-gray-200 mb-2" />
-             <p className="text-gray-400 text-xs font-bold uppercase tracking-widest">No Best Sellers Found</p>
+          <div className="w-full py-16 flex flex-col items-center justify-center border-2 border-dashed border-slate-100 rounded-2xl">
+             <RiInboxLine size={40} className="text-slate-200 mb-2" />
+             <p className="text-slate-400 text-[10px] font-bold uppercase tracking-widest">No Best Sellers Found</p>
           </div>
         )}
       </div>

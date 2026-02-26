@@ -20,7 +20,6 @@ const MenuFormModal = ({
     return () => { document.body.style.overflow = 'unset'; };
   }, []);
 
-  // പ്രൈസ് വാലിഡേഷൻ ചെക്ക്
   const isPriceInvalid = Number(formData.offer_price) > Number(formData.actual_price);
 
   const inputClass = "w-full bg-slate-50 border-2 border-slate-300 rounded-xl px-4 py-2.5 text-[12px] font-bold text-slate-900 outline-none focus:border-slate-900 focus:bg-white transition-all appearance-none placeholder:text-slate-400";

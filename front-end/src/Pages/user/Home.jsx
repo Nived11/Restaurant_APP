@@ -1,20 +1,25 @@
-import { 
-  BannerSection, 
-  DailySpecials, 
-  BestSellers, 
-  ComboSection, 
-  CategorySection, 
-  FAQ, 
-  Testimonials, 
-  BrandFeatures, 
-  HomeError, 
+import { useState } from "react";
+import { AnimatePresence } from "framer-motion";
+import ProductModal from "../../components/common/ProductModal";
+import {
+  BannerSection,
+  DailySpecials,
+  BestSellers,
+  ComboSection,
+  FirstOrderBanner,
+  CategorySection,
+  ExploreMore,
+  FAQ,
+  Testimonials,
+  BrandFeatures,
+  HomeError,
   HomeSkeleton,
-  useHomeData 
-  
+  useHomeData
 } from "../../features/user/home";
 
 const Home = () => {
-const { data, isLoading,isError, error, refetch } = useHomeData();
+  const { data, isLoading, isError, error, refetch } = useHomeData();
+  const [selectedItem, setSelectedItem] = useState(null);
 
   if (isError) {
     return (
@@ -23,21 +28,47 @@ const { data, isLoading,isError, error, refetch } = useHomeData();
       </div>
     );
   }
+
   if (isLoading) {
     return <HomeSkeleton />;
   }
 
-return (
+  return (
     <div className="pb-20">
-      <BannerSection data={data?.banners} />
+      <BannerSection
+        data={data?.banners}
+        onBannerClick={(item) => setSelectedItem(item)}
+      />
+
       <CategorySection data={data?.categories} />
-      <DailySpecials data={data?.specials} />
-      <BestSellers data={data?.bestSellers} />
-      <ComboSection data={data?.combos} />
-      
+
+      <DailySpecials
+        data={data?.specials}
+        onItemClick={(item) => setSelectedItem(item)}
+      />
+      <FirstOrderBanner />
+
+      <BestSellers
+        data={data?.bestSellers}
+        onItemClick={(item) => setSelectedItem(item)}
+      />
+      <ComboSection
+        data={data?.combos}
+        onItemClick={(item) => setSelectedItem(item)}
+      />
+      <ExploreMore />
       <Testimonials />
       <FAQ />
       <BrandFeatures />
+
+      <AnimatePresence>
+        {selectedItem && (
+          <ProductModal
+            item={selectedItem}
+            onClose={() => setSelectedItem(null)}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 };

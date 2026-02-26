@@ -31,7 +31,7 @@ const HomeError = ({ message, refetch }) => {
           <div className={`absolute inset-0 bg-slate-100 rounded-full scale-[2] blur-xl transition-opacity duration-500 ${isRefreshing ? 'opacity-100' : 'opacity-0'}`} />
           <RiBaseStationLine 
             size={48} 
-            className={`relative transition-colors duration-500 ${isRefreshing ? 'text-blue-500' : 'text-red-500'}`} 
+            className={`relative transition-colors duration-500 ${isRefreshing ? 'text-primary' : 'text-red-500'}`} 
           />
         </div>
 

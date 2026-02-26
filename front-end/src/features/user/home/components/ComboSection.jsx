@@ -2,7 +2,7 @@ import React, { useRef, useState } from "react";
 import { RiFlashlightFill, RiArrowLeftSLine, RiArrowRightSLine, RiInboxLine } from "react-icons/ri";
 
 
-const ComboSection = ({ data: combos = [] }) => {
+const ComboSection = ({ data: combos = [], onItemClick }) => {
   const scrollRef = useRef(null);
   const [showLeftArrow, setShowLeftArrow] = useState(false);
 
@@ -103,7 +103,7 @@ const ComboSection = ({ data: combos = [] }) => {
                           )}
                         </div>
                         
-                        <button className="w-full bg-black text-white py-2.5 md:py-3 rounded-xl text-[9px] md:text-xs font-black uppercase flex items-center justify-center gap-2 hover:bg-primary hover:text-black transition-all active:scale-95 shadow-lg shadow-black/5">
+                        <button onClick={() => onItemClick?.(combo)} className="w-full bg-black text-white py-2.5 md:py-3 rounded-xl text-[9px] md:text-xs font-black uppercase flex items-center justify-center gap-2 hover:bg-primary hover:text-black transition-all active:scale-95 shadow-lg shadow-black/5">
                           <RiFlashlightFill size={16} className="text-primary group-hover/item:text-black" />
                           Grab Now
                         </button>

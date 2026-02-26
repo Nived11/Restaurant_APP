@@ -1,6 +1,6 @@
 import { BrowserRouter } from "react-router-dom";
 import AppRoutes from "./routes";
-import ScrollToTop from "./components/common/ScrollToTop";
+import ScrollToTop from "./hooks/ScrollToTop";
 import { Toaster } from "./components/ui/sonner";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 

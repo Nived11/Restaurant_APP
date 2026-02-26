@@ -1,10 +1,12 @@
 import { motion } from "framer-motion";
 import { useRef, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 
 
 const CategorySection = ({ data: categories = [] }) => {
+  const navigate = useNavigate()
   const scrollRef = useRef(null);
   const [showLeftArrow, setShowLeftArrow] = useState(false);
 
@@ -21,6 +23,10 @@ const CategorySection = ({ data: categories = [] }) => {
     if (scrollRef.current) {
       setShowLeftArrow(scrollRef.current.scrollLeft > 20);
     }
+  };
+
+  const handleCategoryClick = (id) => {
+    navigate(`/menu?category=${id}`);
   };
 
   if (categories.length === 0) return null;
@@ -55,11 +61,13 @@ const CategorySection = ({ data: categories = [] }) => {
 
             {
               categories.map((cat) => (
-                <motion.div key={cat.id} whileHover={{ y: -5 }} whileTap={{ scale: 0.95 }} className="flex flex-col items-center shrink-0 cursor-pointer group snap-start py-2">
+                <motion.div 
+                key={cat.id} 
+                onClick={() => handleCategoryClick(cat.id)} 
+                whileHover={{ y: -5 }} whileTap={{ scale: 0.95 }} className="flex flex-col items-center shrink-0 cursor-pointer group snap-start py-2">
                   <div className="relative w-20 h-20 md:w-28 md:h-28 rounded-full overflow-hidden shadow-md border-4 border-white group-hover:border-primary transition-all duration-300">
                     <img src={cat.image} alt={cat.name} 
                     loading="lazy"
-                    decoding="async"
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
                   </div>
                   <div className="mt-4 flex flex-col items-center">
