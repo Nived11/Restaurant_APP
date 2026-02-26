@@ -1,4 +1,4 @@
-import { useSearchParams } from "react-router-dom";
+import { useState } from "react"; 
 import { AnimatePresence } from "framer-motion";
 import { 
   useMenu, 
@@ -11,21 +11,13 @@ import {
 import ProductModal from "../../components/common/ProductModal"; 
 
 const MenuPage = () => {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const selectedItemId = searchParams.get('item');
+  const [selectedItem, setSelectedItem] = useState(null);
 
   const { 
     categories, activeCategory, setActiveCategory, 
     filterType, setFilterType, filteredItems,
     isLoading, error, refetch 
   } = useMenu();
-
-  const handleCloseModal = () => {
-    searchParams.delete('item');
-    setSearchParams(searchParams);
-  };
-
-  const selectedItem = filteredItems.find(item => String(item.id) === selectedItemId);
 
   return (
     <div className="min-h-screen bg-white">
@@ -39,11 +31,12 @@ const MenuPage = () => {
         setFilterType={setFilterType}
       />
 
+      {/* മോഡൽ ലോജിക് */}
       <AnimatePresence>
         {selectedItem && (
           <ProductModal 
             item={selectedItem} 
-            onClose={handleCloseModal} 
+            onClose={() => setSelectedItem(null)} 
           />
         )}
       </AnimatePresence>
@@ -56,7 +49,10 @@ const MenuPage = () => {
       ) : isLoading ? (
         <MenuSkeleton />
       ) : (
-        <MenuItemLists items={filteredItems} />
+        <MenuItemLists 
+          items={filteredItems} 
+          onItemClick={(item) => setSelectedItem(item)} 
+        />
       )}
     </div>
   );

@@ -1,44 +1,44 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { RiArrowRightLine } from "react-icons/ri";
+import { RiArrowRightLine, RiRestaurant2Line } from "react-icons/ri";
 
 const ExploreMore = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="max-w-[1440px] mx-auto px-4 md:px-10 py-10 md:py-16">
-      <div className="relative h-56 md:h-72 rounded-[2rem] md:rounded-[3.5rem] overflow-hidden shadow-2xl group border border-white/10">
+    <div className="max-w-[1440px] mx-auto px-4 md:px-10 py-8 md:py-12">
+      {/* Compact Card Style with subtle border */}
+      <div className="relative group  rounded-[2rem] md:rounded-[3rem] p-8 md:p-12 overflow-hidden flex flex-col items-center text-center">
         
-        {/* New High-Quality Food Image (Burger & Fries Close-up) */}
-        <img 
-          src="https://i.pinimg.com/736x/02/0a/a1/020aa191a471a7d5e6c3d393da575ed8.jpg" 
-          alt="Explore Full Menu"
-          className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
-        />
+        {/* Subtle Background Icon for a premium feel */}
+        <RiRestaurant2Line className="absolute -right-4 -bottom-4 text-slate-100 size-32 md:size-48 -rotate-12 transition-transform group-hover:scale-110 duration-700" />
 
-        {/* Gradient Overlay - Dark to Transparent */}
-        <div className="absolute inset-0 bg-gradient-to-r from-black via-black/40 to-transparent flex flex-col md:flex-row items-center justify-between px-8 md:px-20 text-center md:text-left">
-          
-          <div className="flex flex-col justify-center mt-4 md:mt-0">
-            <h3 className="text-3xl md:text-6xl font-black text-white uppercase tracking-tighter leading-tight">
-              Still <span className="text-primary italic">Hungry?</span>
-            </h3>
-            <p className="text-gray-300 text-[10px] md:text-base font-bold uppercase tracking-[0.2em] mt-1">
-              Explore 50+ dishes in our full menu
-            </p>
-          </div>
+        {/* Top Mini Label */}
+        <span className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.4em] text-primary mb-3 block">
+          Craving for more?
+        </span>
 
-          <button
-            onClick={() => navigate("/menu")}
-            className="cursor-pointer mb-8 md:mb-0 group flex items-center gap-3 bg-primary text-black px-8 md:px-14 py-4 md:py-5 rounded-2xl font-black uppercase text-[11px] md:text-sm transition-all duration-300 hover:bg-white active:scale-95 shadow-xl"
-          >
-            <span>EXPLORE NOW</span>
-            <RiArrowRightLine 
-              size={20} 
-              className="group-hover:translate-x-2 transition-transform duration-300" 
-            />
-          </button>
-        </div>
+        {/* Main Heading - Reduced size for better proportions */}
+        <h3 className="text-3xl md:text-5xl font-black text-slate-900 uppercase tracking-tighter leading-none mb-4 relative z-10">
+          Still <span className="text-primary ">Hungry?</span>
+        </h3>
+
+        {/* Minimalist Description */}
+        <p className="text-slate-500 text-[10px] md:text-xs font-bold uppercase tracking-widest max-w-[250px] md:max-w-none mb-8 relative z-10">
+          Explore our full range of <span className="text-slate-900">50+ handcrafted</span> dishes
+        </p>
+
+        {/* Refined Button - Smaller and Slicker */}
+        <button
+          onClick={() => navigate("/menu")}
+          className="cursor-pointer group relative flex items-center gap-3 bg-slate-900 text-white px-8 md:px-10 py-3.5 md:py-4 rounded-xl font-black uppercase text-[11px] md:text-xs transition-all duration-300 hover:bg-primary hover:text-black active:scale-95 shadow-xl shadow-slate-200 z-10"
+        >
+          <span className="tracking-widest">Explore  Menu</span>
+          <RiArrowRightLine 
+            size={18} 
+            className="group-hover:translate-x-1.5 transition-transform duration-300" 
+          />
+        </button>
 
       </div>
     </div>

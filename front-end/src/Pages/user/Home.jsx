@@ -46,12 +46,12 @@ const Home = () => {
         data={data?.specials}
         onItemClick={(item) => setSelectedItem(item)}
       />
-      <FirstOrderBanner />
 
       <BestSellers
         data={data?.bestSellers}
         onItemClick={(item) => setSelectedItem(item)}
       />
+      <FirstOrderBanner />
       <ComboSection
         data={data?.combos}
         onItemClick={(item) => setSelectedItem(item)}

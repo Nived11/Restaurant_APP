@@ -2,7 +2,7 @@ import React, { memo } from 'react';
 import { Plus, Leaf, Flame } from 'lucide-react';
 import { motion } from 'framer-motion';
 
-const ProductCard = ({ item, onProductClick, onAddToCart }) => {
+const ProductCard = ({ item, onProductClick }) => {
   const offerPrice = Math.round(parseFloat(item.offer_price || 0));
   const actualPrice = Math.round(parseFloat(item.actual_price || item.offer_price || 0));
   const hasDiscount = actualPrice > offerPrice;
@@ -21,7 +21,7 @@ const ProductCard = ({ item, onProductClick, onAddToCart }) => {
       whileHover={{ y: -6 }}
       whileTap={{ scale: 0.98 }}
       className="group relative flex flex-col bg-white rounded-[1.2rem] md:rounded-[2rem] p-2.5 md:p-3 shadow-sm hover:shadow-xl transition-all duration-500 border border-gray-100"
-      onClick={() => onProductClick?.(item)}
+      
     >
       {/* --- IMAGE CONTAINER --- */}
       <div className="relative aspect-square w-full overflow-hidden rounded-[1.2rem] md:rounded-[1.6rem] bg-gray-50">
@@ -76,10 +76,7 @@ const ProductCard = ({ item, onProductClick, onAddToCart }) => {
           <motion.button 
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            onClick={(e) => {
-              e.stopPropagation();
-              onAddToCart?.(item);
-            }}
+            onClick={() => onProductClick?.(item)}
             className="cursor-pointer h-9 w-9 md:h-11 md:w-11 bg-black text-white rounded-xl md:rounded-[1.2rem] flex items-center justify-center shadow-lg hover:bg-[#f9a602] hover:text-black transition-colors duration-300 group/btn"
           >
             <Plus size={18} md:size={22} strokeWidth={3} className="transition-transform group-hover/btn:rotate-90" />

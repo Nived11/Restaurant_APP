@@ -1,6 +1,10 @@
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 
-const FirstOrderBanner = () => (
+const FirstOrderBanner = () => {
+  const navigate = useNavigate();
+
+  return (
   <section className="py-6 px-4 md:px-10">
     <div className="max-w-[1440px] mx-auto">
       <div className="relative h-[180px] md:h-[260px] rounded-[1.5rem] md:rounded-[2.5rem] overflow-hidden flex items-center shadow-xl bg-black">
@@ -30,7 +34,7 @@ const FirstOrderBanner = () => (
             <p className="text-gray-300 mt-1 md:mt-2 text-[9px] md:text-base font-medium opacity-90">
               Automatically applied at checkout for all new foodies.
             </p>
-            <button className="mt-3 md:mt-6 bg-primary text-black font-black px-5 py-2 md:px-8 md:py-3 rounded-xl text-[9px] md:text-sm uppercase shadow-lg active:scale-95 transition-transform">
+            <button  onClick={() => navigate("/menu")}  className="cursor-pointer mt-3 md:mt-6 bg-primary text-black font-black px-5 py-2 md:px-8 md:py-3 rounded-xl text-[9px] md:text-sm uppercase shadow-lg active:scale-95 transition-transform">
               Order Now
             </button>
           </motion.div>
@@ -68,6 +72,7 @@ const FirstOrderBanner = () => (
       </div>
     </div>
   </section>
-);
+  );
+};
 
 export default FirstOrderBanner;

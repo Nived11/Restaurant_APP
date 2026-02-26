@@ -1,28 +1,24 @@
 import React from "react";
 import { RiFireFill, RiInboxLine } from "react-icons/ri";
 
-
-
-const DailySpecials = ({ data: specials = [],onItemClick}) => {
-  
+const DailySpecials = ({ data: specials = [], onItemClick }) => {
   if (specials.length === 0) return null;
 
   return (
-    <section className="py-8 md:py-12 bg-gray-50">
+    <section className="py-6 md:py-12 bg-gray-50">
       <div className="max-w-[1440px] mx-auto px-4 md:px-10">
         
-        <div className="flex items-center justify-start gap-2 md:gap-3 mb-6 md:mb-10">
+        {/* Header Section */}
+        <div className="flex items-center justify-start gap-2 mb-6 md:mb-10">
           <RiFireFill className="text-orange-600 animate-pulse text-xl md:text-3xl" />
-          <h2 className="text-lg md:text-3xl font-black uppercase tracking-tight text-gray-900">
+          <h2 className="text-lg md:text-2xl font-black uppercase tracking-tight text-gray-900">
             Today's <span className="text-orange-600">Hot</span> Specials
           </h2>
-          <RiFireFill className="text-orange-600 animate-pulse text-xl md:text-3xl" />
         </div>
 
         {specials.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
             {specials.map((item) => {
-              // --- Discount Percentage Calculation ---
               const actual = parseFloat(item.actual_price);
               const offer = parseFloat(item.offer_price);
               let discountPercent = 0;
@@ -34,45 +30,50 @@ const DailySpecials = ({ data: specials = [],onItemClick}) => {
               return (
                 <div 
                   key={item.id} 
-                
-                  className="relative h-56 md:h-72 rounded-[1.5rem] md:rounded-[2rem] overflow-hidden group cursor-pointer shadow-md"
+                  onClick={() => onItemClick?.(item)}
+                  className="relative h-52 md:h-64 rounded-[1.2rem] md:rounded-[2rem] overflow-hidden group cursor-pointer shadow-sm hover:shadow-xl transition-all duration-300"
                 >
+                  {/* Image */}
                   <img 
                     src={item.image} 
                     alt={item.name}
                     loading="lazy"
                     decoding="async"
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
                   />
                   
-                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent p-4 md:p-6 flex flex-col justify-end">
+                  {/* Floating Discount Tag */}
+                  {discountPercent > 0 && (
+                    <div className="absolute top-3 right-3 z-10 bg-orange-600 text-white text-[8px] md:text-[10px] font-black px-2 py-1  rounded-2xl shadow-lg">
+                      {discountPercent}% OFF
+                    </div>
+                  )}
+
+                  {/* Gradient Overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent p-4 md:p-6 flex flex-col justify-end">
                     
-                    {/* Display calculated discount */}
-                    {discountPercent > 0 && (
-                      <span className="bg-primary text-black text-[8px] md:text-[10px] font-black px-2 md:px-3 py-1 rounded-full w-fit mb-2 tracking-widest uppercase">
-                        {discountPercent}% OFF
-                      </span>
-                    )}
+                    <div className="mb-2">
+                      <h3 className="text-white text-base md:text-xl font-black leading-tight">
+                        {item.name}
+                      </h3>
+                      <p className="text-gray-300 text-[9px] md:text-xs font-medium line-clamp-1 opacity-90">
+                        {item.description}
+                      </p>
+                    </div>
 
-                    <h3 className="text-white text-lg md:text-2xl font-black leading-tight mb-0.5 md:mb-1">
-                      {item.name}
-                    </h3>
-                    <p className="text-gray-300 text-[10px] md:text-sm font-medium line-clamp-1 mb-3 md:mb-4">
-                      {item.description}
-                    </p>
-
-                    <div className="flex justify-between items-center border-t border-white/10 pt-3 md:pt-4">
+                    <div className="flex justify-between items-end border-t border-white/10 pt-3">
                       <div className="flex flex-col">
                         {actual > offer && (
-                          <span className="text-gray-400 text-[10px] md:text-xs line-through font-bold">
+                          <span className="text-gray-400 text-[9px] md:text-[11px] line-through font-bold">
                             ₹{Math.round(actual)}
                           </span>
                         )}
-                        <span className="text-primary text-xl md:text-2xl font-black leading-none">
+                        <span className="text-primary text-lg md:text-2xl font-black leading-none">
                           ₹{Math.round(offer)}
                         </span>
                       </div>
-                      <button   onClick={() => onItemClick?.(item)} className="bg-white text-black px-4 md:px-6 py-2 md:py-2.5 rounded-xl md:rounded-2xl text-[9px] md:text-[11px] font-black hover:bg-primary transition-all active:scale-95">
+                      
+                      <button className="bg-white text-black px-4 py-2 md:px-5 md:py-2 rounded-xl text-[9px] md:text-[11px] font-black hover:bg-primary hover:text-white transition-all transform active:scale-95 shadow-md">
                         ADD TO CART
                       </button>
                     </div>

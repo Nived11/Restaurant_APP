@@ -34,6 +34,7 @@ const BestSellers = ({ data: bestSellers = [], onItemClick }) => {
               return (
                 <div 
                   key={item.id} 
+                   onClick={() => onItemClick?.(item)}
                   className="group bg-white rounded-xl border border-slate-200 overflow-hidden hover:shadow-md transition-all duration-300 flex flex-col h-full relative"
                 >
                   {/* Discount Badge */}
@@ -50,7 +51,7 @@ const BestSellers = ({ data: bestSellers = [], onItemClick }) => {
                     <img 
                       src={item.image} 
                       alt={item.name}
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" 
+                      className="w-full rounded-b-xl h-full object-cover transition-transform duration-500 group-hover:scale-105" 
                     />
                     <div className="absolute bottom-2 left-2">
                       <span className="bg-white/90 backdrop-blur-sm text-slate-900 text-[7px] md:text-[8px] font-black px-1.5 py-0.5 rounded shadow-sm uppercase">
@@ -90,7 +91,7 @@ const BestSellers = ({ data: bestSellers = [], onItemClick }) => {
                       </div>
 
                       <button 
-                        onClick={() => onItemClick?.(item)}
+                       
                         className="cursor-pointer bg-slate-900 text-white p-1.5 md:p-2 rounded-lg hover:bg-primary hover:text-black transition-all active:scale-90"
                       >
                         <RiAddLine size={16} className="md:size-5" />
