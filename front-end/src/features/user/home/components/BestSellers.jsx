@@ -1,30 +1,9 @@
 import React from "react";
 import { RiAddLine, RiInboxLine } from "react-icons/ri";
 
-// --- Skeleton Loading Component ---
-const SkeletonBestSeller = () => (
-  <div className="animate-pulse">
-    <div className="aspect-square rounded-[1.5rem] md:rounded-[2.5rem] bg-slate-200 mb-3 md:mb-5" />
-    <div className="h-4 w-3/4 bg-slate-200 rounded mb-2" />
-    <div className="h-3 w-1/2 bg-slate-200 rounded mb-2" />
-    <div className="h-5 w-1/4 bg-slate-200 rounded" />
-  </div>
-);
 
-const BestSellers = ({ data: bestSellers = [], loading }) => {
+const BestSellers = ({ data: bestSellers = [] }) => {
   
-  if (loading) {
-    return (
-      <section className="py-12 bg-white">
-        <div className="max-w-[1440px] mx-auto px-4 md:px-10">
-          <div className="h-8 w-64 bg-slate-200 rounded mb-10" />
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-4 gap-y-8 md:gap-x-8 md:gap-y-12">
-            {[1, 2, 3, 4].map((n) => <SkeletonBestSeller key={n} />)}
-          </div>
-        </div>
-      </section>
-    );
-  }
 
   return (
     <section className="py-12 bg-white">

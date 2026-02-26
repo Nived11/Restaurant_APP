@@ -6,36 +6,9 @@ import { RiFlashlightFill } from "react-icons/ri";
 import "slick-carousel/slick/slick.css"; 
 import "slick-carousel/slick/slick-theme.css";
 
-// --- Exact Match Skeleton Loader ---
-const SkeletonBanner = ({ isMobile }) => {
-  return (
-    <div className="relative w-full overflow-hidden py-6">
-      <div className="flex justify-center items-center gap-4">
-        {/* Left Side Partial Slide (Desktop only) */}
-        {!isMobile && (
-          <div className="min-w-[250px] h-[350px] bg-slate-200 rounded-3xl opacity-50 scale-85" />
-        )}
-        
-        {/* Main Center Slide */}
-        <div className="relative w-full max-w-[1400px] h-[180px] md:h-[300px] lg:h-[350px] bg-slate-200 animate-pulse rounded-3xl overflow-hidden shadow-lg mx-2">
-          {/* Content Overlay Skeleton */}
-          <div className="absolute inset-0 flex flex-col justify-end p-5 md:p-10 space-y-3 bg-gradient-to-t from-slate-300/50 to-transparent">
-            <div className="h-6 md:h-10 w-2/3 bg-slate-300 rounded-lg" />
-            <div className="h-3 md:h-5 w-1/2 bg-slate-300 rounded-lg" />
-            <div className="h-8 md:h-12 w-32 bg-slate-400/50 rounded-xl mt-2" />
-          </div>
-        </div>
 
-        {/* Right Side Partial Slide (Desktop only) */}
-        {!isMobile && (
-          <div className="min-w-[250px] h-[350px] bg-slate-200 rounded-3xl opacity-50 scale-85" />
-        )}
-      </div>
-    </div>
-  );
-};
 
-const BannerSection = ({ data: banners = [], loading }) => {
+const BannerSection = ({ data: banners = [] }) => {
   const sliderRef = useRef(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
@@ -60,8 +33,6 @@ const BannerSection = ({ data: banners = [], loading }) => {
     beforeChange: (current, next) => setActiveIndex(next),
   };
 
-  // സ്കെലിറ്റൺ ലോഡറിലേക്ക് isMobile പ്രോപ്പ് അയക്കുന്നു
-  if (loading) return <SkeletonBanner isMobile={isMobile} />;
   
   if (banners.length === 0) return null;
 
@@ -87,7 +58,12 @@ const BannerSection = ({ data: banners = [], loading }) => {
                 animate={{ scale: !isMobile ? (isActive ? 1 : 0.82) : 1 }}
                 className="relative w-full h-[180px] md:h-[300px] lg:h-[350px] overflow-hidden rounded-3xl shadow-lg border border-white/10"
               >
-                <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                <img src={item.image} 
+                alt={item.name} 
+                loading="eager" 
+                decoding="sync"
+                fetchPriority="high"
+                className="w-full h-full object-cover" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/30 to-transparent" />
                 <div className="absolute inset-0 flex flex-col justify-end p-5 md:p-10">
                   <AnimatePresence>

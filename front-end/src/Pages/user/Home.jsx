@@ -1,4 +1,3 @@
-import React from "react";
 import { 
   BannerSection, 
   DailySpecials, 
@@ -9,27 +8,32 @@ import {
   Testimonials, 
   BrandFeatures, 
   HomeError, 
+  HomeSkeleton,
   useHomeData 
+  
 } from "../../features/user/home";
 
 const Home = () => {
-  const { data, loading, error, refetch } = useHomeData();
+const { data, isLoading,isError, error, refetch } = useHomeData();
 
-  if (error) {
+  if (isError) {
     return (
       <div className="min-h-[80vh] flex items-center justify-center p-6">
-        <HomeError message={error} refetch={refetch} />
+        <HomeError message={error?.message || "Something went wrong"} refetch={refetch} />
       </div>
     );
   }
+  if (isLoading) {
+    return <HomeSkeleton />;
+  }
 
-  return (
+return (
     <div className="pb-20">
-      <BannerSection data={data.banners} loading={loading} />
-      <CategorySection data={data.categories} loading={loading} />
-      <DailySpecials data={data.specials} loading={loading} />
-      <BestSellers data={data.bestSellers} loading={loading} />
-      <ComboSection data={data.combos} loading={loading} />
+      <BannerSection data={data?.banners} />
+      <CategorySection data={data?.categories} />
+      <DailySpecials data={data?.specials} />
+      <BestSellers data={data?.bestSellers} />
+      <ComboSection data={data?.combos} />
       
       <Testimonials />
       <FAQ />
