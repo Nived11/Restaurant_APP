@@ -7,7 +7,7 @@ import {
   MenuItemLists, 
   MenuSkeleton, 
   ErrorMenu 
-} from '../../features/user/menu';
+} from '../../features/user/menu/index.js';
 import ProductModal from "../../components/common/ProductModal"; 
 
 const MenuPage = () => {
