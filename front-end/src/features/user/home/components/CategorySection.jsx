@@ -2,15 +2,9 @@ import { motion } from "framer-motion";
 import { useRef, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
-// --- Skeleton Component ---
-const SkeletonCircle = () => (
-  <div className="flex flex-col items-center shrink-0 py-2 animate-pulse">
-    <div className="w-20 h-20 md:w-28 md:h-28 rounded-full bg-gray-200 shadow-md" />
-    <div className="h-3 w-16 bg-gray-200 rounded mt-4" />
-  </div>
-);
 
-const CategorySection = ({ data: categories = [], loading }) => {
+
+const CategorySection = ({ data: categories = [] }) => {
   const scrollRef = useRef(null);
   const [showLeftArrow, setShowLeftArrow] = useState(false);
 
@@ -28,6 +22,8 @@ const CategorySection = ({ data: categories = [], loading }) => {
       setShowLeftArrow(scrollRef.current.scrollLeft > 20);
     }
   };
+
+  if (categories.length === 0) return null;
 
   return (
     <section className="py-12 bg-white">
@@ -57,13 +53,14 @@ const CategorySection = ({ data: categories = [], loading }) => {
           >
             <style dangerouslySetInnerHTML={{__html: `.no-scrollbar::-webkit-scrollbar { display: none; }`}} />
 
-            {loading ? (
-              [...Array(8)].map((_, i) => <SkeletonCircle key={i} />)
-            ) : (
+            {
               categories.map((cat) => (
                 <motion.div key={cat.id} whileHover={{ y: -5 }} whileTap={{ scale: 0.95 }} className="flex flex-col items-center shrink-0 cursor-pointer group snap-start py-2">
                   <div className="relative w-20 h-20 md:w-28 md:h-28 rounded-full overflow-hidden shadow-md border-4 border-white group-hover:border-primary transition-all duration-300">
-                    <img src={cat.image} alt={cat.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                    <img src={cat.image} alt={cat.name} 
+                    loading="lazy"
+                    decoding="async"
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
                   </div>
                   <div className="mt-4 flex flex-col items-center">
                     <span className="text-[10px] md:text-[12px] font-bold uppercase tracking-wider text-gray-700 group-hover:text-black text-center leading-[1.1] w-[70px] md:w-[90px] min-h-[2.2em] flex items-center justify-center">
@@ -73,7 +70,7 @@ const CategorySection = ({ data: categories = [], loading }) => {
                   <motion.div className="h-1 w-0 bg-primary mt-1 rounded-full group-hover:w-1/2 transition-all duration-300" />
                 </motion.div>
               ))
-            )}
+            }
           </div>
         </div>
       </div>

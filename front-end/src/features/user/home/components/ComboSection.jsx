@@ -1,19 +1,8 @@
 import React, { useRef, useState } from "react";
 import { RiFlashlightFill, RiArrowLeftSLine, RiArrowRightSLine, RiInboxLine } from "react-icons/ri";
 
-// --- Skeleton Loading Component ---
-const SkeletonCombo = () => (
-  <div className="snap-start min-w-[310px] md:min-w-[440px] bg-slate-50 rounded-[2rem] p-3 md:p-4 flex gap-4 md:gap-6 animate-pulse items-center">
-    <div className="shrink-0 w-28 h-28 md:w-36 md:h-40 bg-slate-200 rounded-[1.5rem] md:rounded-[2rem]" />
-    <div className="flex-1 space-y-3">
-      <div className="h-5 w-3/4 bg-slate-200 rounded" />
-      <div className="h-3 w-full bg-slate-200 rounded" />
-      <div className="h-8 w-1/2 bg-slate-200 rounded mt-4" />
-    </div>
-  </div>
-);
 
-const ComboSection = ({ data: combos = [], loading }) => {
+const ComboSection = ({ data: combos = [] }) => {
   const scrollRef = useRef(null);
   const [showLeftArrow, setShowLeftArrow] = useState(false);
 
@@ -32,18 +21,7 @@ const ComboSection = ({ data: combos = [], loading }) => {
     }
   };
 
-  if (loading) {
-    return (
-      <section className="py-12 bg-white">
-        <div className="max-w-[1440px] mx-auto px-4 md:px-10">
-          <div className="h-8 w-48 bg-slate-100 rounded mb-8" />
-          <div className="flex gap-4 md:gap-6 overflow-hidden">
-            {[1, 2, 3].map((n) => <SkeletonCombo key={n} />)}
-          </div>
-        </div>
-      </section>
-    );
-  }
+  if (combos.length === 0) return null;
 
   return (
     <section className="py-12 bg-white overflow-hidden">
@@ -95,6 +73,8 @@ const ComboSection = ({ data: combos = [], loading }) => {
                     <div className="relative shrink-0 w-28 h-28 md:w-36 md:h-40 overflow-hidden rounded-[1.5rem] md:rounded-[2rem] shadow-inner bg-gray-100">
                       <img 
                         src={combo.image} 
+                        loading="lazy"
+                        decoding="async"
                         className="w-full h-full object-cover group-hover/item:scale-110 transition-transform duration-500" 
                         alt={combo.name}
                       />

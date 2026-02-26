@@ -1,34 +1,11 @@
 import React from "react";
 import { RiFireFill, RiInboxLine } from "react-icons/ri";
 
-const SkeletonCard = () => (
-  <div className="relative h-56 md:h-72 rounded-[1.5rem] md:rounded-[2rem] overflow-hidden bg-slate-200 animate-pulse">
-    <div className="absolute inset-0 p-4 md:p-6 flex flex-col justify-end space-y-3">
-      <div className="h-4 w-20 bg-slate-300 rounded-full" />
-      <div className="h-6 w-3/4 bg-slate-300 rounded-md" />
-      <div className="h-3 w-1/2 bg-slate-300 rounded-md" />
-      <div className="flex justify-between items-center pt-3">
-        <div className="h-8 w-16 bg-slate-300 rounded-md" />
-        <div className="h-10 w-24 bg-slate-300 rounded-xl" />
-      </div>
-    </div>
-  </div>
-);
 
-const DailySpecials = ({ data: specials = [], loading }) => {
+
+const DailySpecials = ({ data: specials = []}) => {
   
-  if (loading) {
-    return (
-      <section className="py-8 md:py-12 bg-gray-50">
-        <div className="max-w-[1440px] mx-auto px-4 md:px-10">
-          <div className="h-8 w-48 bg-slate-200 animate-pulse rounded-md mb-8" />
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8">
-            {[1, 2, 3].map((n) => <SkeletonCard key={n} />)}
-          </div>
-        </div>
-      </section>
-    );
-  }
+  if (specials.length === 0) return null;
 
   return (
     <section className="py-8 md:py-12 bg-gray-50">
@@ -62,6 +39,8 @@ const DailySpecials = ({ data: specials = [], loading }) => {
                   <img 
                     src={item.image} 
                     alt={item.name}
+                    loading="lazy"
+                    decoding="async"
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
                   />
                   

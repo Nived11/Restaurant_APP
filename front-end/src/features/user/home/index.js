@@ -7,6 +7,8 @@ export { default as ComboSection } from "./components/ComboSection";
 export { default as FAQ } from "./components/FAQ";
 export { default as Testimonials } from "./components/Testimonials";
 export { default as BrandFeatures } from "./components/BrandFeatures";
+
 export { default as HomeError } from "./components/HomeError";
+export { default as HomeSkeleton } from "./components/HomeSkeleton";
 
 export { default as useHomeData } from "./hooks/useHomeData";
