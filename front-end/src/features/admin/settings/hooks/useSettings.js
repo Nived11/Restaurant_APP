@@ -2,13 +2,17 @@ import { useState, useCallback } from 'react';
 import { toast } from 'sonner';
 
 export const useSettings = () => {
-  // Initial dummy state based on your requirements
   const [settings, setSettings] = useState({
     appName: "The Crunch",
     email: "hello@thecrunch.com",
     phone: "+91 98765 43210",
     address: "Kakkanad, Kochi, Kerala",
     location: "https://maps.google.com?q=Kakkanad,+Kochi,+Kerala",
+    footerDescription: "Savor the authentic spices of Kerala. We deliver fresh, chef-crafted meals from our kitchen to your doorstep in record time.",
+    workingHours: {
+      weekdays: "10:00 AM - 11:00 PM",
+      sunday: "09:00 AM - 12:00 AM"
+    },
     socials: {
       instagram: "https://instagram.com/thecrunch",
       facebook: "https://facebook.com/thecrunch",
@@ -20,7 +24,6 @@ export const useSettings = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
-  // Handle standard field changes
   const handleChange = (field, value) => {
     setSettings(prev => ({
       ...prev,
@@ -28,41 +31,25 @@ export const useSettings = () => {
     }));
   };
 
-  // Handle nested social media field changes
-  const handleSocialChange = (platform, value) => {
+  const handleNestedChange = (category, field, value) => {
     setSettings(prev => ({
       ...prev,
-      socials: {
-        ...prev.socials,
-        [platform]: value
+      [category]: {
+        ...prev[category],
+        [field]: value
       }
     }));
   };
 
-  // Clear specific field (Acts as Delete)
-  const handleClearField = (field, isSocial = false) => {
-    if (isSocial) {
-      handleSocialChange(field, "");
-    } else {
-      handleChange(field, "");
-    }
-  };
-
-  // Save Settings to Backend (Mock API Call)
   const saveSettings = useCallback(async (e) => {
     e.preventDefault();
     setIsSaving(true);
 
     try {
       // TODO: Replace with actual API call later
-      // await api.post('/admin/settings/update/', settings);
-      
-      // Simulating network delay
       await new Promise(resolve => setTimeout(resolve, 1500));
-      
       toast.success("Settings updated successfully!");
     } catch (error) {
-      console.error("Failed to update settings:", error);
       toast.error("Failed to update settings. Please try again.");
     } finally {
       setIsSaving(false);
@@ -74,8 +61,7 @@ export const useSettings = () => {
     isLoading,
     isSaving,
     handleChange,
-    handleSocialChange,
-    handleClearField,
+    handleNestedChange,
     saveSettings
   };
 };
