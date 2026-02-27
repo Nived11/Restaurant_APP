@@ -8,6 +8,9 @@ const ReserveTable = ({ isOpen, onClose }) => {
   const { formData, loading, error, handleChange, handleSubmit } = useReserveTable(onClose);
   const today = new Date().toISOString().split("T")[0];
 
+  const inputClass = "w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-2.5 md:py-3.5 text-[12px] font-bold text-slate-900 outline-none focus:border-slate-900 focus:bg-white transition-all appearance-none placeholder:text-slate-400";
+  const labelClass = "text-[9px] md:text-[10px] font-black text-slate-700 uppercase tracking-widest ml-1 mb-1.5 block";
+
   const modalVariants = {
     initial: isMobile ? { y: "100%", opacity: 1 } : { y: 0, opacity: 0, scale: 0.98 },
     animate: { y: 0, opacity: 1, scale: 1 },
@@ -48,7 +51,7 @@ const ReserveTable = ({ isOpen, onClose }) => {
               <div className="flex justify-center mb-1">
                 <img src={Logo} alt="Logo" className="h-12 md:h-16 w-auto object-contain" />
               </div>
-              <h2 className="text-lg md:text-3xl font-black uppercase tracking-tight">
+              <h2 className="text-lg md:text-3xl font-black uppercase tracking-tight text-slate-900">
                 Table <span className="text-primary italic">Reservation</span>
               </h2>
 
@@ -59,18 +62,18 @@ const ReserveTable = ({ isOpen, onClose }) => {
               )}
             </div>
 
-            <form onSubmit={handleSubmit} className="px-5 md:px-12 pb-6 md:pb-10 overflow-y-auto space-y-2.5 md:space-y-4 no-scrollbar">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5 md:gap-4">
-                <div className="space-y-0.5 md:space-y-1">
-                  <label className="text-[9px] md:text-[10px] font-black uppercase text-gray-400 ml-1">Full Name</label>
+            <form onSubmit={handleSubmit} className="px-5 md:px-12 pb-6 md:pb-10 overflow-y-auto space-y-4 no-scrollbar">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <label className={labelClass}>Full Name</label>
                   <div className="relative">
                     <User className="absolute left-4 top-1/2 -translate-y-1/2 text-primary" size={14} />
-                    <input name="full_name" value={formData.full_name} onChange={handleChange} required type="text" placeholder="Your Name" className="w-full pl-10 pr-4 py-2.5 md:py-3.5 bg-gray-50 border border-gray-100 rounded-xl focus:ring-2 focus:ring-primary/50 outline-none font-bold text-xs" />
+                    <input name="full_name" value={formData.full_name} onChange={handleChange} required type="text" placeholder="Your Name" className={inputClass.replace('px-4', 'pl-10')} />
                   </div>
                 </div>
 
-                <div className="space-y-0.5 md:space-y-1">
-                  <label className="text-[9px] md:text-[10px] font-black uppercase text-gray-400 ml-1">Phone (10 Digits)</label>
+                <div className="space-y-1">
+                  <label className={labelClass}>Phone (10 Digits)</label>
                   <div className="relative">
                     <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-primary" size={14} />
                     <input
@@ -79,37 +82,35 @@ const ReserveTable = ({ isOpen, onClose }) => {
                       onChange={handleChange}
                       required
                       type="text"
-                      inputMode="numeric" // Mobile numeric keyboard
-                      pattern="[0-9]*"   // Only numbers
-                      placeholder="Enter 10-digit phone number"
-                      className="w-full pl-10 pr-4 py-2.5 md:py-3.5 bg-gray-50 border border-gray-100 rounded-xl focus:ring-2 focus:ring-primary/50 outline-none font-bold text-xs"
+                      inputMode="numeric"
+                      pattern="[0-9]*"
+                      placeholder="Enter 10-digit number"
+                      className={inputClass.replace('px-4', 'pl-10')}
                     />
                   </div>
                 </div>
               </div>
 
-              {/* Email */}
-              <div className="space-y-0.5 md:space-y-1">
-                <label className="text-[9px] md:text-[10px] font-black uppercase text-gray-400 ml-1">Email (Optional)</label>
+              <div className="space-y-1">
+                <label className={labelClass}>Email (Optional)</label>
                 <div className="relative">
                   <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-primary" size={14} />
-                  <input name="email" value={formData.email} onChange={handleChange} type="email" placeholder="mail@example.com" className="w-full pl-10 pr-4 py-2.5 md:py-3.5 bg-gray-50 border border-gray-100 rounded-xl focus:ring-2 focus:ring-primary/50 outline-none font-bold text-xs" />
+                  <input name="email" value={formData.email} onChange={handleChange} type="email" placeholder="mail@example.com" className={inputClass.replace('px-4', 'pl-10')} />
                 </div>
               </div>
 
-              {/* Date, Time, Guests */}
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-2.5 md:gap-4">
-                <div className="space-y-0.5 md:space-y-1">
-                  <label className="text-[9px] md:text-[10px] font-black uppercase text-gray-400 ml-1">Date</label>
-                  <input name="date" value={formData.date} onChange={handleChange} required min={today} type="date" className="w-full px-3 py-2.5 md:py-3.5 bg-gray-50 border border-gray-100 rounded-xl focus:ring-2 focus:ring-primary/50 outline-none font-bold text-xs" />
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                <div className="space-y-1">
+                  <label className={labelClass}>Date</label>
+                  <input name="date" value={formData.date} onChange={handleChange} required min={today} type="date" className={inputClass} />
                 </div>
-                <div className="space-y-0.5 md:space-y-1">
-                  <label className="text-[9px] md:text-[10px] font-black uppercase text-gray-400 ml-1">Time</label>
-                  <input name="time" value={formData.time} onChange={handleChange} required type="time" className="w-full px-3 py-2.5 md:py-3.5 bg-gray-50 border border-gray-100 rounded-xl focus:ring-2 focus:ring-primary/50 outline-none font-bold text-xs" />
+                <div className="space-y-1">
+                  <label className={labelClass}>Time</label>
+                  <input name="time" value={formData.time} onChange={handleChange} required type="time" className={inputClass} />
                 </div>
-                <div className="space-y-0.5 col-span-2 md:col-span-1">
-                  <label className="text-[9px] md:text-[10px] font-black uppercase text-gray-400 ml-1">Guests</label>
-                  <select name="guests" value={formData.guests} onChange={handleChange} className="w-full px-3 py-2.5 md:py-3.5 bg-gray-50 border border-gray-100 rounded-xl focus:ring-2 focus:ring-primary/50 outline-none font-bold text-xs appearance-none">
+                <div className="space-y-1 col-span-2 md:col-span-1">
+                  <label className={labelClass}>Guests</label>
+                  <select name="guests" value={formData.guests} onChange={handleChange} className={inputClass}>
                     <option value="2 People">2 People</option>
                     <option value="3 People">3 People</option>
                     <option value="4 People">4 People</option>
@@ -119,10 +120,9 @@ const ReserveTable = ({ isOpen, onClose }) => {
                 </div>
               </div>
 
-              {/* Notes */}
-              <div className="space-y-0.5 md:space-y-1">
-                <label className="text-[9px] md:text-[10px] font-black uppercase text-gray-400 ml-1">Notes (Optional)</label>
-                <textarea name="notes" value={formData.notes} onChange={handleChange} rows={isMobile ? "2" : "3"} placeholder="Requests..." className="w-full px-4 py-2.5 md:py-4 bg-gray-50 border border-gray-100 rounded-xl focus:ring-2 focus:ring-primary/50 outline-none font-bold text-xs resize-none"></textarea>
+              <div className="space-y-1">
+                <label className={labelClass}>Notes (Optional)</label>
+                <textarea name="notes" value={formData.notes} onChange={handleChange} rows={isMobile ? "2" : "3"} placeholder="Special requests..." className={`${inputClass} resize-none`} />
               </div>
 
               <motion.button
@@ -130,19 +130,7 @@ const ReserveTable = ({ isOpen, onClose }) => {
                 whileTap={!loading ? { scale: 0.99 } : undefined}
                 disabled={loading}
                 type="submit"
-                className={`
-    w-full md:max-w-xs mx-auto
-    flex items-center justify-center gap-2
-    bg-primary text-white
-    py-3 md:py-4 rounded-xl
-    font-black uppercase tracking-widest
-    text-[10px] md:text-xs
-    shadow-lg shadow-primary/20
-    transition-all
-    ${loading
-                    ? 'opacity-90 cursor-not-allowed brightness-90 pointer-events-none'
-                    : 'hover:brightness-105 cursor-pointer'}
-  `}
+                className={`w-full md:max-w-xs mx-auto flex items-center justify-center gap-2 bg-slate-900 text-white py-3 md:py-4 rounded-xl font-black uppercase tracking-widest text-[10px] md:text-xs shadow-lg transition-all ${loading ? 'opacity-90 cursor-not-allowed' : 'hover:bg-black cursor-pointer'}`}
               >
                 {loading && <Loader2 size={14} className="animate-spin" />}
                 {loading ? "Booking..." : "Confirm Booking"}

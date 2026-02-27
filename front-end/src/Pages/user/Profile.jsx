@@ -1,9 +1,19 @@
-import React, { useState } from "react";
+import React, { useState , useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { ProfileBanner, ProfileTabs, OrderHistory, AddressBook ,ProfileOverview} from "../../features/user/profile";
 
 const Profile = () => {
-  // Set "profile" as default
+  const location = useLocation();
   const [activeTab, setActiveTab] = useState("profile");
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const tab = params.get("tab");
+    if (tab) {
+      setActiveTab(tab);
+    }
+  }, [location]);
+
 
   return (
     <div className="min-h-screen mt-4 md:mt-6 pb-10 px-2 md:px-4">

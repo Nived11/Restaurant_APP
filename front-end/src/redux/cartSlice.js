@@ -17,22 +17,32 @@ const cartSlice = createSlice({
     addToCart: (state, action) => {
       const { item, quantity } = action.payload;
       const existingItem = state.items.find((i) => i.id === item.id);
+      const stockLimit = item.quantity; // Backend-ൽ നിന്നുള്ള സ്റ്റോക്ക്
 
       if (existingItem) {
-        if (existingItem.quantity + quantity <= item.quantity) {
+        if (existingItem.quantity + quantity <= stockLimit) {
           existingItem.quantity += quantity;
-        } else {
-          return;
         }
       } else {
-        state.items.push({ ...item, quantity });
+        state.items.push({ ...item, quantity, total_stock: stockLimit });
       }
       localStorage.setItem('cart', JSON.stringify(state.items));
     },
+
+    updateQuantity: (state, action) => {
+      const { id, quantity } = action.payload;
+      const item = state.items.find(i => i.id === id);
+      if (item) {
+        item.quantity = quantity;
+        localStorage.setItem('cart', JSON.stringify(state.items));
+      }
+    },
+
     removeFromCart: (state, action) => {
       state.items = state.items.filter(item => item.id !== action.payload);
       localStorage.setItem('cart', JSON.stringify(state.items));
     },
+
     clearCart: (state) => {
       state.items = [];
       localStorage.removeItem('cart');
@@ -40,5 +50,5 @@ const cartSlice = createSlice({
   },
 });
 
-export const { addToCart, removeFromCart, clearCart } = cartSlice.actions;
+export const { addToCart, removeFromCart, clearCart, updateQuantity } = cartSlice.actions;
 export default cartSlice.reducer;
