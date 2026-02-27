@@ -1,6 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useCart,ProgressBar, CartSection, AddressSection, ReviewSection, OrderAnimation } from '../../features/user/cart';
+import { 
+  useCart, 
+  ProgressBar, 
+  CartSection, 
+  AddressSection, 
+  ReviewSection, 
+  OrderAnimation 
+} from '../../features/user/cart';
 
 export default function Cart() {
   const { cartItems, subTotal, totalAmount, incrementQty, decrementQty, removeItem } = useCart();
@@ -10,14 +17,36 @@ export default function Cart() {
   const [isLoggedIn] = useState(true); 
   const [selectedAddress, setSelectedAddress] = useState(null);
 
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    document.documentElement.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    document.body.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+  };
+
+  useEffect(() => {
+    scrollToTop();
+  }, [step]);
+
   const handleNextStep = () => {
     if (step === 1) {
-      if (!isLoggedIn) { window.location.href = "/login"; return; }
+      if (!isLoggedIn) { 
+        window.location.href = "/login"; 
+        return; 
+      }
       setStep(2);
     } else if (step === 2) {
-      if (!selectedAddress) { alert("Please select an address"); return; }
+      if (!selectedAddress) { 
+        alert("Please select an address"); 
+        return; 
+      }
       setStep(3);
     }
+    scrollToTop();
+  };
+
+  const handleBack = (prevStep) => {
+    setStep(prevStep);
+    scrollToTop();
   };
 
   const handlePlaceOrder = () => {
@@ -30,9 +59,12 @@ export default function Cart() {
   if (isOrderProcessing) return <OrderAnimation />;
 
   return (
-    <div className="min-h-screen bg-white pt-10 pb-24">
+    <div className="min-h-screen bg-white pt-6 pb-24 overflow-y-visible">
+      {/* ProgressBar */}
       <ProgressBar step={step} />
+      
       <main className="max-w-7xl mx-auto px-6">
+        {/* STEP 1 */}
         {step === 1 && (
           <CartSection 
             cartItems={cartItems} 
@@ -44,9 +76,28 @@ export default function Cart() {
             onNext={handleNextStep}
           />
         )}
-        {/* Step 2 and 3 continue... */}
-        {step === 2 && <AddressSection onNext={handleNextStep} onBack={() => setStep(1)} selectedAddress={selectedAddress} setSelectedAddress={setSelectedAddress} />}
-        {step === 3 && <ReviewSection cartItems={cartItems} subTotal={subTotal} totalAmount={totalAmount} onPlaceOrder={handlePlaceOrder} onBack={() => setStep(2)} selectedAddress={selectedAddress} />}
+        
+        {/* STEP 2 */}
+        {step === 2 && (
+          <AddressSection 
+            onNext={handleNextStep} 
+            onBack={() => handleBack(1)} 
+            selectedAddress={selectedAddress} 
+            setSelectedAddress={setSelectedAddress} 
+          />
+        )}
+        
+        {/* STEP 3 */}
+        {step === 3 && (
+          <ReviewSection 
+            cartItems={cartItems} 
+            subTotal={subTotal} 
+            totalAmount={totalAmount} 
+            onPlaceOrder={handlePlaceOrder} 
+            onBack={() => handleBack(2)} 
+            selectedAddress={selectedAddress} 
+          />
+        )}
       </main>
     </div>
   );
