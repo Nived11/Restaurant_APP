@@ -1,4 +1,3 @@
-export { default as Login } from "./Login";
-export { default as Signup } from "./Signup";
-export { default as Otp } from "./Otp";
+export { default as UserLogin } from "./UserLogin";
+export { default as UserSignup } from "./UserSignup";
 export { default as AdminLogin } from "./AdminLogin";

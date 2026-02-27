@@ -1,4 +1,4 @@
-import { AdminLoginForm } from "../../features/admin/adminlogin";
+import { AdminLoginForm } from "../../features/admin/admin-auth";
 
 const AdminLogin = () => {
   return (

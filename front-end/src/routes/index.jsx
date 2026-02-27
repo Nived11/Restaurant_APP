@@ -3,65 +3,72 @@ import AdminRoute from "./AdminRoute";
 import AdminLayout from "../Layouts/AdminLayout";
 import PublicLayout from "../Layouts/PublicLayout";
 
-// Pages
-import { Login, Signup, Otp, AdminLogin } from "../Pages/auth";
+import { UserLogin, UserSignup, AdminLogin } from "../Pages/auth";
 import { Home, Cart, Menu as UserMenu, About, Contact, Profile } from "../Pages/user";
-import { Dashboard, Orders, Menu as AdminMenu, Bookings, Inbox, Customers, Revenue , Settings} from "../Pages/admin";
+import { Dashboard, Orders, Menu as AdminMenu, Bookings, Inbox, Customers, Revenue, Settings } from "../Pages/admin";
 import NotFound from "../Pages/NotFound.jsx";
 
 const AppRoutes = () => {
-  const token = localStorage.getItem("admin_token");
-  const role = localStorage.getItem("admin_role"); // "admin" or "staff"
-  const user = { name: localStorage.getItem("admin_user"), role };
+  const adminToken = localStorage.getItem("admin_token");
+  const adminRole = localStorage.getItem("admin_role");
+  const adminUser = { name: localStorage.getItem("admin_user"), role: adminRole };
+
+  const userToken = localStorage.getItem("user_token");
 
   return (
     <Routes>
-      {/* 1. ADMIN AUTH: Redirect to dashboard if logged in */}
-      <Route 
-        path="/admin/login" 
-        element={token ? <Navigate to="/admin/dashboard" replace /> : <AdminLogin />} 
-      />
+      {/* -----------------------------------------------------------
+          1. AUTH ROUTES (User & Admin Login/Signup)
+      -------------------------------------------------------------- */}
+      
+      <Route path="/login" element={userToken ? <Navigate to="/" replace /> : <UserLogin />} />
+      <Route path="/signup" element={userToken ? <Navigate to="/" replace /> : <UserSignup />} />
 
-      {/* 2. PUBLIC ROUTES */}
+      <Route path="/admin/login" element={adminToken ? <Navigate to="/admin/dashboard" replace /> : <AdminLogin />} />
+
+      {/* -----------------------------------------------------------
+          2. PUBLIC ROUTES (Common for all users)
+      -------------------------------------------------------------- */}
       <Route path="/" element={<PublicLayout />}>
         <Route index element={<Home />} />
         <Route path="menu" element={<UserMenu />} />
         <Route path="cart" element={<Cart />} />
         <Route path="about" element={<About />} />
         <Route path="contact" element={<Contact />} />
-        <Route path="profile" element={<Profile />} />
-        <Route path="login" element={<Login />} />
-        <Route path="signup" element={<Signup />} />
+        
+        <Route  path="profile"  element={userToken ? <Profile /> : <Navigate to="/login" replace />} />
       </Route>
 
-      {/* 3. PROTECTED ADMIN & STAFF AREA */}
+      {/* -----------------------------------------------------------
+          3. PROTECTED ADMIN & STAFF AREA
+      -------------------------------------------------------------- */}
       <Route element={<AdminRoute />}>
-        <Route path="/admin" element={<AdminLayout user={user} />}>
+        <Route path="/admin" element={<AdminLayout user={adminUser} />}>
           <Route index element={<Navigate to="dashboard" replace />} />
           
-          {/* Shared Pages */}
-          <Route path="dashboard" element={<Dashboard user={user} />} />
-          <Route path="orders" element={<Orders user={user} />} />
-          <Route path="menu" element={<AdminMenu user={user} />} />
-          <Route path="bookings" element={<Bookings user={user} />} />
-          <Route path="inbox" element={<Inbox user={user} />} />
+          <Route path="dashboard" element={<Dashboard user={adminUser} />} />
+          <Route path="orders" element={<Orders user={adminUser} />} />
+          <Route path="menu" element={<AdminMenu user={adminUser} />} />
+          <Route path="bookings" element={<Bookings user={adminUser} />} />
+          <Route path="inbox" element={<Inbox user={adminUser} />} />
 
-          {/* Role Protection: Only "admin" can enter these paths */}
+          {/* Admin Role Only Pages */}
           <Route 
             path="customers" 
-            element={role === "admin" ? <Customers user={user} /> : <Navigate to="/admin/dashboard" replace />} 
+            element={adminRole === "admin" ? <Customers user={adminUser} /> : <Navigate to="/admin/dashboard" replace />} 
           />
           <Route 
             path="revenue" 
-            element={role === "admin" ? <Revenue user={user} /> : <Navigate to="/admin/dashboard" replace />} 
+            element={adminRole === "admin" ? <Revenue user={adminUser} /> : <Navigate to="/admin/dashboard" replace />} 
           />
           <Route 
             path="settings" 
-            element={role === "admin" ? <Settings user={user} /> : <Navigate to="/admin/dashboard" replace />} 
+            element={adminRole === "admin" ? <Settings user={adminUser} /> : <Navigate to="/admin/dashboard" replace />} 
           />
         </Route>
       </Route>
 
+      {/* 4. 404 NOT FOUND */}
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
