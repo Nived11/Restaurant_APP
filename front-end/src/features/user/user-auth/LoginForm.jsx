@@ -118,7 +118,7 @@ const LoginForm = () => {
                   {otp.map((data, index) => (
                     <input
                       key={index}
-                      type="text"
+                      type="tel"
                       maxLength="1"
                       value={data}
                       onChange={(e) => handleOtpChange(e.target, index)}
