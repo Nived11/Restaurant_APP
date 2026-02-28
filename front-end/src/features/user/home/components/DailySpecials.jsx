@@ -5,7 +5,7 @@ const DailySpecials = ({ data: specials = [], onItemClick }) => {
   if (specials.length === 0) return null;
 
   return (
-    <section className="py-6 md:py-12 bg-gray-50">
+    <section className="py-0 md:py-12 bg-gray-50">
       <div className="max-w-[1440px] mx-auto px-4 md:px-10">
         
         {/* Header Section */}

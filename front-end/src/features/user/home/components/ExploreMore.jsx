@@ -6,7 +6,7 @@ const ExploreMore = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="max-w-[1440px] mx-auto px-4 md:px-10 py-8 md:py-12">
+    <div className="max-w-[1440px] mx-auto px-4 md:px-10 py-4 md:py-8">
       {/* Compact Card Style with subtle border */}
       <div className="relative group  rounded-[2rem] md:rounded-[3rem] p-8 md:p-12 overflow-hidden flex flex-col items-center text-center">
         

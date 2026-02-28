@@ -107,7 +107,7 @@ const SearchBar = ({
             initial={{ opacity: 0, y: 15, scale: 0.98 }} 
             animate={{ opacity: 1, y: 0, scale: 1 }} 
             exit={{ opacity: 0, y: 15, scale: 0.98 }}
-            className={`absolute ${isMobile ? 'top-full' : 'top-[120%]'} left-0 right-0 mt-0 sm:mt-6 bg-white rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.2)] z-[130] border border-gray-100 overflow-hidden md:w-[400px] md:left-auto`}
+            className={`absolute ${isMobile ? 'top-full left-0 right-0' : 'top-[110%] right-0'} left-0 right-0 mt-0 sm:mt-6 bg-white rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.2)] z-[130] border border-gray-100 overflow-hidden md:w-[400px] md:left-auto`}
           >
             <div className="max-h-[60vh] overflow-y-auto p-2">
               {suggestions.categories.length > 0 && (

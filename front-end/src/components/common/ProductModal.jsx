@@ -100,7 +100,7 @@ const ProductModal = ({ item, onClose }) => {
         </button>
 
         {/* --- IMAGE SECTION --- */}
-        <div className="w-full md:w-[45%] h-48 md:h-[500px] relative shrink-0 overflow-hidden">
+        <div className="w-full md:w-[45%] h-60  md:h-[506px] relative shrink-0 overflow-hidden">
           <img 
             src={item.image} 
             alt={item.name} 
@@ -220,7 +220,6 @@ const ProductModal = ({ item, onClose }) => {
                   )}
                 </>
               ) : (
-                /* Only show this error if the modal is opened AND it's already at max limit */
                 <div className="space-y-4">
                   <div className="flex items-center gap-3 bg-red-50 border border-red-100 p-4 rounded-2xl">
                     <AlertCircle className="text-red-500 shrink-0" size={20} />

@@ -13,12 +13,10 @@ export const useMenu = () => {
   const [filterType, setFilterType] = useState('All');
 
   useEffect(() => {
-    if (urlCategoryId) {
-      setActiveCategoryId(urlCategoryId);
-    }
+    setActiveCategoryId(urlCategoryId || 'All');
   }, [urlCategoryId]);
 
-  // 1. Fetch Categories
+  // 1. Fetch Categories 
   const { data: categoriesData } = useQuery({
     queryKey: ["categories"],
     queryFn: async () => {
@@ -32,7 +30,7 @@ export const useMenu = () => {
     staleTime: 600000,
   });
 
-  // 2. Fetch ALL Menu Items (For Search Suggestions)
+  // 2. Fetch ALL Menu Items 
   const { data: allItems = [] } = useQuery({
     queryKey: ["allMenuItemsMaster"],
     queryFn: async () => {
@@ -46,17 +44,20 @@ export const useMenu = () => {
     staleTime: 300000,
   });
 
-  // 3. Fetch Filtered Menu Items (For Menu Page Display)
+  // 3. Fetch Filtered Menu Items 
   const { data: menuItems, isLoading, error, refetch } = useQuery({
     queryKey: ["menuItems", activeCategoryId, filterType, searchQueryURL],
     queryFn: async () => {
       try {
         let params = new URLSearchParams();
-        if (activeCategoryId !== 'All') params.append('category', activeCategoryId);
-        if (filterType !== 'All') params.append('diet', filterType.toUpperCase());
-        if (searchQueryURL) params.append('search', searchQueryURL);
 
-        const res = await api.get(`/inventory/public/menu-items/?${params.toString()}`);
+        if (searchQueryURL) params.append('search', searchQueryURL);
+        
+        if (activeCategoryId !== 'All') params.append('category', activeCategoryId);
+
+        if (filterType !== 'All') params.append('diet', filterType.toUpperCase());
+
+        const res = await api.get(`/inventory/public/menu-items/`, { params });
         return Array.isArray(res.data) ? res.data : res.data.results || [];
       } catch (err) {
         throw new Error(extractErrorMessages(err));

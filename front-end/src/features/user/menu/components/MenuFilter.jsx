@@ -1,8 +1,31 @@
-import React from 'react';
 import { ChevronDown, UtensilsCrossed } from 'lucide-react';
+import { useNavigate, useSearchParams } from 'react-router-dom'; 
 import DietToggle from './DietToggle';
 
 const MenuFilter = ({ categories, activeCategory, setActiveCategory, filterType, setFilterType }) => {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams(); 
+  const handleCategoryChange = (categoryId) => {
+    setActiveCategory(categoryId);
+    
+    const newParams = new URLSearchParams(searchParams);
+    
+    newParams.delete('search'); 
+    
+    if (categoryId === 'All') {
+      newParams.delete('category');
+    } else {
+      newParams.set('category', categoryId);
+    }
+    
+    navigate(`/menu?${newParams.toString()}`);
+  };
+
+  const handleDietChange = (val) => {
+    setFilterType(val);
+    
+  };
+
   return (
     <div className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-gray-100 py-3 md:py-6 px-4">
       <div className="max-w-[1440px] mx-auto">
@@ -20,13 +43,13 @@ const MenuFilter = ({ categories, activeCategory, setActiveCategory, filterType,
 
           <div className="flex-1 flex justify-center">
             <div className="hidden md:block">
-              <DietToggle filterType={filterType} setFilterType={setFilterType} />
+              <DietToggle filterType={filterType} setFilterType={handleDietChange} />
             </div>
 
             <div className="md:hidden w-full relative">
               <select 
                 value={filterType}
-                onChange={(e) => setFilterType(e.target.value)}
+                onChange={(e) => handleDietChange(e.target.value)}
                 className="w-full bg-white border border-primary/60 rounded-xl px-4 py-3 text-[10px] font-black outline-none focus:border-[#f9a602] shadow-xl appearance-none cursor-pointer"
               >
                 <option value="All">All Diets</option>
@@ -41,7 +64,7 @@ const MenuFilter = ({ categories, activeCategory, setActiveCategory, filterType,
             <div className="relative w-full">
               <select 
                 value={String(activeCategory)} 
-                onChange={(e) => setActiveCategory(e.target.value)}
+                onChange={(e) => handleCategoryChange(e.target.value)}
                 className="w-full bg-white border border-primary/60 rounded-xl md:rounded-2xl px-4 md:px-6 py-3 text-[10px] md:text-xs font-black outline-none focus:border-[#f9a602] shadow-xl appearance-none cursor-pointer"
               >
                 {categories.map((cat) => (
