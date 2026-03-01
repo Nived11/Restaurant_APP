@@ -26,7 +26,7 @@ export const useCart = () => {
 
   const removeItem = (id) => {
     dispatch(removeFromCart(id));
-    toast.success("Item removed from basket");
+    toast.success("Item removed from cart!");
   };
 
   return {

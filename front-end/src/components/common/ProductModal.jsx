@@ -59,10 +59,23 @@ const ProductModal = ({ item, onClose }) => {
     discountPercent = Math.round(((actualPrice - offerPrice) / actualPrice) * 100);
   }
 
+  // --- ONLY ANIMATION LOGIC UPDATED FOR SMOOTHNESS ---
   const modalVariants = {
     initial: isMobile ? { y: "100%" } : { y: 30, opacity: 0, scale: 0.95 },
-    animate: { y: 0, opacity: 1, scale: 1 },
-    exit: isMobile ? { y: "100%" } : { y: 30, opacity: 0, scale: 0.95 },
+    animate: { 
+      y: 0, 
+      opacity: 1, 
+      scale: 1,
+      transition: isMobile 
+        ? { duration: 0.4, ease: [0.32, 0.72, 0, 1] } // Smooth Slide like iOS
+        : { duration: 0.3, ease: "easeOut" }
+    },
+    exit: { 
+      y: isMobile ? "100%" : 30, 
+      opacity: isMobile ? 1 : 0, 
+      scale: isMobile ? 1 : 0.95,
+      transition: { duration: 0.3, ease: "easeIn" }
+    },
   };
 
   return (
@@ -71,6 +84,7 @@ const ProductModal = ({ item, onClose }) => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
+        transition={{ duration: 0.2 }}
         onClick={onClose}
         className="absolute inset-0 bg-black/70 backdrop-blur-md"
       />
@@ -80,14 +94,14 @@ const ProductModal = ({ item, onClose }) => {
         initial="initial"
         animate="animate"
         exit="exit"
-        transition={isMobile ? { type: "spring", damping: 30, stiffness: 300 } : { duration: 0.3 }}
         drag={isMobile ? "y" : false}
         dragConstraints={{ top: 0 }}
         dragElastic={0.1}
         onDragEnd={(e, { offset, velocity }) => {
           if (offset.y > 100 || velocity.y > 600) onClose();
         }}
-        className="relative bg-white w-full md:max-w-5xl rounded-t-[2rem] md:rounded-[3rem] shadow-2xl overflow-hidden h-fit md:h-auto flex flex-col md:flex-row"
+        // GPU optimization for smooth mobile animation
+        className="relative bg-white w-full md:max-w-5xl rounded-t-[2rem] md:rounded-[3rem] shadow-2xl overflow-hidden h-fit md:h-auto flex flex-col md:flex-row will-change-transform"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="md:hidden absolute top-2.5 left-1/2 -translate-x-1/2 w-10 h-1 bg-white/80 backdrop-blur-md rounded-full z-50" />
@@ -150,7 +164,6 @@ const ProductModal = ({ item, onClose }) => {
 
             {/* Actions Bar */}
             <div className="mt-1 pt-4 border-t border-primary/20 ">
-              {/* If already added in current session OR there is space to add */}
               {isAdded || maxAvailableToAdd > 0 ? (
                 <>
                   <div className="flex items-center justify-between mb-4 md:mb-6">
@@ -223,7 +236,7 @@ const ProductModal = ({ item, onClose }) => {
                 <div className="space-y-4">
                   <div className="flex items-center gap-3 bg-red-50 border border-red-100 p-4 rounded-2xl">
                     <AlertCircle className="text-red-500 shrink-0" size={20} />
-                    <p className="text-red-600 font-bold text-[10px] md:text-xs leading-tight">
+                    <p className="text-red-600 font-bold text-[8px] md:text-xs leading-tight">
                       Maximum limit reached for this item in your cart.
                     </p>
                   </div>
