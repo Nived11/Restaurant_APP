@@ -67,14 +67,17 @@ const ProductModal = ({ item, onClose }) => {
       opacity: 1, 
       scale: 1,
       transition: isMobile 
-        ? { duration: 0.4, ease: [0.32, 0.72, 0, 1] } // Smooth Slide like iOS
+        ? { duration: 0.4, ease: [0.32, 0.72, 0, 1] } 
         : { duration: 0.3, ease: "easeOut" }
     },
     exit: { 
-      y: isMobile ? "100%" : 30, 
+      y: "100%", 
       opacity: isMobile ? 1 : 0, 
-      scale: isMobile ? 1 : 0.95,
-      transition: { duration: 0.3, ease: "easeIn" }
+      scale: isMobile ? 1 : 0.95, 
+      transition: { 
+        duration: 0.25, // Closing time കുറച്ചു
+        ease: [0.4, 0, 1, 1], // Power 4 out easing for faster exit
+      }
     },
   };
 
