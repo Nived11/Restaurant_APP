@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+
 import { 
   useCart, 
   ProgressBar, 
@@ -8,14 +9,16 @@ import {
   ReviewSection, 
   OrderAnimation 
 } from '../../features/user/cart';
+import { toast } from 'sonner';
 
 export default function Cart() {
   const { cartItems, subTotal, totalAmount, incrementQty, decrementQty, removeItem } = useCart();
   const [step, setStep] = useState(1);
   const navigate = useNavigate();
   const [isOrderProcessing, setIsOrderProcessing] = useState(false);
-  const [isLoggedIn] = useState(true); 
   const [selectedAddress, setSelectedAddress] = useState(null);
+
+  const isLoggedIn = !!localStorage.getItem('user_access');
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
@@ -30,7 +33,11 @@ export default function Cart() {
   const handleNextStep = () => {
     if (step === 1) {
       if (!isLoggedIn) { 
-        window.location.href = "/login"; 
+        toast.warning("Please login to proceed");
+         setTimeout(() => {
+          navigate("/login", { state: { from: "/cart" } });
+        }, 1500);
+        
         return; 
       }
       setStep(2);

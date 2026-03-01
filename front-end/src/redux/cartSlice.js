@@ -17,7 +17,7 @@ const cartSlice = createSlice({
     addToCart: (state, action) => {
       const { item, quantity } = action.payload;
       const existingItem = state.items.find((i) => i.id === item.id);
-      const stockLimit = item.quantity; // Backend-ൽ നിന്നുള്ള സ്റ്റോക്ക്
+      const stockLimit = item.quantity; 
 
       if (existingItem) {
         if (existingItem.quantity + quantity <= stockLimit) {

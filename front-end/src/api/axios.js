@@ -1,12 +1,37 @@
 import axios from 'axios';
+import { toast } from 'sonner';
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'https://thechrunch-backend.onrender.com/api',
+  baseURL: import.meta.env.VITE_API_URL,
 });
 
+
+const getAuthData = () => {
+  const adminToken = localStorage.getItem('admin_token');
+  const userToken = localStorage.getItem('user_access');
+  const adminRole = localStorage.getItem('admin_role'); 
+  
+  if (adminToken) {
+    return {
+      token: adminToken,
+      refresh: localStorage.getItem('admin_refresh'),
+      context: 'admin_panel',
+      role: adminRole 
+    };
+  }
+  return {
+    token: userToken,
+    refresh: localStorage.getItem('user_refresh'),
+    context: 'user_side',
+    role: 'user'
+  };
+};
+
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('admin_token');
-  if (token) config.headers.Authorization = `Bearer ${token}`;
+  const { token } = getAuthData();
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
   return config;
 });
 
@@ -15,26 +40,44 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
+    // 401 Error (Unauthorized)
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
+      const { refresh, context } = getAuthData();
+
+      if (!refresh) return Promise.reject(error);
 
       try {
-        const refreshToken = localStorage.getItem('admin_refresh');
-        
         const res = await axios.post(`${api.defaults.baseURL}/token/refresh/`, {
-          refresh: refreshToken,
+          refresh: refresh,
         });
 
         if (res.status === 200) {
-          localStorage.setItem('admin_token', res.data.access);
-          
-          originalRequest.headers.Authorization = `Bearer ${res.data.access}`;
+          const newAccessToken = res.data.access;
+
+          if (context === 'admin_panel') {
+            localStorage.setItem('admin_token', newAccessToken);
+          } else {
+            localStorage.setItem('user_access', newAccessToken);
+          }
+
+          originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
           return api(originalRequest);
         }
       } catch (refreshError) {
-        localStorage.clear();
+        localStorage.removeItem('admin_token');
+        localStorage.removeItem('admin_refresh');
+        localStorage.removeItem('admin_role');
+        localStorage.removeItem('user_access');
+        localStorage.removeItem('user_refresh');
+        
         toast.error('Session expired. Please login again.');
-        window.location.href = '/admin/login';
+        
+        if (context === 'admin_panel') {
+          window.location.href = '/admin/login';
+        } else {
+          window.location.href = '/';
+        }
       }
     }
     return Promise.reject(error);

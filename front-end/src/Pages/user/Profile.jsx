@@ -25,7 +25,6 @@ const Profile = () => {
           <ProfileTabs activeTab={activeTab} setActiveTab={setActiveTab} />
 
           <div className="p-4 md:p-14">
-            {/* Dynamic Content Switching */}
             {activeTab === "profile" && <ProfileOverview />}
             {activeTab === "orders" && <OrderHistory />}
             {activeTab === "address" && <AddressBook />}
