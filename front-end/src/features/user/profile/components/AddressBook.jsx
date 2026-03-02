@@ -93,18 +93,18 @@ const AddressBook = () => {
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="flex flex-col items-center justify-center p-12 bg-gray-50/50 border-2 border-dashed border-gray-200 rounded-[2.5rem] text-center"
+          className="flex flex-col items-center justify-center p-12  text-center"
         >
-          <div className="w-20 h-20 bg-white shadow-xl shadow-gray-200/50 text-gray-300 rounded-[2rem] flex items-center justify-center mb-6">
+          <div className="w-20 h-20 bg-white shadow-xl shadow-gray-200/50 text-gray-500 rounded-full flex items-center justify-center mb-6">
             <MapPin size={40} />
           </div>
-          <h3 className="text-xl font-black uppercase tracking-tighter text-gray-900 leading-none">No Addresses Saved</h3>
-          <p className="text-[11px] font-bold text-gray-400 mt-3 uppercase tracking-widest max-w-[200px]">
+          <h3 className="text-[15px] sm:text-2xl font-black uppercase tracking-tighter text-gray-900 leading-none">No Addresses Saved</h3>
+          <p className="text-[8px] sm:text-[12px] font-bold text-gray-600 mt-3 uppercase tracking-widest ">
             Add your first delivery address to get started
           </p>
           <button
             onClick={handleAddNew}
-            className="mt-8 flex items-center gap-2 px-8 py-4 bg-primary text-white text-[11px] font-black uppercase tracking-[0.2em] rounded-2xl shadow-xl shadow-primary/20 hover:scale-105 active:scale-95 transition-all"
+            className="cursor-pointer mt-8 flex items-center gap-2 px-10 py-3 sm:py-4 whitespace-nowrap sm:px-8 bg-primary text-white text-[8px] sm:text-[11px] font-black uppercase tracking-[0.2em] rounded-2xl shadow-xl shadow-primary/20 hover:scale-105 active:scale-95 transition-all"
           >
             <Plus size={18} />
             Add New Address

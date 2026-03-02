@@ -165,10 +165,10 @@ const ProfileOverview = () => {
                       type="text" 
                       value={tempData[field.id]}
                       onChange={(e) => setTempData({...tempData, [field.id]: e.target.value})}
-                      className="w-full bg-transparent outline-none text-[11px] sm:text-[12px] font-bold text-gray-800 uppercase"
+                      className="w-full bg-transparent outline-none text-[11px] sm:text-[12px] font-bold text-gray-800 "
                     />
                   ) : (
-                    <p className="text-[11px] sm:text-[12px] font-bold text-gray-800 uppercase truncate">
+                    <p className="text-[11px] sm:text-[12px] font-bold text-gray-800  truncate">
                       {field.value}
                     </p>
                   )}
