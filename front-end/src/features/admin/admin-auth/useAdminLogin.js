@@ -27,13 +27,12 @@ export const useAdminLogin = () => {
         setError(""); 
 
         try {
-            const res = await api.post('/auth/login/', credentials);
+            const res = await api.post('/auth/admin-login/', credentials);
             
             if (res.data.status === true) {
                 localStorage.setItem("admin_token", res.data.access);
                 localStorage.setItem("admin_refresh", res.data.refresh);
                 localStorage.setItem("admin_role", res.data.role); 
-                localStorage.setItem("admin_user", credentials.username);
                 
                 toast.success("successfully logged in!");
                 navigate("/admin/dashboard");

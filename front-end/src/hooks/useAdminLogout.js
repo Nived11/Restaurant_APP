@@ -5,7 +5,6 @@ export const useAdminLogout = () => {
         localStorage.removeItem("admin_token");
         localStorage.removeItem("admin_refresh");
         localStorage.removeItem("admin_role");
-        localStorage.removeItem("admin_user");
 
         toast.success("Logged out successfully!");
 

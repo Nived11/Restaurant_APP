@@ -9,24 +9,32 @@ import { Dashboard, Orders, Menu as AdminMenu, Bookings, Inbox, Customers, Reven
 import NotFound from "../Pages/NotFound.jsx";
 
 const AppRoutes = () => {
-  const adminToken = localStorage.getItem("admin_token");
-  const adminRole = localStorage.getItem("admin_role");
-  const adminUser = { name: localStorage.getItem("admin_user"), role: adminRole };
+  const getAdminToken = () => localStorage.getItem("admin_token");
+  const getAdminRole = () => localStorage.getItem("admin_role");
+  const getUserToken = () => localStorage.getItem("user_access");
 
-  const userToken = localStorage.getItem("user_access");
+  const adminInfo = { role: getAdminRole() };
 
   return (
     <Routes>
       {/* -----------------------------------------------------------
-          1. AUTH ROUTES (User & Admin Login/Signup)
+           1. AUTH ROUTES 
       -------------------------------------------------------------- */}
-
-      <Route path="/login" element={userToken ? <Navigate to="/" replace /> : <UserLogin />} />
-      <Route path="/signup" element={userToken ? <Navigate to="/" replace /> : <UserSignup />} />
-      <Route path="/admin/login" element={adminToken ? <Navigate to="/admin/dashboard" replace /> : <AdminLogin />} />
+      <Route 
+        path="/login" 
+        element={getUserToken() ? <Navigate to="/" replace /> : <UserLogin />} 
+      />
+      <Route 
+        path="/signup" 
+        element={getUserToken() ? <Navigate to="/" replace /> : <UserSignup />} 
+      />
+      <Route 
+        path="/admin/login" 
+        element={getAdminToken() ? <Navigate to="/admin/dashboard" replace /> : <AdminLogin />} 
+      />
 
       {/* -----------------------------------------------------------
-          2. PUBLIC ROUTES (Common for all users)
+           2. PUBLIC & USER ROUTES
       -------------------------------------------------------------- */}
       <Route path="/" element={<PublicLayout />}>
         <Route index element={<Home />} />
@@ -35,34 +43,36 @@ const AppRoutes = () => {
         <Route path="about" element={<About />} />
         <Route path="contact" element={<Contact />} />
 
-        <Route path="profile" element={userToken ? <Profile /> : <Navigate to="/login" replace />} />
+        <Route 
+          path="profile" 
+          element={getUserToken() ? <Profile /> : <Navigate to="/login" replace />} 
+        />
       </Route>
 
       {/* -----------------------------------------------------------
-          3. PROTECTED ADMIN & STAFF AREA
+           3. PROTECTED ADMIN & STAFF AREA
       -------------------------------------------------------------- */}
       <Route element={<AdminRoute />}>
-        <Route path="/admin" element={<AdminLayout user={adminUser} />}>
+        <Route path="/admin" element={<AdminLayout user={adminInfo} />}>
           <Route index element={<Navigate to="dashboard" replace />} />
 
-          <Route path="dashboard" element={<Dashboard user={adminUser} />} />
-          <Route path="orders" element={<Orders user={adminUser} />} />
-          <Route path="menu" element={<AdminMenu user={adminUser} />} />
-          <Route path="bookings" element={<Bookings user={adminUser} />} />
-          <Route path="inbox" element={<Inbox user={adminUser} />} />
+          <Route path="dashboard" element={<Dashboard user={adminInfo} />} />
+          <Route path="orders" element={<Orders user={adminInfo} />} />
+          <Route path="menu" element={<AdminMenu user={adminInfo} />} />
+          <Route path="bookings" element={<Bookings user={adminInfo} />} />
+          <Route path="inbox" element={<Inbox user={adminInfo} />} />
 
-          {/* Admin Role Only Pages */}
           <Route
             path="customers"
-            element={adminRole === "admin" ? <Customers user={adminUser} /> : <Navigate to="/admin/dashboard" replace />}
+            element={getAdminRole() === "admin" ? <Customers user={adminInfo} /> : <Navigate to="/admin/dashboard" replace />}
           />
           <Route
             path="revenue"
-            element={adminRole === "admin" ? <Revenue user={adminUser} /> : <Navigate to="/admin/dashboard" replace />}
+            element={getAdminRole() === "admin" ? <Revenue user={adminInfo} /> : <Navigate to="/admin/dashboard" replace />}
           />
           <Route
             path="settings"
-            element={adminRole === "admin" ? <Settings user={adminUser} /> : <Navigate to="/admin/dashboard" replace />}
+            element={getAdminRole() === "admin" ? <Settings user={adminInfo} /> : <Navigate to="/admin/dashboard" replace />}
           />
         </Route>
       </Route>

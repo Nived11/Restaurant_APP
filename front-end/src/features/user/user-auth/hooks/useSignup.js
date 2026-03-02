@@ -61,6 +61,11 @@ export const useSignup = () => {
         if (e) e.preventDefault();
         setError(null);
 
+        if (formData.name.trim().length < 3) {
+            setError("Name must be at least 3 characters long.");
+            return;
+        }
+
         if (formData.phone.length !== 10) {
             setError("Invalid phone number. Please enter 10 digits.");
             return;

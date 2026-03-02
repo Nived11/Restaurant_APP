@@ -5,28 +5,29 @@ const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
 });
 
-
 const getAuthData = () => {
+  const pathname = window.location.pathname;
+  const isAdminPath = pathname.startsWith('/admin');
+
   const adminToken = localStorage.getItem('admin_token');
   const userToken = localStorage.getItem('user_access');
-  const adminRole = localStorage.getItem('admin_role'); 
-  
-  if (adminToken) {
+
+  if (isAdminPath && adminToken) {
     return {
       token: adminToken,
       refresh: localStorage.getItem('admin_refresh'),
-      context: 'admin_panel',
-      role: adminRole 
+      context: 'admin_panel'
     };
   }
+
   return {
     token: userToken,
     refresh: localStorage.getItem('user_refresh'),
-    context: 'user_side',
-    role: 'user'
+    context: 'user_side'
   };
 };
 
+// Request Interceptor
 api.interceptors.request.use((config) => {
   const { token } = getAuthData();
   if (token) {
@@ -35,12 +36,12 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+// Response Interceptor (Token Refresh Logic)
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
 
-    // 401 Error (Unauthorized)
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
       const { refresh, context } = getAuthData();
@@ -48,7 +49,7 @@ api.interceptors.response.use(
       if (!refresh) return Promise.reject(error);
 
       try {
-        const res = await axios.post(`${api.defaults.baseURL}/token/refresh/`, {
+        const res = await axios.post(`${import.meta.env.VITE_API_URL}/token/refresh/`, {
           refresh: refresh,
         });
 
@@ -65,14 +66,11 @@ api.interceptors.response.use(
           return api(originalRequest);
         }
       } catch (refreshError) {
-        localStorage.removeItem('admin_token');
-        localStorage.removeItem('admin_refresh');
-        localStorage.removeItem('admin_role');
-        localStorage.removeItem('user_access');
-        localStorage.removeItem('user_refresh');
-        
+        console.error("Refresh failed, clearing storage...");
+        localStorage.clear();
+
         toast.error('Session expired. Please login again.');
-        
+
         if (context === 'admin_panel') {
           window.location.href = '/admin/login';
         } else {
