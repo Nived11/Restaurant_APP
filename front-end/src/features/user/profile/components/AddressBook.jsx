@@ -1,125 +1,236 @@
 import React, { useState } from "react";
-import { Home, Briefcase, MapPin, Edit3, Trash2, Plus, Phone, User, } from "lucide-react";
+import { Home, Briefcase, Edit3, Trash2, Plus, Loader2, MapPin , AlertCircle} from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useAddress } from "../hooks/useAddress";
 import AddressForm from "./AddressForm";
 import DeleteConfirmation from "./DeleteConfirmation";
+import { extractErrorMessages } from "../../../../utils/extractErrorMessages";
 
 const AddressBook = () => {
+  const {
+    addresses,
+    isLoading,
+    addAddress,
+    addressError,
+    refetchAddresses,
+    updateAddress,
+    deleteAddress,
+    isAdding,
+    isDeleting,
+    isUpdating
+  } = useAddress();
+
   const [showForm, setShowForm] = useState(false);
   const [editingAddress, setEditingAddress] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
-  
-  const [addresses, setAddresses] = useState([
-    { id: 1, type: "Home", name: "Alex Thompson", detail: "Jonathan's Villa, 12th Street", area: "Marine Drive, Kochi", mobile: "+91 98765 43210" },
-    { id: 2, type: "Office", name: "Alex Thompson", detail: "Infopark Phase 2, Unit 4B", area: "Kakkanad, Kochi", mobile: "+91 98765 43210" },
-  ]);
+  const [deleteError, setDeleteError] = useState(null);
 
   const handleEdit = (addr) => {
     setEditingAddress(addr);
     setShowForm(true);
   };
 
+  if (isLoading) {
+    return (
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-6">
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="bg-white border border-gray-100 p-4 md:p-6 rounded-[1.5rem] animate-pulse">
+            <div className="flex justify-between mb-4">
+              <div className="flex gap-3">
+                <div className="w-11 h-11 bg-gray-200 rounded-2xl" />
+                <div className="space-y-2">
+                  <div className="w-12 h-2 bg-gray-200 rounded" />
+                  <div className="w-8 h-2 bg-gray-100 rounded" />
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <div className="w-8 h-8 bg-gray-100 rounded-xl" />
+                <div className="w-8 h-8 bg-gray-100 rounded-xl" />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <div className="h-4 bg-gray-200 rounded w-3/4" />
+              <div className="h-3 bg-gray-100 rounded w-1/2" />
+              <div className="h-3 bg-gray-50 rounded w-1/4" />
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  if (addressError) {
+    return (
+      <motion.div 
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="flex flex-col items-center justify-center p-10  text-center"
+      >
+        <div className="w-16 h-16  text-red-500 rounded-full flex items-center justify-center mb-4">
+          <AlertCircle size={32} />
+        </div>
+        <h3 className="text-lg font-black uppercase tracking-tighter text-gray-900">Connection Error</h3>
+        <p className="text-xs font-bold text-gray-500 mt-2 max-w-[250px] leading-relaxed">
+          {extractErrorMessages(addressError) || "Could not fetch your addresses. Please try again later."}
+        </p>
+       <button 
+          onClick={() => refetchAddresses()} 
+          className="mt-6 flex items-center gap-2 px-6 py-2.5 bg-slate-900 text-white text-[10px] font-black uppercase tracking-widest rounded-xl shadow-lg active:scale-95 transition-all"
+        >
+          {isLoading ? (
+            <Loader2 size={14} className="animate-spin" />
+          ) : null}
+          Retry 
+        </button>
+      </motion.div>
+    );
+  }
+
+  if (addresses.length === 0) {
+    return (
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="flex flex-col items-center justify-center p-12 bg-gray-50/50 border-2 border-dashed border-gray-200 rounded-[2.5rem] text-center"
+      >
+        <div className="w-20 h-20 bg-white shadow-xl shadow-gray-200/50 text-gray-300 rounded-[2rem] flex items-center justify-center mb-6">
+          <MapPin size={40} />
+        </div>
+        <h3 className="text-xl font-black uppercase tracking-tighter text-gray-900 leading-none">No Addresses Saved</h3>
+        <p className="text-[11px] font-bold text-gray-400 mt-3 uppercase tracking-widest max-w-[200px]">
+          Add your first delivery address to get started
+        </p>
+        
+        <button
+          onClick={() => { setEditingAddress(null); setShowForm(true); }}
+          className="mt-8 flex items-center gap-2 px-8 py-4 bg-primary text-white text-[11px] font-black uppercase tracking-[0.2em] rounded-2xl shadow-xl shadow-primary/20 hover:scale-105 active:scale-95 transition-all"
+        >
+          <Plus size={18} />
+          Add New Address
+        </button>
+      </motion.div>
+    );
+  }
+
   return (
-    <div className="relative">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5">
+    <div className="relative w-full">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-6">
         {addresses.map((addr) => (
-          <motion.div 
+          <motion.div
             layout
-            key={addr.id} 
-            className="group bg-white border border-gray-100 p-4 md:p-5 rounded-[1.5rem] md:rounded-[2rem] shadow-sm hover:shadow-xl hover:shadow-black/5 transition-all duration-300 relative"
+            key={addr.id}
+            className={`group relative bg-white border ${addr.is_default ? 'border-primary/20 ring-1 ring-primary/5' : 'border-gray-100'} p-4 md:p-6 rounded-[1.5rem] transition-all shadow-xl hover:shadow-gray-200/50`}
           >
-            {/* Top Action Bar */}
-            <div className="flex justify-between items-center mb-4">
-              <div className="flex items-center gap-2">
-                {/* Icon Box */}
-                <div className="w-8 h-8 md:w-10 md:h-10 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-colors duration-500">
-                  {addr.type === "Home" ? <Home size={16} /> : <Briefcase size={16} />}
-                </div>
-                <span className="text-[10px] font-black uppercase tracking-[0.1em] text-gray-800">{addr.type}</span>
-              </div>
-              
-              {/* FIXED ACTIONS: Always visible, no opacity-0 */}
-              <div className="flex gap-1.5">
-                <button 
-                  onClick={() => handleEdit(addr)} 
-                  title="Edit Address"
-                  className="p-2 bg-gray-100 text-gray-600 hover:text-primary hover:bg-primary/10 rounded-full transition-all active:scale-90"
-                >
-                  <Edit3 size={14}/>
-                </button>
-                <button 
-                  onClick={() => setDeleteId(addr.id)} 
-                  title="Delete Address"
-                  className="p-2 bg-gray-100 text-gray-600 hover:text-red-500 hover:bg-red-50 rounded-full transition-all active:scale-90"
-                >
-                  <Trash2 size={14}/>
-                </button>
-              </div>
-            </div>
-
-            {/* Address Details */}
-            <div className="space-y-1">
-              <h4 className="font-black text-[11px] md:text-sm text-gray-800 uppercase tracking-tighter line-clamp-1">
-                {addr.detail}
-              </h4>
-              <p className="text-[9px] md:text-[10px] font-bold text-gray-400 uppercase tracking-widest line-clamp-1">
-                {addr.area}
-              </p>
-            </div>
-
-            {/* Contact Information Footer */}
-            <div className="mt-4 pt-4 border-t border-gray-50 flex items-center justify-between">
+            <div className="flex justify-between items-start mb-4">
               <div className="flex items-center gap-3">
-                <div className="flex items-center gap-1 text-[8px] font-black text-gray-400 uppercase">
-                  <User size={10} className="text-primary/40"/> {addr.name.split(' ')[0]}
+                <div className={`w-9 h-9 md:w-11 md:h-11 rounded-2xl flex items-center justify-center transition-colors ${addr.is_default ? 'bg-primary text-white' : 'bg-gray-50 text-gray-700 group-hover:bg-primary/10 group-hover:text-primary'}`}>
+                  {addr.address_type === "Work" ? <Briefcase size={18} /> : <Home size={18} />}
                 </div>
-                <div className="flex items-center gap-1 text-[8px] font-black text-gray-400 uppercase">
-                  <Phone size={10} className="text-primary/40"/> {addr.mobile.slice(-5)}
+                <div>
+                  <span className="text-[10px] font-black uppercase tracking-widest text-gray-900 block">{addr.address_type}</span>
+                  {addr.is_default && (
+                    <span className="text-[8px] font-bold text-primary uppercase tracking-tighter flex items-center gap-0.5">
+                      Default
+                    </span>
+                  )}
                 </div>
+              </div>
+
+              <div className="flex gap-4">
+                <button onClick={() => handleEdit(addr)} className="cursor-pointer p-2 bg-gray-100 text-gray-700 hover:bg-primary/10 hover:text-primary rounded-xl transition-all">
+                  <Edit3 size={14} />
+                </button>
+                <button onClick={() => setDeleteId(addr.id)} className="cursor-pointer p-2 bg-gray-100 text-gray-700 hover:bg-red-50 hover:text-red-500 rounded-xl transition-all">
+                  <Trash2 size={14} />
+                </button>
+              </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <h4 className="font-bold text-[13px] md:text-sm text-gray-900 leading-tight">
+                {addr.complete_address}
+              </h4>
+              <p className="text-[10px] md:text-[11px] font-medium text-gray-600 leading-relaxed">
+                <span className="text-gray-400 mr-1">📍</span> {addr.landmark}
+              </p>
+
+              {/* Frontend Reverse Geocoded Location Name */}
+              <div className="flex items-center gap-1.5 pt-0.5">
+                <MapPin size={11} className="text-primary shrink-0" />
+                <p className="text-[9px] font-bold text-gray-500 uppercase tracking-tight truncate">
+                  {addr.placeName || "Locating..."}
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2 pt-1">
+                <span className="px-2 py-0.5 bg-gray-100 text-gray-800 text-[9px] font-black rounded-md tracking-wider">
+                  {addr.pincode}
+                </span>
               </div>
             </div>
           </motion.div>
         ))}
 
-        {/* Add New Address Button */}
-        <button 
+        <button
           onClick={() => { setEditingAddress(null); setShowForm(true); }}
-          className="border-2 border-dashed border-gray-100 bg-gray-50/20 rounded-[1.5rem] md:rounded-[2rem] p-6 flex flex-col items-center justify-center gap-2 text-gray-400 hover:bg-white hover:border-primary/30 hover:text-primary transition-all group"
+          className="cursor-pointer group min-h-[140px] border-2 border-dashed border-gray-400 bg-gray-50/50 rounded-[1.5rem] md:rounded-[2.2rem] p-6 flex flex-col items-center justify-center gap-3 hover:border-primary/40 hover:bg-white hover:shadow-lg transition-all duration-300"
         >
-          <div className="w-10 h-10 rounded-full border-2 border-dashed border-gray-200 flex items-center justify-center group-hover:border-primary/40 group-hover:bg-primary/5">
-            <Plus size={18} />
+          <div className="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center text-gray-500 group-hover:text-primary group-hover:scale-110 transition-all">
+            <Plus size={22} />
           </div>
-          <span className="text-[9px] font-black uppercase tracking-[0.2em]">Add New Address</span>
+          <span className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 group-hover:text-primary">New Address</span>
         </button>
       </div>
 
-      {/* FIXED FORM OVERLAY */}
       <AnimatePresence>
         {showForm && (
-          <div className="fixed inset-0 z-[999] flex items-center justify-center p-4">
-            <motion.div 
-              initial={{ opacity: 0 }} 
-              animate={{ opacity: 1 }} 
+          <div className="fixed inset-0 z-[999] flex items-end sm:items-center justify-center p-0 sm:p-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setShowForm(false)}
-              className="absolute inset-0 bg-black/60 backdrop-blur-md" 
+              className="absolute inset-0 bg-black/40 backdrop-blur-sm"
             />
-            <AddressForm 
-              initialData={editingAddress} 
-              onClose={() => setShowForm(false)} 
+            <AddressForm
+              initialData={editingAddress}
+              onClose={() => setShowForm(false)}
+              isSubmitting={isAdding || isUpdating}
+              onSubmit={async (data) => {
+                try {
+                  if (editingAddress) {
+                    await updateAddress({ id: editingAddress.id, data });
+                  } else {
+                    await addAddress(data);
+                  }
+                  setShowForm(false);
+                } catch (err) { }
+              }}
             />
           </div>
         )}
       </AnimatePresence>
 
-      {/* CONFIRMATION MODAL */}
-      <DeleteConfirmation 
-        isOpen={!!deleteId} 
-        onClose={() => setDeleteId(null)} 
-        onConfirm={() => {
-            setAddresses(addresses.filter(a => a.id !== deleteId));
+      <DeleteConfirmation
+        isOpen={!!deleteId}
+        isLoading={isDeleting}
+        error={deleteError}
+        onClose={() => {
+          if (!isDeleting) {
             setDeleteId(null);
-        }} 
+            setDeleteError(null);
+          }
+        }}
+        onConfirm={async () => {
+          try {
+            setDeleteError(null);
+            await deleteAddress(deleteId); 
+            setDeleteId(null);
+          } catch (err) {
+            const errorMessage = extractErrorMessages(err);
+            setDeleteError(errorMessage);
+          }
+        }}
       />
     </div>
   );

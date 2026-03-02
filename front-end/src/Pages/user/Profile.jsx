@@ -1,6 +1,7 @@
-import React, { useState , useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import { ProfileBanner, ProfileTabs, OrderHistory, AddressBook ,ProfileOverview} from "../../features/user/profile";
+import { motion, AnimatePresence } from "framer-motion";
+import { ProfileTabs, OrderHistory, AddressBook, ProfileOverview } from "../../features/user/profile";
 
 const Profile = () => {
   const location = useLocation();
@@ -9,27 +10,34 @@ const Profile = () => {
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const tab = params.get("tab");
-    if (tab) {
-      setActiveTab(tab);
-    }
+    if (tab) setActiveTab(tab);
   }, [location]);
 
-
   return (
-    <div className="min-h-screen mt-4 md:mt-6 pb-10 px-2 md:px-4">
+    <div className="min-h-screen bg-[#FAFAFA] pt-6 md:pt-12 pb-20 px-4">
       <div className="max-w-[1440px] mx-auto">
-        <div className="bg-white rounded-[1.5rem] shadow-2xl shadow-black/5 overflow-hidden border border-gray-100">
+        {/* Main Container */}
+        <div className="bg-white rounded-[1rem] md:rounded-[1.5rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100/50 overflow-hidden">
           
-          <ProfileBanner />
-          
+          {/* Navigation Tabs */}
           <ProfileTabs activeTab={activeTab} setActiveTab={setActiveTab} />
 
-          <div className="p-4 md:p-14">
-            {activeTab === "profile" && <ProfileOverview />}
-            {activeTab === "orders" && <OrderHistory />}
-            {activeTab === "address" && <AddressBook />}
+          {/* Dynamic Content Area */}
+          <div className="p-6 md:p-12 lg:p-16">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeTab}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.3, ease: "easeOut" }}
+              >
+                {activeTab === "profile" && <ProfileOverview />}
+                {activeTab === "orders" && <OrderHistory />}
+                {activeTab === "address" && <AddressBook />}
+              </motion.div>
+            </AnimatePresence>
           </div>
-
         </div>
       </div>
     </div>
