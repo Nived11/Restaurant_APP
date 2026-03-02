@@ -35,7 +35,7 @@ const EditableField = ({ icon: Icon, label, value, onChange, placeholder, isText
         {isTextArea ? (
           <textarea
             ref={inputRef}
-            value={value}
+            value={value || ""} // ✅ FIX: Prevents React 'null' warning
             onChange={(e) => onChange(e.target.value)}
             readOnly={!isEditing}
             placeholder={placeholder}
@@ -49,7 +49,7 @@ const EditableField = ({ icon: Icon, label, value, onChange, placeholder, isText
           <input 
             ref={inputRef}
             type="text" 
-            value={value}
+            value={value || ""} // ✅ FIX: Prevents React 'null' warning
             onChange={(e) => onChange(e.target.value)}
             readOnly={!isEditing}
             placeholder={placeholder}

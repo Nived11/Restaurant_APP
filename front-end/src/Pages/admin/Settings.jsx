@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Save, Loader2, Globe, Building2, FileText, Instagram } from 'lucide-react';
 
-// Import hook and components using the correct relative paths
+// Import hook and components 
 import { useSettings } from '../../features/admin/settings/hooks/useSettings';
 import SettingsContact from '../../features/admin/settings/components/SettingsContact';
 import SettingsHours from '../../features/admin/settings/components/SettingsHours';
@@ -36,9 +36,11 @@ const Settings = () => {
   const { 
     settings, 
     isLoading,
-    isSaving, 
+    isSaving,
+    isLocating,
     handleChange, 
-    handleNestedChange, 
+    handleNestedChange,
+    handleGetCurrentLocation, 
     saveSettings 
   } = useSettings();
 
@@ -86,9 +88,27 @@ const Settings = () => {
             </div>
 
             <div className="bg-white p-6 md:p-8 rounded-[2rem] border border-gray-100 shadow-sm hover:shadow-md transition-shadow duration-300 min-h-[400px]">
-              {activeTab === 'contact' && <SettingsContact settings={settings} handleChange={handleChange} />}
-              {activeTab === 'footer' && <SettingsHours settings={settings} handleChange={handleChange} handleNestedChange={handleNestedChange} />}
-              {activeTab === 'social' && <SettingsSocial settings={settings} handleNestedChange={handleNestedChange} />}
+              {activeTab === 'contact' && (
+                <SettingsContact 
+                  settings={settings} 
+                  handleChange={handleChange} 
+                  isLocating={isLocating}
+                  handleGetCurrentLocation={handleGetCurrentLocation}
+                />
+              )}
+              {activeTab === 'footer' && (
+                <SettingsHours 
+                  settings={settings} 
+                  handleChange={handleChange} 
+                  handleNestedChange={handleNestedChange} 
+                />
+              )}
+              {activeTab === 'social' && (
+                <SettingsSocial 
+                  settings={settings} 
+                  handleNestedChange={handleNestedChange} 
+                />
+              )}
             </div>
 
             <div className="flex items-center justify-end gap-4 mt-8 pb-12">

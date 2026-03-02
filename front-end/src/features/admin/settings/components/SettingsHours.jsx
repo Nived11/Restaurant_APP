@@ -1,6 +1,6 @@
 import React from 'react';
 import { Clock, FileText } from 'lucide-react';
-import EditableField from './EditableField'; // Check the import path
+import EditableField from './EditableField'; 
 
 const SettingsHours = ({ settings, handleChange, handleNestedChange }) => {
   return (
@@ -20,25 +20,25 @@ const SettingsHours = ({ settings, handleChange, handleNestedChange }) => {
           <EditableField 
             icon={FileText} 
             label="Footer Description (About Us)" 
-            value={settings.footerDescription} 
+            value={settings?.footerDescription} 
             onChange={(val) => handleChange('footerDescription', val)} 
-            placeholder="Brief description about the restaurant..."
+            placeholder="Enter footer description about the restaurant"
             isTextArea={true}
           />
         </div>
         <EditableField 
           icon={Clock} 
           label="Working Hours (Mon - Sat)" 
-          value={settings.workingHours.weekdays} 
+          value={settings?.workingHours?.weekdays} 
           onChange={(val) => handleNestedChange('workingHours', 'weekdays', val)} 
-          placeholder="E.g., 10:00 AM - 11:00 PM"
+          placeholder="Enter weekday working hours"
         />
         <EditableField 
           icon={Clock} 
           label="Working Hours (Sunday)" 
-          value={settings.workingHours.sunday} 
+          value={settings?.workingHours?.sunday} 
           onChange={(val) => handleNestedChange('workingHours', 'sunday', val)} 
-          placeholder="E.g., 09:00 AM - 12:00 AM"
+          placeholder="Enter sunday working hours"
         />
       </div>
     </div>
