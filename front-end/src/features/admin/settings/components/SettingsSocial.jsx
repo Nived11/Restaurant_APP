@@ -1,6 +1,6 @@
 import React from 'react';
 import { Instagram, Facebook, Twitter, MessageCircle } from 'lucide-react';
-import EditableField from './EditableField'; // Check the import path
+import EditableField from './EditableField'; 
 
 const SettingsSocial = ({ settings, handleNestedChange }) => {
   return (
@@ -19,30 +19,30 @@ const SettingsSocial = ({ settings, handleNestedChange }) => {
         <EditableField 
           icon={Instagram} 
           label="Instagram URL" 
-          value={settings.socials.instagram} 
+          value={settings?.socials?.instagram} 
           onChange={(val) => handleNestedChange('socials', 'instagram', val)} 
-          placeholder="https://instagram.com/..."
+          placeholder="Enter Instagram URL"
         />
         <EditableField 
           icon={Facebook} 
           label="Facebook URL" 
-          value={settings.socials.facebook} 
+          value={settings?.socials?.facebook} 
           onChange={(val) => handleNestedChange('socials', 'facebook', val)} 
-          placeholder="https://facebook.com/..."
+          placeholder="Enter Facebook URL"
         />
         <EditableField 
           icon={Twitter} 
           label="Twitter (X) URL" 
-          value={settings.socials.twitter} 
+          value={settings?.socials?.twitter} 
           onChange={(val) => handleNestedChange('socials', 'twitter', val)} 
-          placeholder="https://twitter.com/..."
+          placeholder="Enter Twitter URL"
         />
         <EditableField 
           icon={MessageCircle} 
           label="WhatsApp URL" 
-          value={settings.socials.whatsapp} 
+          value={settings?.socials?.whatsapp} 
           onChange={(val) => handleNestedChange('socials', 'whatsapp', val)} 
-          placeholder="https://wa.me/..."
+          placeholder="Enter WhatsApp URL"
         />
       </div>
     </div>
