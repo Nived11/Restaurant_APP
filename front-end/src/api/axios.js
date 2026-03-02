@@ -67,10 +67,10 @@ api.interceptors.response.use(
         }
       } catch (refreshError) {
         console.error("Refresh failed, clearing storage...");
-        localStorage.clear(); 
-        
+        localStorage.clear();
+
         toast.error('Session expired. Please login again.');
-        
+
         if (context === 'admin_panel') {
           window.location.href = '/admin/login';
         } else {
