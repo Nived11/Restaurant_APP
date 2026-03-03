@@ -21,6 +21,7 @@ const ReserveTable = ({ isOpen, onClose }) => {
   const inputClass = "w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-2 md:py-3.5 text-[11px] md:text-[12px] font-bold text-slate-900 outline-none focus:border-primary focus:bg-white transition-all appearance-none placeholder:text-slate-400";
   const labelClass = "text-[8px] md:text-[10px] font-black text-slate-700 uppercase tracking-widest ml-1 mb-1 block";
 
+  // സ്മൂത്ത് ആനിമേഷനുള്ള വേരിയന്റുകൾ
   const modalVariants = {
     initial: isMobile ? { y: "100%" } : { y: 30, opacity: 0, scale: 0.95 },
     animate: { 
@@ -28,14 +29,14 @@ const ReserveTable = ({ isOpen, onClose }) => {
       opacity: 1, 
       scale: 1,
       transition: isMobile 
-        ? { duration: 0.4, ease: [0.32, 0.72, 0, 1] } 
+        ? { type: "spring", damping: 30, stiffness: 300, mass: 0.8 } // മൊബൈലിൽ സ്പ്രിംഗ് ആനിമേഷൻ കൂടുതൽ സ്മൂത്താണ്
         : { duration: 0.3, ease: "easeOut" }
     },
     exit: { 
       y: "100%", 
       opacity: isMobile ? 1 : 0, 
       scale: isMobile ? 1 : 0.95, 
-      transition: { duration: 0.25, ease: [0.4, 0, 1, 1] }
+      transition: { duration: 0.3, ease: [0.32, 0.72, 0, 1] }
     },
   };
 
@@ -43,11 +44,12 @@ const ReserveTable = ({ isOpen, onClose }) => {
     <AnimatePresence>
       {isOpen && (
         <div className="fixed inset-0 z-[2000] flex items-end md:items-center justify-center p-0 md:p-6 overflow-hidden">
-          {/* Backdrop */}
+          {/* Backdrop - opacity 0.4s സ്ലോ ആയി വരുന്നത് സ്മൂത്ത്നെസ്സ് കൂട്ടും */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
             onClick={onClose}
             className="absolute inset-0 bg-black/70 backdrop-blur-md"
           />
@@ -60,11 +62,13 @@ const ReserveTable = ({ isOpen, onClose }) => {
             exit="exit"
             drag={isMobile ? "y" : false}
             dragConstraints={{ top: 0 }}
-            dragElastic={0.1}
+            dragElastic={0.05} // ഡ്രാഗ് ചെയ്യുമ്പോൾ കൂടുതൽ കൺട്രോൾ കിട്ടാൻ
             onDragEnd={(e, { offset, velocity }) => {
-              if (offset.y > 100 || velocity.y > 600) onClose();
+              if (offset.y > 100 || velocity.y > 500) onClose();
             }}
-            className="relative bg-white w-full md:max-w-4xl rounded-t-[2.5rem] md:rounded-[3rem] shadow-2xl flex flex-col max-h-[95vh] md:max-h-[90vh] will-change-transform overflow-hidden"
+            // performance മെച്ചപ്പെടുത്താൻ താഴെ പറയുന്നവ ചേർത്തു
+            className="relative bg-white w-full md:max-w-4xl rounded-t-[2.5rem] md:rounded-[3rem] shadow-2xl flex flex-col max-h-[95vh] md:max-h-[90vh] overflow-hidden touch-none md:touch-auto"
+            style={{ willChange: "transform" }} 
             onClick={(e) => e.stopPropagation()}
           >
             {/* Mobile Handle Bar */}
@@ -95,7 +99,7 @@ const ReserveTable = ({ isOpen, onClose }) => {
             </div>
 
             {/* Form Content */}
-            <form onSubmit={handleSubmit} className="px-6 md:px-16 pb-8 md:pb-12 overflow-y-auto space-y-3 md:space-y-5 no-scrollbar">
+            <form onSubmit={handleSubmit} className="px-6 md:px-16 pb-8 md:pb-12 overflow-y-auto space-y-3 md:space-y-5 no-scrollbar flex-1">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-6">
                 <div className="space-y-1">
                   <label className={labelClass}>Full Name</label>
