@@ -3,6 +3,7 @@ import { useOutletContext, Outlet, useNavigate,useLocation } from "react-router-
 import AdminSidebar from "../components/common/AdminSidebar";
 import AdminHeader from "../components/common/AdminHeader";
 import { Menu, Bell } from "lucide-react";
+import logoCrunch from "../assets/Logocrunch.png";
 import  api  from "../api/axios";
 
 const AdminLayout = () => {
@@ -64,8 +65,8 @@ const AdminLayout = () => {
         {/* --- HEADER --- */}
         <header className="lg:hidden h-20 bg-[#1A1A1A] px-6 flex items-center justify-between sticky top-0 z-40 border-b border-white/5 flex-shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-primary border-2 border-[#1A1A1A] overflow-hidden">
-              <img src={`https://api.dicebear.com/7.x/bottts-neutral/svg?seed=Pepper&backgroundColor=f9a602`} alt="pfp" />
+            <div className="w-12 h-12 relative  overflow-hidden">
+              <img src={logoCrunch} alt="logo" className="w-full h-full" />
             </div>
           </div>
 

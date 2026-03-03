@@ -12,10 +12,13 @@ export const CartSection = ({ cartItems, subTotal, totalAmount, incrementQty, de
         <h2 className="text-md md:text-3xl font-black uppercase tracking-tight italic text-black">
           Checkout <span className="text-[#f9a602]">Details</span>
         </h2>
+        {!isCartEmpty &&
+        
         <Link to="/menu" className="group flex items-center gap-1.5 text-[8px] bg-gray-100 p-2 rounded-lg  md:text-[10px]  font-black uppercase tracking-widest text-gray-700 hover:text-[#f9a602] transition-colors">
           <Plus size={12} className="group-hover:rotate-90 transition-transform" />
           Add More Items
         </Link>
+        }
       </div>
       
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">

@@ -46,6 +46,9 @@ const SearchBar = ({
   }, [searchQuery, categories, allItems]);
 
   const handleSelect = (type, data) => {
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
     if (type === 'category') {
       navigate(`/menu?category=${data.id}`);
     } else {
@@ -87,6 +90,7 @@ const SearchBar = ({
               autoFocus={!isMobile}
               onKeyDown={(e) => {
                 if(e.key === 'Enter' && searchQuery) {
+                  e.currentTarget.blur();
                   navigate(`/menu?search=${searchQuery}`);
                   handleCloseSearch();
                 }
