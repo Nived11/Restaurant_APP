@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Home, Briefcase, Edit3, Trash2, Plus, Loader2, MapPin, AlertCircle } from "lucide-react";
+import { Home, Briefcase, Edit3, Trash2, Plus, Loader2, MapPin, AlertCircle, Podcast } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAddress } from "../hooks/useAddress";
 import AddressForm from "./AddressForm";
@@ -141,16 +141,17 @@ const AddressBook = () => {
               </div>
 
               <div className="space-y-1.5">
-                <h4 className="font-bold text-[13px] md:text-sm text-gray-900 leading-tight">{addr.complete_address}</h4>
+                <h4 className="font-bold text-[10px] md:text-[12px] text-gray-700 leading-tight truncate">{addr.complete_address}</h4>
                 <p className="text-[10px] md:text-[11px] font-medium text-gray-600 leading-relaxed">
                   <span className="text-gray-400 mr-1">📍</span> {addr.landmark}
                 </p>
+                <div className="flex items-center gap-2 pt-1">
+                  <Podcast size={11} className="text-gray-400  shrink-0" />
+                  <span className="px-2 py-0.5 bg-gray-100 text-gray-800 text-[9px] font-black rounded-md tracking-wider">{addr.pincode}</span>
+                </div>
                 <div className="flex items-center gap-1.5 pt-0.5">
                   <MapPin size={11} className="text-primary shrink-0" />
-                  <p className="text-[9px] font-bold text-gray-500 uppercase tracking-tight truncate">{addr.placeName || "Locating..."}</p>
-                </div>
-                <div className="flex items-center gap-2 pt-1">
-                  <span className="px-2 py-0.5 bg-gray-100 text-gray-800 text-[9px] font-black rounded-md tracking-wider">{addr.pincode}</span>
+                  <p className="text-[9px] font-bold text-gray-500 uppercase tracking-tight truncate">{addr.placeName || "Location Pinned"}</p>
                 </div>
               </div>
             </motion.div>

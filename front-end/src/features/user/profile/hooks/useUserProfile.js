@@ -26,7 +26,6 @@ export const useUserProfile = () => {
     mutationFn: async (updatedData) => {
       setValidationError(null);
       
-      // Client-side Validation: Name at least 3 characters
       if (updatedData.name.trim().length < 3) {
         throw new Error("Name must be at least 3 characters long");
       }

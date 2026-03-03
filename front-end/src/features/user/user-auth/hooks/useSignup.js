@@ -88,6 +88,7 @@ export const useSignup = () => {
 
             if (response.data.data?.test_otp) {
                 console.log("OTP (Test Mode):", response.data.data.test_otp);
+                toast.info(`Test OTP: ${response.data.data.test_otp}`);
             }
         } catch (err) {
             const errMsg = extractErrorMessages(err);

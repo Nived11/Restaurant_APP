@@ -2,33 +2,8 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import api from "../../../../api/axios"; 
 import { extractErrorMessages } from "../../../../utils/extractErrorMessages";
+import { fetchLocationDetails } from "../../../../utils/addressHelper";
 import { toast } from "sonner";
-
-const getPlaceName = async (lat, lon) => {
-  if (!lat || !lon) return null;
-  try {
-    const response = await fetch(
-      `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=en`
-    );
-    if (!response.ok) return null;
-    const data = await response.json();
-    
-    const adminLevels = data.localityInfo?.administrative || [];
-    const districtObj = adminLevels.find(level => 
-      level.description?.toLowerCase().includes("district") || level.order === 4
-    );
-    let district = districtObj ? districtObj.name.replace(/\s*district\s*/gi, "").trim() : "";
-    
-    const parts = [data.locality, data.city, district].filter(part => part && part.length > 0);
-    return {
-      formattedName: parts.join(", ") || "Location Pinned",
-      postcode: data.postcode || ""
-    };
-  } catch (error) {
-    console.error("Geocoding Error:", error);
-    return null;
-  }
-};
 
 export const useAddress = () => {
   const queryClient = useQueryClient();
@@ -38,16 +13,9 @@ export const useAddress = () => {
     queryKey: ["addresses"],
     queryFn: async () => {
       const response = await api.get("/auth/addresses/");
-      const rawAddresses = response.data;
-      const enrichedAddresses = await Promise.all(
-        rawAddresses.map(async (addr) => {
-          const details = await getPlaceName(addr.latitude, addr.longitude);
-          return { ...addr, placeName: details?.formattedName || "Location Not Found" };
-        })
-      );
-      return enrichedAddresses;
+      return response.data; 
     },
-    staleTime: 0, 
+    staleTime: 60000, 
   });
 
   const getCurrentLocation = async () => {
@@ -60,7 +28,7 @@ export const useAddress = () => {
       navigator.geolocation.getCurrentPosition(
         async (position) => {
           const { latitude, longitude } = position.coords;
-          const details = await getPlaceName(latitude, longitude);
+          const details = await fetchLocationDetails(latitude, longitude);
           setIsLocating(false);
           resolve({ latitude, longitude, ...details });
         },
@@ -74,7 +42,7 @@ export const useAddress = () => {
     });
   };
 
-  const addMutation = useMutation({
+  const addAddress = useMutation({
     mutationFn: (newData) => api.post("/auth/addresses/", newData),
     onSuccess: () => {
       queryClient.invalidateQueries(["addresses"]);
@@ -83,7 +51,7 @@ export const useAddress = () => {
     onError: (err) => toast.error(extractErrorMessages(err))
   });
 
-  const updateMutation = useMutation({
+  const updateAddress = useMutation({
     mutationFn: ({ id, data }) => api.patch(`/auth/addresses/${id}/`, data),
     onSuccess: () => {
       queryClient.invalidateQueries(["addresses"]);
@@ -92,7 +60,7 @@ export const useAddress = () => {
     onError: (err) => toast.error(extractErrorMessages(err))
   });
 
-  const deleteMutation = useMutation({
+  const deleteAddress = useMutation({
     mutationFn: (id) => api.delete(`/auth/addresses/${id}/`),
     onSuccess: () => {
       queryClient.invalidateQueries(["addresses"]);
@@ -104,16 +72,12 @@ export const useAddress = () => {
   return {
     addresses: addressQuery.data || [],
     isLoading: addressQuery.isLoading,
-    addressError: addressQuery.error,
-    refetchAddresses: addressQuery.refetch,
     isLocating,
     getCurrentLocation,
-    addAddress: addMutation.mutateAsync,
-    updateAddress: updateMutation.mutateAsync,
-    deleteAddress: deleteMutation.mutateAsync,
-    isAdding: addMutation.isPending,
-    isUpdating: updateMutation.isPending,
-    isDeleting: deleteMutation.isPending, 
+    addAddress: addAddress.mutateAsync,
+    updateAddress: updateAddress.mutateAsync,
+    deleteAddress: deleteAddress.mutateAsync,
+    isAdding: addAddress.isPending,
   };
 };
 
