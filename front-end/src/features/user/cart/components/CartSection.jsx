@@ -72,7 +72,7 @@ export const CartSection = ({ cartItems, subTotal, totalAmount, incrementQty, de
             })
           ) : (
             <div className="p-16 border-2 border-dashed border-gray-100 rounded-[2.5rem] text-center">
-              <p className="font-black text-gray-300 uppercase tracking-widest text-xs mb-4">Your bag is empty</p>
+              <p className="font-black text-gray-500 uppercase tracking-widest text-xs mb-4">Your bag is empty</p>
               <Link to="/menu" className="inline-block bg-black text-white px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-[#f9a602] hover:text-black transition-all">Go To Menu</Link>
             </div>
           )}
