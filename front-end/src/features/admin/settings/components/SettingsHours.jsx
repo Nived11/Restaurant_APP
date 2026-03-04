@@ -2,7 +2,7 @@ import React from 'react';
 import { Clock, FileText } from 'lucide-react';
 import EditableField from './EditableField'; 
 
-const SettingsHours = ({ settings, handleChange, handleNestedChange }) => {
+const SettingsHours = ({ settings, handleChange, handleNestedChange, isEditingMode }) => {
   return (
     <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
       <div className="mb-8 pb-6 border-b border-gray-100">
@@ -12,7 +12,9 @@ const SettingsHours = ({ settings, handleChange, handleNestedChange }) => {
           </div>
           Footer Content & Hours
         </h2>
-        <p className="text-xs text-gray-500 mt-2">Manage the about text and operational hours shown at the bottom of the site.</p>
+        <p className="text-xs text-gray-500 mt-2 font-medium">
+          {isEditingMode ? "You can now edit the footer description and hours." : "Enable edit mode to change these details."}
+        </p>
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
@@ -24,6 +26,7 @@ const SettingsHours = ({ settings, handleChange, handleNestedChange }) => {
             onChange={(val) => handleChange('footerDescription', val)} 
             placeholder="Enter footer description about the restaurant"
             isTextArea={true}
+            disabled={!isEditingMode} // ✅ Locked when not in edit mode
           />
         </div>
         <EditableField 
@@ -32,6 +35,7 @@ const SettingsHours = ({ settings, handleChange, handleNestedChange }) => {
           value={settings?.workingHours?.weekdays} 
           onChange={(val) => handleNestedChange('workingHours', 'weekdays', val)} 
           placeholder="Enter weekday working hours"
+          disabled={!isEditingMode} // ✅ Locked when not in edit mode
         />
         <EditableField 
           icon={Clock} 
@@ -39,6 +43,7 @@ const SettingsHours = ({ settings, handleChange, handleNestedChange }) => {
           value={settings?.workingHours?.sunday} 
           onChange={(val) => handleNestedChange('workingHours', 'sunday', val)} 
           placeholder="Enter sunday working hours"
+          disabled={!isEditingMode} // ✅ Locked when not in edit mode
         />
       </div>
     </div>

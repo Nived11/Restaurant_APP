@@ -4,7 +4,7 @@ export const fetchLocationDetails = async (lat, lon) => {
   try {
     const TOKEN = import.meta.env.VITE_LOCATION_IQ_TOKEN;
     const response = await fetch(
-      `https://us1.locationiq.com/v1/reverse.php?key=${TOKEN}&lat=${lat}&lon=${lon}&format=json`
+      `https://us1.locationiq.com/v1/reverse.php?key=${TOKEN}&lat=${lat}&lon=${lon}&format=json&accept-language=en    `
     );
     
     if (!response.ok) return null;

@@ -1,26 +1,17 @@
 import { useState, useCallback, useEffect } from 'react';
 import { toast } from 'sonner';
 import api from '../../../../api/axios'; 
+import { fetchLocationDetails } from '../../../../utils/addressHelper';
+// ✅ Import your exact error extractor function
+import { extractErrorMessages } from '../../../../utils/extractErrorMessages';
 
 export const useSettings = () => {
   const [settings, setSettings] = useState({
-    appName: "",
-    email: "",
-    phone: "",
-    address: "",
-    location: "", 
-    deliveryRadius: "",
+    appName: "", email: "", phone: "", address: "", 
+    latitude: null, longitude: null, deliveryRadius: 0,
     footerDescription: "",
-    workingHours: {
-      weekdays: "",
-      sunday: ""
-    },
-    socials: {
-      instagram: "",
-      facebook: "",
-      twitter: "",
-      whatsapp: ""
-    }
+    workingHours: { weekdays: "", sunday: "" },
+    socials: { instagram: "", facebook: "", twitter: "", whatsapp: "" }
   });
 
   const [isLoading, setIsLoading] = useState(true);
@@ -30,12 +21,11 @@ export const useSettings = () => {
   const fetchSettings = useCallback(async () => {
     try {
       const response = await api.get('/site-settings/info/');
-      if (response.data) {
-        setSettings(response.data);
-      }
+      if (response.data) setSettings(prev => ({ ...prev, ...response.data }));
     } catch (error) {
-      console.error("Failed to fetch settings:", error);
-      toast.error("Failed to load settings data.");
+      // ✅ Using your extractor function here
+      const errorMessage = extractErrorMessages(error);
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -56,38 +46,21 @@ export const useSettings = () => {
     }));
   };
 
-  const handleGetCurrentLocation = useCallback(() => {
-    setIsLocating(true);
-    if ("geolocation" in navigator) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const lat = position.coords.latitude;
-          const lng = position.coords.longitude;
-          const newLocationUrl = `https://maps.google.com/?q=${lat},${lng}`;
-          handleChange('location', newLocationUrl);
-          toast.success("Location fetched successfully!");
-          setIsLocating(false);
-        },
-        (error) => {
-          toast.error("Failed to get location. Please check browser permissions.");
-          setIsLocating(false);
-        }
-      );
-    }
-  }, []);
+  const truncateCoordinate = (coord) => {
+    if (coord === null || coord === undefined || coord === "") return null;
+    return Number(Number(coord).toFixed(6));
+  };
 
   const saveSettings = useCallback(async (e) => {
-    e.preventDefault();
+    if (e) e.preventDefault();
     setIsSaving(true);
+    const toastId = toast.loading("Saving settings...");
 
     try {
-      // ✅ FIX: Filter out empty strings from nested objects to avoid Django URL validation errors
       const cleanNested = (obj) => {
         const filtered = {};
-        Object.keys(obj).forEach(key => {
-          if (obj[key] && obj[key].trim() !== "") {
-            filtered[key] = obj[key];
-          }
+        Object.keys(obj || {}).forEach(key => {
+          if (obj[key] && String(obj[key]).trim() !== "") filtered[key] = obj[key];
         });
         return filtered;
       };
@@ -95,6 +68,8 @@ export const useSettings = () => {
       const payload = {
         ...settings,
         deliveryRadius: Number(settings.deliveryRadius) || 0,
+        latitude: truncateCoordinate(settings.latitude),
+        longitude: truncateCoordinate(settings.longitude),
         workingHours: cleanNested(settings.workingHours),
         socials: cleanNested(settings.socials)
       };
@@ -102,32 +77,48 @@ export const useSettings = () => {
       const response = await api.put('/site-settings/info/', payload);
       
       if (response.status === 200 || response.status === 201) {
-        toast.success("Settings updated successfully!");
-        setSettings(response.data);
+        setSettings(prev => ({ ...prev, ...response.data }));
+        toast.success("Settings saved successfully! ✅", { id: toastId });
       }
     } catch (error) {
-      const errorData = error.response?.data;
-      console.error("Backend Error Details:", errorData);
-      
-      if (errorData && typeof errorData === 'object') {
-        const firstError = Object.entries(errorData)[0];
-        toast.error(`Error in ${firstError[0]}: ${firstError[1]}`);
-      } else {
-        toast.error("Failed to update settings. Please try again.");
-      }
+      const errorMessage = extractErrorMessages(error);
+      toast.error(errorMessage, { id: toastId });
     } finally {
       setIsSaving(false);
     }
   }, [settings]);
 
+  const handleGetCurrentLocation = useCallback(() => {
+    setIsLocating(true);
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+          handleChange('latitude', lat);
+          handleChange('longitude', lng);
+          try {
+            const locationData = await fetchLocationDetails(lat, lng);
+            if (locationData && locationData.formattedAddress) {
+              handleChange('address', locationData.formattedAddress);
+            }
+          } catch (error) {
+            console.error("Address fetch error", error);
+          }
+          toast.success("Location fetched!");
+          setIsLocating(false);
+        },
+        () => {
+          toast.error("Location access denied.");
+          setIsLocating(false);
+        },
+        { enableHighAccuracy: true }
+      );
+    }
+  }, [settings]);
+
   return {
-    settings,
-    isLoading,
-    isSaving,
-    isLocating,
-    handleChange,
-    handleNestedChange,
-    handleGetCurrentLocation,
-    saveSettings
+    settings, isLoading, isSaving, isLocating, 
+    handleChange, handleNestedChange, handleGetCurrentLocation, saveSettings
   };
-};
+};  
