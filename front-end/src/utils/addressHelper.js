@@ -11,14 +11,10 @@ export const fetchLocationDetails = async (lat, lon) => {
     const data = await response.json();
     const addr = data.address;
 
-    const place = addr.town || addr.village || addr.suburb || addr.city_district || "";
-    
+    const place = addr.suburb || addr.neighbourhood || addr.town || addr.village || addr.city_district || "";
     const subDistrict = addr.county || "";
-
-    const district = addr.state_district || addr.city || addr.district || "";
-
+    const district = addr.city || addr.district || addr.state_district || "";
     const state = addr.state || "";
-
     const pincode = addr.postcode || "";
 
     const addressParts = [place, subDistrict, district, state]

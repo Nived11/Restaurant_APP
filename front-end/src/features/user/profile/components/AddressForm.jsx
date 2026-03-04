@@ -102,7 +102,7 @@ const AddressForm = ({ initialData, onClose, onSubmit }) => {
         onDragEnd={(e, { offset, velocity }) => {
           if (offset.y > 80 || velocity.y > 500) onClose();
         }}
-        className="relative bg-white w-full max-w-lg rounded-t-[2rem] md:rounded-[2rem] shadow-2xl flex flex-col h-[90vh] md:h-auto max-h-[92vh] overflow-hidden"
+        className="relative bg-white w-full max-w-lg rounded-t-[2rem] md:rounded-[2rem] shadow-2xl flex flex-col h-[86vh] md:h-auto max-h-[92vh] overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
         <AnimatePresence>

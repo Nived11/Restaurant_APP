@@ -13,25 +13,27 @@ import { X, MapPin } from "lucide-react";
 import Logo from "../../assets/Logo-web.png";
 import ReserveTable from "./ReserveTable.jsx";
 import SearchBar from "./SearchBar.jsx";
-import ProductModal from "./ProductModal.jsx"; 
+import ProductModal from "./ProductModal.jsx";
 import Location from "./Location.jsx";
-import LocationPicker from "./LocationPicker.jsx"; 
+import LocationPicker from "./LocationPicker.jsx";
 import { useMenu } from "../../features/user/menu/hooks/useMenu";
 import { handleLocationUpdate } from "../../hooks/locationActions.js";
 import { clearError } from "../../redux/locationSlice.js";
+import { useAddress } from "../../features/user/profile/hooks/useAddress.js";
 
 const Header = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [showExtras, setShowExtras] = useState(true);
   const [searchOpen, setSearchOpen] = useState(false);
   const [isReserveOpen, setIsReserveOpen] = useState(false);
-  const [selectedItem, setSelectedItem] = useState(null); 
+  const [selectedItem, setSelectedItem] = useState(null);
   const [showLocationPicker, setShowLocationPicker] = useState(false);
+  const { getCurrentLocation, isLocating } = useAddress();
 
   const dispatch = useDispatch();
   const cartItems = useSelector((state) => state.cart.items);
   const { currentLocation, errorPopup } = useSelector((state) => state.location);
-  
+
   const searchRef = useRef(null);
   const location = useLocation();
   const { categories = [], allItems = [] } = useMenu();
@@ -42,15 +44,25 @@ const Header = () => {
   const words = useMemo(() => {
     if (categories && categories.length > 0) {
       return categories
-        .map(cat => (typeof cat === 'object' ? cat.name : cat)) 
-        .filter(name => name && name.toLowerCase() !== "all"); 
+        .map(cat => (typeof cat === 'object' ? cat.name : cat))
+        .filter(name => name && name.toLowerCase() !== "all");
     }
-    return ["Delicious Food", "Pizza", "Burger", "Biryani"]; 
+    return ["Delicious Food", "Pizza", "Burger", "Biryani"];
   }, [categories]);
 
   const { scrollY } = useScroll();
   const lastScrollY = useRef(0);
-  
+
+  // Background Scroll Toggle
+  useEffect(() => {
+    if (showLocationPicker) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+    return () => { document.body.style.overflow = "unset"; };
+  }, [showLocationPicker]);
+
   useMotionValueEvent(scrollY, "change", (latest) => {
     const diff = latest - lastScrollY.current;
     if (diff > 10 && latest > 50) {
@@ -76,28 +88,49 @@ const Header = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [searchOpen]);
 
-  // --- Automatic Location Check on Reload ---
-  useEffect(() => {
-    if (!currentLocation.lat) {
-      navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          const { latitude, longitude } = pos.coords;
-          dispatch(handleLocationUpdate(latitude, longitude));
-        },
-        (err) => {
-          console.log("Location access denied or timed out");
-        },
-        { enableHighAccuracy: true, timeout: 10000 }
-      );
+useEffect(() => {
+  const askForLocation = () => {
+    if (!navigator.geolocation) {
+      console.log("Geolocation is not supported");
+      return;
     }
-  }, [dispatch, currentLocation.lat]);
+
+    const options = {
+      enableHighAccuracy: true, 
+      timeout: 15000,           // 15 സെക്കൻഡ് ടൈംഔട്ട്
+      maximumAge: 0,
+    };
+
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const { latitude, longitude } = pos.coords;
+        dispatch(handleLocationUpdate(latitude, longitude));
+      },
+      (err) => {
+        // എറർ മെസ്സേജുകൾ Redux വഴി പോപ്പ്അപ്പിൽ കാണിക്കുന്നു
+        if (err.code === err.PERMISSION_DENIED) {
+          dispatch(setErrorPopup("Location access denied. Please enable it in browser settings to check delivery availability."));
+        } else if (err.code === err.TIMEOUT) {
+          dispatch(setErrorPopup("Unable to find your location automatically within 15 seconds. Please select it manually."));
+        } else {
+          dispatch(setErrorPopup("Something went wrong while fetching location. Please try selecting manually."));
+        }
+      },
+      options
+    );
+  };
+
+  if (!currentLocation.lat) {
+    askForLocation();
+  }
+}, [dispatch, currentLocation.lat]);
 
   const springConfig = { type: "spring", stiffness: 400, damping: 30, mass: 0.8 };
 
   const modalVariants = {
-    initial: { y: isMobile ? "100%" : "20%", opacity: 0 },
-    animate: { y: 0, opacity: 1, transition: { type: "spring", damping: 25, stiffness: 200 } },
-    exit: { y: isMobile ? "100%" : "20%", opacity: 0, transition: { duration: 0.2 } }
+    initial: { y: "100%", opacity: 0.5 },
+    animate: { y: 0, opacity: 1, transition: { type: "spring", damping: 25, stiffness: 280, mass: 0.5 } },
+    exit: { y: "100%", opacity: 0, transition: { duration: 0.2, ease: "easeIn" } }
   };
 
   return (
@@ -107,24 +140,24 @@ const Header = () => {
         <div className="flex justify-center pt-0">
           <Link to="/"><img src={Logo} alt="Logo" className="h-20 w-50 object-contain" /></Link>
         </div>
-        
+
         <div className="px-5 pb-4">
-          <SearchBar 
-            isMobile={true} 
-            searchQuery={searchQuery} 
-            setSearchQuery={setSearchQuery} 
-            words={words} 
+          <SearchBar
+            isMobile={true}
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            words={words}
             categories={categories}
-            allItems={allItems} 
+            allItems={allItems}
             handleCloseSearch={handleCloseSearch}
-            onSelectItem={(item) => setSelectedItem(item)} 
+            onSelectItem={(item) => setSelectedItem(item)}
           />
         </div>
 
-        <motion.div 
-           animate={{ height: showExtras ? "auto" : 0, opacity: showExtras ? 1 : 0 }}
-           transition={{ duration: 0.3, ease: "easeInOut" }}
-           className="overflow-hidden"
+        <motion.div
+          animate={{ height: showExtras ? "auto" : 0, opacity: showExtras ? 1 : 0 }}
+          transition={{ duration: 0.3, ease: "easeInOut" }}
+          className="overflow-hidden"
         >
           <Location variant="mobile" address={currentLocation.address} onClick={() => setShowLocationPicker(true)} />
         </motion.div>
@@ -146,7 +179,7 @@ const Header = () => {
               </Link>
             );
           })}
-          
+
           <div className="relative -mt-12 mx-2">
             <motion.button onClick={() => setIsReserveOpen(true)} whileTap={{ scale: 0.9 }} className="w-14 h-14 bg-black rounded-full border-4 border-white shadow-lg flex items-center justify-center text-primary">
               <RiRestaurantLine size={24} />
@@ -183,11 +216,10 @@ const Header = () => {
               <Link to="/" className="shrink-0 transition-transform hover:scale-105">
                 <img src={Logo} alt="Logo" className="h-12 md:h-16 lg:h-24 w-auto object-contain" />
               </Link>
-              
               {!searchOpen && <Location variant="desktop" address={currentLocation.address} onClick={() => setShowLocationPicker(true)} />}
             </div>
 
-            <motion.nav 
+            <motion.nav
               animate={{ opacity: searchOpen ? 0 : 1, y: searchOpen ? 10 : 0, pointerEvents: searchOpen ? "none" : "auto" }}
               className="flex items-center gap-1 lg:gap-3 bg-white/40 backdrop-blur-md border border-white/20 p-1.5 rounded-full relative shadow-sm"
             >
@@ -210,7 +242,7 @@ const Header = () => {
 
             <div className="flex items-center gap-1 md:gap-3 lg:gap-6 shrink-0 relative">
               <div ref={searchRef}>
-                <SearchBar 
+                <SearchBar
                   searchOpen={searchOpen} setSearchOpen={setSearchOpen} searchQuery={searchQuery}
                   setSearchQuery={setSearchQuery} handleCloseSearch={handleCloseSearch} words={words}
                   categories={categories} allItems={allItems} onSelectItem={(item) => setSelectedItem(item)}
@@ -232,12 +264,12 @@ const Header = () => {
             </div>
           </div>
 
-          <motion.div 
+          <motion.div
             initial={false}
-            animate={{ 
-              height: showExtras ? "auto" : 0, 
+            animate={{
+              height: showExtras ? "auto" : 0,
               opacity: showExtras ? 1 : 0,
-              marginBottom: showExtras ? "12px" : "0px" 
+              marginBottom: showExtras ? "12px" : "0px"
             }}
             transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
             className="flex xl:hidden w-full px-6 justify-start border-t border-gray-50 pt-2 overflow-hidden"
@@ -247,62 +279,51 @@ const Header = () => {
         </header>
       </div>
 
-      {/* --- Error Popup (Improved UI) --- */}
+      {/* --- Error Popup --- */}
       <AnimatePresence>
         {errorPopup && (
           <div className="fixed inset-0 z-[2000] flex items-center justify-center p-4">
-            <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => dispatch(clearError())}
-              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-            />
-            <motion.div 
-              initial={{ scale: 0.9, opacity: 0, y: 20 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.9, opacity: 0, y: 20 }}
-              className="relative bg-white w-full max-w-sm rounded-[2.5rem] overflow-hidden shadow-2xl px-8 py-8 flex flex-col items-center"
-            >
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => dispatch(clearError())} className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+            <motion.div initial={{ scale: 0.9, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.9, opacity: 0, y: 20 }} className="relative bg-white w-full max-w-sm rounded-[2.5rem] overflow-hidden shadow-2xl px-8 py-8 flex flex-col items-center">
               <div className="relative mb-6">
-                <motion.div 
-                  animate={{ scale: [1, 1.1, 1] }}
-                  transition={{ repeat: Infinity, duration: 2 }}
-                  className="absolute inset-0 bg-primary/10 rounded-full scale-150 blur-sm"
-                />
-                <div className="relative bg-primary p-4 rounded-full shadow-lg shadow-primary/40">
-                  <MapPin size={32} className="text-white" />
-                </div>
+                <motion.div animate={{ scale: [1, 1.1, 1] }} transition={{ repeat: Infinity, duration: 2 }} className="absolute inset-0 bg-primary/10 rounded-full scale-150 blur-sm" />
+                <div className="relative bg-primary p-4 rounded-full shadow-lg shadow-primary/40"><MapPin size={32} className="text-white" /></div>
               </div>
-              <h3 className="text-xl font-black text-gray-900 mb-2 text-center uppercase tracking-tight">Out of Range</h3>
-              <p className="text-gray-600 font-semibold text-sm leading-relaxed mb-8 text-center px-2">
-                {errorPopup}
-              </p>
+              <h3 className="text-xl font-black text-gray-900 mb-2 text-center uppercase tracking-tight">Out of Range !</h3>
+              <p className="text-gray-600 font-semibold text-sm leading-relaxed mb-8 text-center px-2">{errorPopup}</p>
               <button 
-                onClick={() => dispatch(clearError())}
-                className="cursor-pointer w-full py-4 bg-black hover:bg-gray-900 text-white text-sm rounded-2xl font-bold transition-all active:scale-95 flex items-center justify-center gap-2 shadow-xl"
-              >
-                Got it, Thanks!
-              </button>
+  onClick={() => {
+    dispatch(clearError());
+    setShowLocationPicker(true); 
+  }}className="cursor-pointer w-full py-4 bg-black hover:bg-gray-900 text-white text-sm rounded-2xl font-bold transition-all active:scale-95 flex items-center justify-center gap-2 shadow-xl"> OK</button>
             </motion.div>
           </div>
         )}
       </AnimatePresence>
 
-      {/* --- Location Picker POPUP Modal --- */}
+      {/* --- Location Picker Modal with Swipe Down --- */}
       <AnimatePresence>
         {showLocationPicker && (
-          <div className="fixed inset-0 z-[2000] flex items-end md:items-center justify-center p-0 md:p-4">
-            <motion.div 
+          <div className="fixed inset-0 z-[2000] flex items-end md:items-center justify-center p-0 md:p-4 overflow-hidden">
+            <motion.div
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               onClick={() => setShowLocationPicker(false)}
               className="absolute inset-0 bg-black/60 backdrop-blur-sm"
             />
-            <motion.div 
+            <motion.div
               variants={modalVariants} initial="initial" animate="animate" exit="exit"
-              className="relative bg-white w-full max-w-2xl rounded-t-[2.5rem] md:rounded-[2.5rem] shadow-2xl flex flex-col h-[85vh] md:h-[80vh] overflow-hidden"
+              drag={isMobile ? "y" : false}
+              dragConstraints={{ top: 0 }}
+              dragElastic={0.1}
+              onDragEnd={(e, { offset, velocity }) => {
+                if (offset.y > 100 || velocity.y > 500) setShowLocationPicker(false);
+              }}
+              className="relative bg-white w-full max-w-2xl rounded-t-[2.5rem] md:rounded-[2.5rem] shadow-2xl flex flex-col h-[90vh] md:h-[80vh] overflow-hidden"
               onClick={(e) => e.stopPropagation()}
             >
+              {/* Drag Handle for Mobile */}
+              <div className="md:hidden flex justify-center pt-3 shrink-0"><div className="w-12 h-1 bg-gray-200 rounded-full" /></div>
+
               <div className="flex justify-between items-center p-6 border-b bg-white shrink-0">
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-primary rounded-xl"><MapPin size={20} className="text-black" /></div>
@@ -315,16 +336,18 @@ const Header = () => {
                   <X size={20} className="text-gray-600" />
                 </button>
               </div>
-              <div className="flex-1 relative bg-gray-50">
-                <LocationPicker 
+
+              <div className="flex-1 relative bg-gray-50 overflow-hidden">
+                <LocationPicker
                   initialPos={currentLocation.lat ? { lat: currentLocation.lat, lng: currentLocation.lng } : null}
                   onConfirm={(data) => {
                     dispatch(handleLocationUpdate(data.lat, data.lng));
                     setShowLocationPicker(false);
                   }}
+                  getCurrentLocation={getCurrentLocation}
+                  isLocating={isLocating}
                 />
               </div>
-              <div className="md:hidden absolute top-2 left-1/2 -translate-x-1/2 w-12 h-1.5 bg-gray-300 rounded-full opacity-50" />
             </motion.div>
           </div>
         )}
