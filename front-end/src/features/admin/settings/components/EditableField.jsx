@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Check, Pencil } from 'lucide-react';
 
-const EditableField = ({ icon: Icon, label, value, onChange, placeholder, isTextArea = false }) => {
+const EditableField = ({ icon: Icon, label, value, onChange, placeholder, isTextArea = false, disabled = false }) => {
   const [isEditing, setIsEditing] = useState(false);
   const inputRef = useRef(null);
 
@@ -13,11 +13,17 @@ const EditableField = ({ icon: Icon, label, value, onChange, placeholder, isText
 
   const handleEditClick = (e) => {
     e.preventDefault();
+    if (disabled) return;
     setIsEditing(true);
   };
 
+  const handleConfirm = (e) => {
+    if (e) e.preventDefault();
+    setIsEditing(false);
+  };
+
   return (
-    <div className="space-y-2">
+    <div className={`space-y-2 ${disabled ? 'opacity-70' : ''}`}>
       <label className="text-[11px] font-black text-gray-400 uppercase tracking-widest pl-1">
         {label}
       </label>
@@ -26,7 +32,7 @@ const EditableField = ({ icon: Icon, label, value, onChange, placeholder, isText
           isEditing 
             ? 'border-[#f9a602] bg-white ring-4 ring-[#f9a602]/10 shadow-sm' 
             : 'border-gray-200 bg-gray-50 hover:bg-white hover:border-gray-300'
-        } rounded-2xl transition-all duration-300`}
+        } rounded-2xl transition-all duration-300 ${disabled ? 'bg-gray-100 cursor-not-allowed' : ''}`}
       >
         <div className={`pl-4 pr-2 transition-colors duration-300 ${isEditing ? 'text-[#f9a602]' : 'text-gray-400 group-hover:text-gray-600'}`}>
           <Icon size={18} />
@@ -35,28 +41,28 @@ const EditableField = ({ icon: Icon, label, value, onChange, placeholder, isText
         {isTextArea ? (
           <textarea
             ref={inputRef}
-            value={value || ""} // ✅ FIX: Prevents React 'null' warning
+            value={value || ""}
             onChange={(e) => onChange(e.target.value)}
-            readOnly={!isEditing}
+            readOnly={!isEditing || disabled}
             placeholder={placeholder}
             rows={3}
-            onBlur={() => setIsEditing(false)}
+            onBlur={handleConfirm}
             className={`flex-1 py-3.5 px-2 bg-transparent border-none focus:outline-none text-sm font-semibold text-gray-800 resize-none ${
-              !isEditing && 'cursor-default'
+              (!isEditing || disabled) && 'cursor-default'
             }`}
           />
         ) : (
           <input 
             ref={inputRef}
             type="text" 
-            value={value || ""} // ✅ FIX: Prevents React 'null' warning
+            value={value || ""}
             onChange={(e) => onChange(e.target.value)}
-            readOnly={!isEditing}
+            readOnly={!isEditing || disabled}
             placeholder={placeholder}
-            onBlur={() => setIsEditing(false)}
-            onKeyDown={(e) => e.key === 'Enter' && setIsEditing(false)}
+            onBlur={handleConfirm}
+            onKeyDown={(e) => e.key === 'Enter' && handleConfirm()}
             className={`flex-1 py-3.5 px-2 w-full bg-transparent border-none focus:outline-none text-sm font-semibold text-gray-800 truncate ${
-              !isEditing && 'cursor-default'
+              (!isEditing || disabled) && 'cursor-default'
             }`}
           />
         )}
@@ -65,19 +71,21 @@ const EditableField = ({ icon: Icon, label, value, onChange, placeholder, isText
           {isEditing ? (
             <button 
               type="button"
-              onMouseDown={(e) => { e.preventDefault(); setIsEditing(false); }}
-              className="w-8 h-8 bg-green-100 text-green-600 rounded-xl hover:bg-green-200 transition-colors flex items-center justify-center animate-in zoom-in duration-200"
+              onMouseDown={handleConfirm}
+              className="w-8 h-8 bg-green-100 text-green-600 rounded-xl hover:bg-green-200 transition-colors flex items-center justify-center animate-in zoom-in duration-200 z-10"
             >
               <Check size={16} strokeWidth={3} />
             </button>
           ) : (
-            <button 
-              type="button"
-              onClick={handleEditClick}
-              className="w-8 h-8 bg-white border border-gray-200 text-gray-500 rounded-xl hover:bg-gray-100 hover:text-[#0A0A0A] transition-all flex items-center justify-center opacity-0 group-hover:opacity-100 shadow-sm"
-            >
-              <Pencil size={14} strokeWidth={2.5} />
-            </button>
+            !disabled && (
+              <button 
+                type="button"
+                onClick={handleEditClick}
+                className="w-8 h-8 bg-white border border-gray-200 text-gray-500 rounded-xl hover:bg-gray-100 hover:text-[#0A0A0A] transition-all flex items-center justify-center opacity-0 group-hover:opacity-100 shadow-sm z-10"
+              >
+                <Pencil size={14} strokeWidth={2.5} />
+              </button>
+            )
           )}
         </div>
       </div>
