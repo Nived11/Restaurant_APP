@@ -124,7 +124,7 @@ export const OrderSection = ({ selectedAddress, cartItems, subTotal, totalAmount
               <button 
                 onClick={handleConfirmOrder} 
                 disabled={isSubmitting}
-                className="cursor-pointer w-full bg-[#f9a602] text-black py-4 md:py-5 rounded-2xl font-black uppercase tracking-widest text-[10px] md:text-xs hover:bg-white transition-all active:scale-95 shadow-lg flex items-center justify-center gap-3 disabled:opacity-50"
+                className="cursor-pointer w-full bg-[#f9a602] text-black py-4 md:py-5 rounded-2xl font-black uppercase tracking-widest text-[10px] md:text-xs hover:bg-primary/80 transition-all active:scale-95 shadow-lg flex items-center justify-center gap-3 disabled:opacity-50"
               >
                 Place Order Now
               </button>
