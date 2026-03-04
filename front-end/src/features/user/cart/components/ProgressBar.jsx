@@ -36,7 +36,7 @@ export const ProgressBar = ({ step }) => {
                   w-8 h-8 md:w-12 md:h-12 
                   ${isActive 
                     ? 'bg-[#f9a602] text-black scale-110 shadow-[#f9a602]/20' 
-                    : 'bg-white border-2 border-gray-400 text-gray-500 shadow-md'}
+                    : 'bg-white border-2 border-gray-400 text-gray-600 shadow-md'}
                 `}
               >
                 {isCompleted ? (
@@ -52,7 +52,7 @@ export const ProgressBar = ({ step }) => {
                   absolute -bottom-8 font-black uppercase tracking-widest transition-colors duration-300
                   /* Mobile font: text-[8px] | Desktop font: md:text-[10px] */
                   text-[8px] md:text-[10px] whitespace-nowrap
-                  ${isActive ? 'text-black' : 'text-gray-400'}
+                  ${isActive ? 'text-black' : 'text-gray-500'}
                 `}
               >
                 {s.label}
