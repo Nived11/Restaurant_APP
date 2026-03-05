@@ -33,7 +33,7 @@ export const useAddress = () => {
           resolve({ latitude, longitude, ...details });
         },
         (error) => {
-          toast.error("Enable GPS access");
+          toast.warning("Enable GPS access");
           setIsLocating(false);
           reject(error);
         },

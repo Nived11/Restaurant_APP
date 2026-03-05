@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { SITE_CONFIG } from "../../config/siteConfig";
+import { useSiteInfo } from "../../hooks/useSiteInfo";
 import { 
   RiInstagramFill, 
   RiFacebookCircleFill, 
@@ -18,11 +18,14 @@ import { IoFastFoodOutline } from "react-icons/io5";
 import Logo from "../../assets/Logo-web.png";
 
 const Footer = () => {
+  const { data: info, isLoading } = useSiteInfo();
+
+  if (isLoading) return <footer className="bg-[#0A0A0A] h-20"></footer>;
+
   return (
     <footer className="bg-[#0A0A0A] text-white pt-12 md:pt-20 pb-32 md:pb-12 border-t border-white/5">
       <div className="max-w-[1440px] mx-auto px-6 md:px-10">
         
-        {/* Main Footer Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12 border-b border-white/5 pb-12 md:pb-16">
           
           {/* 1. Brand & About */}
@@ -30,27 +33,34 @@ const Footer = () => {
             <Link to="/" className="inline-block group">
               <img 
                 src={Logo} 
-               alt={`${SITE_CONFIG.appName} Logo`}
+                alt={`${info.appName} Logo`}
                 className="h-18 md:h-25 w-auto object-contain transition-all duration-300 group-hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.2)]" 
               />
             </Link>
             <p className="text-gray-400 text-xs md:text-sm leading-relaxed font-medium max-w-xs">
-              Savor the authentic spices of Kerala. We deliver fresh, chef-crafted meals from our kitchen to your doorstep in record time.
+              {info.footerDescription}
             </p>
+
             {/* Social Icons */}
             <div className="flex gap-5 pt-5">
-              <a href={SITE_CONFIG.socials.instagram} className="text-gray-500 hover:text-[#E4405F] transition-all transform hover:-translate-y-1"><RiInstagramFill size={20} /></a>
-              <a href={SITE_CONFIG.socials.facebook} className="text-gray-500 hover:text-[#1877F2] transition-all transform hover:-translate-y-1"><RiFacebookCircleFill size={20} /></a>
-              <a href={SITE_CONFIG.socials.twitter} className="text-gray-500 hover:text-white transition-all transform hover:-translate-y-1"><RiTwitterXFill size={18} /></a>
-              <a href={SITE_CONFIG.socials.whatsapp} className="text-gray-500 hover:text-[#25D366] transition-all transform hover:-translate-y-1"><RiWhatsappFill size={20} /></a>
+              <a href={info.socials.instagram !== "#" ? `https://instagram.com/${info.socials.instagram}` : "#"} target="_blank" rel="noreferrer" className="text-gray-500 hover:text-[#E4405F] transition-all transform hover:-translate-y-1">
+                <RiInstagramFill size={20} />
+              </a>
+              <a href={info.socials.facebook !== "#" ? `https://facebook.com/${info.socials.facebook}` : "#"} target="_blank" rel="noreferrer" className="text-gray-500 hover:text-[#1877F2] transition-all transform hover:-translate-y-1">
+                <RiFacebookCircleFill size={20} />
+              </a>
+              <a href={info.socials.twitter !== "#" ? `https://twitter.com/${info.socials.twitter}` : "#"} target="_blank" rel="noreferrer" className="text-gray-500 hover:text-white transition-all transform hover:-translate-y-1">
+                <RiTwitterXFill size={18} />
+              </a>
+              <a href={info.socials.whatsapp !== "#" ? `https://wa.me/${info.socials.whatsapp}` : "#"} target="_blank" rel="noreferrer" className="text-gray-500 hover:text-[#25D366] transition-all transform hover:-translate-y-1">
+                <RiWhatsappFill size={20} />
+              </a>
             </div>
           </div>
 
           {/* 2. Navigation */}
           <div>
-            <h4 className="text-[10px] md:text-xs font-black uppercase tracking-[0.2em] text-white/50 mb-6 md:mb-8 border-l-2 border-primary pl-3">
-               Navigation
-            </h4>
+            <h4 className="text-[10px] md:text-xs font-black uppercase tracking-[0.2em] text-white/50 mb-6 md:mb-8 border-l-2 border-primary pl-3">Navigation</h4>
             <ul className="space-y-4 text-gray-400">
               {[
                 { name: "Home", path: "/", icon: <RiHome4Line /> },
@@ -73,22 +83,20 @@ const Footer = () => {
 
           {/* 3. Working Hours */}
           <div>
-            <h4 className="text-[10px] md:text-xs font-black uppercase tracking-[0.2em] text-white/50 mb-6 md:mb-8 border-l-2 border-primary pl-3">
-               Working Hours
-            </h4>
+            <h4 className="text-[10px] md:text-xs font-black uppercase tracking-[0.2em] text-white/50 mb-6 md:mb-8 border-l-2 border-primary pl-3">Working Hours</h4>
             <div className="space-y-5">
               <div className="flex items-center gap-3">
                 <RiTimeLine className="text-primary shrink-0" size={18} />
                 <div className="text-[11px] md:text-xs">
                   <p className="text-gray-500 font-bold uppercase text-[9px] mb-1">Mon - Sat</p>
-                  <p className="text-white font-medium">10:00 AM - 11:00 PM</p>
+                  <p className="text-white font-medium">{info.workingHours.weekdays}</p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
                 <RiTimeLine className="text-primary shrink-0" size={18} />
                 <div className="text-[11px] md:text-xs">
                   <p className="text-gray-500 font-bold uppercase text-[9px] mb-1">Sunday</p>
-                  <p className="text-white font-medium">09:00 AM - 12:00 AM</p>
+                  <p className="text-white font-medium">{info.workingHours.sunday}</p>
                 </div>
               </div>
             </div>
@@ -96,40 +104,48 @@ const Footer = () => {
 
           {/* 4. Get In Touch */}
           <div>
-            <h4 className="text-[10px] md:text-xs font-black uppercase tracking-[0.2em] text-white/50 mb-6 md:mb-8 border-l-2 border-primary pl-3">
-               Get In Touch
-            </h4>
+            <h4 className="text-[10px] md:text-xs font-black uppercase tracking-[0.2em] text-white/50 mb-6 md:mb-8 border-l-2 border-primary pl-3">Get In Touch</h4>
             <ul className="space-y-6">
               <li>
-                <a href={SITE_CONFIG.location} target="_blank" rel="noreferrer" className="flex items-start gap-4 group">
+                <a 
+                  href={info.latitude ? `https://www.google.com/maps?q=${info.latitude},${info.longitude}` : "#"} 
+                  target="_blank" rel="noreferrer" 
+                  className="flex items-start gap-4 group"
+                >
                   <div className="w-9 h-9 rounded-lg bg-white/5 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-black transition-all shrink-0">
                     <RiMapPin2Line size={18} />
                   </div>
                   <div>
                     <p className="text-[9px] font-black text-gray-600 uppercase mb-0.5">Visit Us</p>
-                    <p className="text-xs md:text-sm font-medium text-white/80 group-hover:text-white transition-colors leading-snug">{SITE_CONFIG.address}</p>
+                    <p className="text-xs md:text-sm font-medium text-white/80 group-hover:text-white transition-colors leading-snug">
+                      {info.type_address}
+                    </p>
                   </div>
                 </a>
               </li>
               <li>
-                <a href={`tel:${SITE_CONFIG.phone}`} className="flex items-center gap-4 group">
+                <a href={`tel:+91${info.phone}`} className="flex items-center gap-4 group">
                   <div className="w-9 h-9 rounded-lg bg-white/5 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-black transition-all shrink-0">
                     <RiPhoneLine size={18} />
                   </div>
                   <div>
                     <p className="text-[9px] font-black text-gray-600 uppercase mb-0.5">Call Us</p>
-                    <p className="text-xs md:text-sm font-medium text-white/80 group-hover:text-white transition-colors">{SITE_CONFIG.phone}</p>
+                    <p className="text-xs md:text-sm font-medium text-white/80 group-hover:text-white transition-colors">
+                      +91 {info.phone}
+                    </p>
                   </div>
                 </a>
               </li>
               <li>
-                <a href={`mailto:${SITE_CONFIG.email}`} className="flex items-center gap-4 group">
+                <a href={`mailto:${info.email}`} className="flex items-center gap-4 group">
                   <div className="w-9 h-9 rounded-lg bg-white/5 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-black transition-all shrink-0">
                     <RiMailLine size={18} />
                   </div>
                   <div>
                     <p className="text-[9px] font-black text-gray-600 uppercase mb-0.5">Email Us</p>
-                    <p className="text-xs md:text-sm font-medium text-white/80 group-hover:text-white transition-colors">{SITE_CONFIG.email}</p>
+                    <p className="text-xs md:text-sm font-medium text-white/80 group-hover:text-white transition-colors">
+                      {info.email}
+                    </p>
                   </div>
                 </a>
               </li>
@@ -139,9 +155,16 @@ const Footer = () => {
 
         {/* Bottom Bar */}
         <div className="mt-8 flex flex-col md:flex-row justify-between items-center gap-6">
-          <p className="text-[9px] md:text-[10px] font-bold text-gray-600 uppercase tracking-widest text-center md:text-left leading-loose">
-            &copy; 2026 TheCrunch. All rights reserved
-          </p>
+          <div className="flex flex-col items-center md:items-start gap-1">
+            <p className="text-[9px] md:text-[10px] font-bold text-gray-600 uppercase tracking-widest text-center md:text-left leading-loose">
+              © {new Date().getFullYear()} {info.appName}. All rights reserved
+            </p>
+            {/* Developed By Section */}
+            <p className="text-[8px] md:text-[9px] font-medium text-gray-700 uppercase tracking-widest">
+              Developed by <a href="www.yourbrand.com" className="text-gray-500 hover:text-primary transition-colors">Your Brand</a>
+            </p>
+          </div>
+          
           <div className="flex gap-6 md:gap-8 text-[9px] md:text-[10px] font-bold text-gray-500 uppercase tracking-widest">
             <a href="#" className="hover:text-white transition-colors flex items-center gap-1.5 group">
               <RiArrowRightSLine className="text-primary group-hover:translate-x-1 transition-transform" /> Terms

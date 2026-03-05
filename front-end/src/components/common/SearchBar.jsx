@@ -2,7 +2,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Search, X, Clock, Utensils, LayoutGrid } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import TypingPlaceholder from "./TypingPlaceholder";
+import TypingPlaceholder from "../ui/TypingPlaceholder";
 
 const SearchBar = ({ 
   searchOpen, 
