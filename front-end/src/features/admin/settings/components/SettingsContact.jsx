@@ -1,10 +1,9 @@
-import React, { useEffect, useState } from 'react';
-import { Building2, Mail, Phone, MapPin, Loader2, LocateFixed, Navigation2, Lock, Unlock, Search, X } from 'lucide-react';
+import React, { useEffect } from 'react';
+import { Building2, Mail, Phone, MapPin, Loader2, LocateFixed, Navigation2, Lock, Search, X, MapPinOff } from 'lucide-react';
 import EditableField from './EditableField';
 import { MapContainer, TileLayer, Marker, Circle, useMap, useMapEvents } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
-import { fetchLocationDetails } from '../../../../utils/addressHelper';
 
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
 import markerIcon from 'leaflet/dist/images/marker-icon.png';
@@ -36,7 +35,21 @@ const MapEvents = ({ onMapClick }) => {
   return null;
 };
 
-const SettingsContact = ({ settings, handleChange, isLocating, handleGetCurrentLocation, isEditingMode }) => {
+const SettingsContact = ({ 
+  settings, 
+  handleChange, 
+  isLocating, 
+  handleGetCurrentLocation, 
+  isEditingMode,
+  searchQuery, 
+  setSearchQuery, 
+  searchResults, 
+  isSearching,
+  showDropdown, 
+  setShowDropdown, 
+  handleSelectSearchResult, 
+  handleMapClick 
+}) => {
 
   const isMapLocked = !isEditingMode;
 
@@ -47,76 +60,6 @@ const SettingsContact = ({ settings, handleChange, isLocating, handleGetCurrentL
   const currentLng = settings?.longitude ? parseFloat(settings.longitude) : defaultLng;
 
   const radiusInMeters = (parseFloat(settings?.deliveryRadius) || 0) * 1000;
-
-  // ✅ Search State Variables
-  const [searchQuery, setSearchQuery] = useState("");
-  const [searchResults, setSearchResults] = useState([]);
-  const [isSearching, setIsSearching] = useState(false);
-  const [showDropdown, setShowDropdown] = useState(false);
-
-  // ✅ LocationIQ Search Function
-  useEffect(() => {
-    const fetchSearchResults = async () => {
-      if (searchQuery.trim().length < 3) {
-        setSearchResults([]);
-        return;
-      }
-      
-      setIsSearching(true);
-      try {
-        const TOKEN = import.meta.env.VITE_LOCATION_IQ_TOKEN;
-        // LocationIQ Search API
-        const response = await fetch(`https://us1.locationiq.com/v1/search.php?key=${TOKEN}&q=${searchQuery}&format=json&addressdetails=1&limit=5`);
-        
-        if (response.ok) {
-          const data = await response.json();
-          setSearchResults(Array.isArray(data) ? data : []);
-          setShowDropdown(true);
-        }
-      } catch (error) {
-        console.error("Search API Error:", error);
-      } finally {
-        setIsSearching(false);
-      }
-    };
-
-    // Debounce to prevent too many API calls while typing
-    const delayDebounceFn = setTimeout(() => {
-      fetchSearchResults();
-    }, 500);
-
-    return () => clearTimeout(delayDebounceFn);
-  }, [searchQuery]);
-
-  // ✅ Handle selecting a location from search results
-  const handleSelectSearchResult = (result) => {
-    const lat = parseFloat(result.lat);
-    const lon = parseFloat(result.lon);
-    
-    handleChange('latitude', lat);
-    handleChange('longitude', lon);
-    handleChange('address', result.display_name); // Set the full address
-    
-    setSearchQuery(result.display_name); // Update search box with selected address
-    setShowDropdown(false);
-  };
-
-  const handleMapClick = async (lat, lng) => {
-    if (isMapLocked) return;
-
-    handleChange('latitude', lat);
-    handleChange('longitude', lng);
-    
-    try {
-      const locationData = await fetchLocationDetails(lat, lng);
-      if (locationData && locationData.formattedAddress) {
-        handleChange('address', locationData.formattedAddress);
-        setSearchQuery(""); // Clear search box when map is clicked
-      }
-    } catch (error) {
-      console.error("Error fetching location details:", error);
-    }
-  };
 
   return (
     <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
@@ -133,10 +76,13 @@ const SettingsContact = ({ settings, handleChange, isLocating, handleGetCurrentL
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-        <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-6">
+        <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
           <EditableField icon={Building2} label="Restaurant Name" value={settings?.appName} onChange={(val) => handleChange('appName', val)} disabled={!isEditingMode} />
           <EditableField icon={Mail} label="Email Address" value={settings?.email} onChange={(val) => handleChange('email', val)} disabled={!isEditingMode} />
           <EditableField icon={Phone} label="Phone Number" value={settings?.phone} onChange={(val) => handleChange('phone', val)} disabled={!isEditingMode} />
+          
+          {/* ✅ NEW: Manual Typed Address Field */}
+          <EditableField icon={MapPinOff} label="Typed Address (Manual)" value={settings?.type_address} onChange={(val) => handleChange('type_address', val)} disabled={!isEditingMode} placeholder="Type exact physical address..." />
         </div>
 
         <div className="md:col-span-2 mt-4 space-y-4">
@@ -146,7 +92,6 @@ const SettingsContact = ({ settings, handleChange, isLocating, handleGetCurrentL
           
           <div className="relative w-full h-[450px] bg-gray-100 rounded-[2.5rem] overflow-hidden border border-gray-200 shadow-sm z-0">
             
-            {/* ✅ SEARCH BAR OVERLAY */}
             <div className="absolute top-5 left-1/2 -translate-x-1/2 w-[90%] md:w-[70%] z-[600]">
               <div className="relative">
                 <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -175,7 +120,6 @@ const SettingsContact = ({ settings, handleChange, isLocating, handleGetCurrentL
                 )}
               </div>
 
-              {/* ✅ SEARCH RESULTS DROPDOWN */}
               {showDropdown && searchResults.length > 0 && !isMapLocked && (
                 <ul className="absolute top-full mt-2 w-full bg-white border border-gray-100 rounded-2xl shadow-xl overflow-hidden z-[600] max-h-60 overflow-y-auto animate-in slide-in-from-top-2">
                   {searchResults.map((result, index) => (
@@ -195,7 +139,6 @@ const SettingsContact = ({ settings, handleChange, isLocating, handleGetCurrentL
               )}
             </div>
 
-            {/* Glass layer protection when map is locked */}
             {isMapLocked && (
               <div className="absolute inset-0 z-[500] bg-white/10 backdrop-blur-[1px] flex items-center justify-center transition-all duration-300">
                 <div className="bg-black/70 text-white px-5 py-3 rounded-full text-xs font-bold flex items-center gap-2 backdrop-blur-md shadow-2xl pointer-events-none border border-white/20">
@@ -231,7 +174,7 @@ const SettingsContact = ({ settings, handleChange, isLocating, handleGetCurrentL
               )}
               
               <MapUpdater lat={settings?.latitude} lng={settings?.longitude} />
-              <MapEvents onMapClick={handleMapClick} />
+              <MapEvents onMapClick={(lat, lng) => handleMapClick(lat, lng, isMapLocked)} />
             </MapContainer>
 
             <div className="absolute bottom-6 right-6 z-[400]">
@@ -253,7 +196,7 @@ const SettingsContact = ({ settings, handleChange, isLocating, handleGetCurrentL
               </div>
               <div className="flex-1">
                 <p className="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-1">
-                  Selected Map Location
+                  Selected Map Location (Auto-generated)
                 </p>
                 <p className="text-sm font-bold text-gray-800 leading-relaxed">
                   {settings?.address ? settings.address : "Location not selected. Search or click on the map."}
