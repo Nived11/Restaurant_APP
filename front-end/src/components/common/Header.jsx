@@ -20,6 +20,7 @@ import { useMenu } from "../../features/user/menu/hooks/useMenu";
 import { handleLocationUpdate } from "../../hooks/locationActions.js";
 import { clearError } from "../../redux/locationSlice.js";
 import { useAddress } from "../../features/user/profile/hooks/useAddress.js";
+import { fetchCart } from "../../redux/cartSlice.js"; 
 
 const Header = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -40,6 +41,13 @@ const Header = () => {
 
   const cartCount = cartItems.length;
   const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
+
+  useEffect(() => {
+    const token = localStorage.getItem('user_access');
+    if (token) {
+      dispatch(fetchCart());
+    }
+  }, [dispatch]);
 
   const words = useMemo(() => {
     if (categories && categories.length > 0) {
@@ -88,42 +96,34 @@ const Header = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [searchOpen]);
 
-useEffect(() => {
-  const askForLocation = () => {
-    if (!navigator.geolocation) {
-      console.log("Geolocation is not supported");
-      return;
-    }
+  useEffect(() => {
+    const askForLocation = () => {
+      if (!navigator.geolocation) {
+        console.log("Geolocation is not supported");
+        return;
+      }
 
-    const options = {
-      enableHighAccuracy: true, 
-      timeout: 15000,           // 15 സെക്കൻഡ് ടൈംഔട്ട്
-      maximumAge: 0,
+      const options = {
+        enableHighAccuracy: true, 
+        timeout: 15000,           
+        maximumAge: 0,
+      };
+
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const { latitude, longitude } = pos.coords;
+          dispatch(handleLocationUpdate(latitude, longitude));
+        },
+        (err) => {
+        },
+        options
+      );
     };
 
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        const { latitude, longitude } = pos.coords;
-        dispatch(handleLocationUpdate(latitude, longitude));
-      },
-      (err) => {
-        // എറർ മെസ്സേജുകൾ Redux വഴി പോപ്പ്അപ്പിൽ കാണിക്കുന്നു
-        if (err.code === err.PERMISSION_DENIED) {
-          dispatch(setErrorPopup("Location access denied. Please enable it in browser settings to check delivery availability."));
-        } else if (err.code === err.TIMEOUT) {
-          dispatch(setErrorPopup("Unable to find your location automatically within 15 seconds. Please select it manually."));
-        } else {
-          dispatch(setErrorPopup("Something went wrong while fetching location. Please try selecting manually."));
-        }
-      },
-      options
-    );
-  };
-
-  if (!currentLocation.lat) {
-    askForLocation();
-  }
-}, [dispatch, currentLocation.lat]);
+    if (!currentLocation.lat) {
+      askForLocation();
+    }
+  }, [dispatch, currentLocation.lat]);
 
   const springConfig = { type: "spring", stiffness: 400, damping: 30, mass: 0.8 };
 
@@ -292,16 +292,16 @@ useEffect(() => {
               <h3 className="text-xl font-black text-gray-900 mb-2 text-center uppercase tracking-tight">Out of Range !</h3>
               <p className="text-gray-600 font-semibold text-sm leading-relaxed mb-8 text-center px-2">{errorPopup}</p>
               <button 
-  onClick={() => {
-    dispatch(clearError());
-    setShowLocationPicker(true); 
-  }}className="cursor-pointer w-full py-4 bg-black hover:bg-gray-900 text-white text-sm rounded-2xl font-bold transition-all active:scale-95 flex items-center justify-center gap-2 shadow-xl"> OK</button>
+                onClick={() => {
+                  dispatch(clearError());
+                  setShowLocationPicker(true); 
+                }} className="cursor-pointer w-full py-4 bg-black hover:bg-gray-900 text-white text-sm rounded-2xl font-bold transition-all active:scale-95 flex items-center justify-center gap-2 shadow-xl"> OK</button>
             </motion.div>
           </div>
         )}
       </AnimatePresence>
 
-      {/* --- Location Picker Modal with Swipe Down --- */}
+      {/* --- Location Picker Modal --- */}
       <AnimatePresence>
         {showLocationPicker && (
           <div className="fixed inset-0 z-[2000] flex items-end md:items-center justify-center p-0 md:p-4 overflow-hidden">
@@ -321,7 +321,6 @@ useEffect(() => {
               className="relative bg-white w-full max-w-2xl rounded-t-[2.5rem] md:rounded-[2.5rem] shadow-2xl flex flex-col h-[90vh] md:h-[80vh] overflow-hidden"
               onClick={(e) => e.stopPropagation()}
             >
-              {/* Drag Handle for Mobile */}
               <div className="md:hidden flex justify-center pt-3 shrink-0"><div className="w-12 h-1 bg-gray-200 rounded-full" /></div>
 
               <div className="flex justify-between items-center p-6 border-b bg-white shrink-0">

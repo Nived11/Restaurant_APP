@@ -1,10 +1,13 @@
 import { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
+import { useDispatch } from 'react-redux'; 
 import api from '../../../../api/axios';
 import { extractErrorMessages } from '../../../../utils/extractErrorMessages';
+import { mergeCartOnLogin } from '../../../../redux/cartSlice'; 
 import { toast } from 'sonner';
 
 export const useLogin = () => {
+    const dispatch = useDispatch(); // Initialize dispatch
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null); 
     const [step, setStep] = useState(1);
@@ -16,14 +19,12 @@ export const useLogin = () => {
     const inputRefs = useRef([]);
     const location = useLocation();
 
-    // --- Helpers ---
     const formatTime = (seconds) => {
         const mins = Math.floor(seconds / 60);
         const secs = seconds % 60;
         return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
     };
 
-    // Timer Logic
     useEffect(() => {
         let interval;
         if (step === 2 && timer > 0) {
@@ -35,7 +36,6 @@ export const useLogin = () => {
         return () => clearInterval(interval);
     }, [step, timer]);
 
-    // Clear errors after 5 seconds
     useEffect(() => {
         if (error) {
             const t = setTimeout(() => setError(null), 5000);
@@ -43,7 +43,6 @@ export const useLogin = () => {
         }
     }, [error]);
 
-    // --- OTP Input Handling ---
     const handleOtpChange = (value, index) => {
         if (isNaN(value)) return;
         const newOtp = [...otp];
@@ -58,18 +57,13 @@ export const useLogin = () => {
         }
     };
 
-    // --- API Actions ---
-
-    // 1. Send OTP
     const sendOtp = async (e) => {
         if (e) e.preventDefault();
         setError(null);
-
         if (mobile.length !== 10) {
             setError("Please enter a valid 10-digit mobile number");
             return;
         }
-
         setLoading(true);
         try {
             const response = await api.post('/auth/login-otp/', { phone_number: mobile });
@@ -80,18 +74,15 @@ export const useLogin = () => {
                 setCanResend(false);
             }
             if (response.data.data?.test_otp) {
-                console.log("Login OTP (Test Mode):", response.data.data.test_otp);
                 toast.info(`Test OTP: ${response.data.data.test_otp}`);
             }
         } catch (err) {
-            const errMsg = extractErrorMessages(err);
-            setError(errMsg);
+            setError(extractErrorMessages(err));
         } finally {
             setLoading(false);
         }
     };
 
-    // 2. Verify OTP
     const verifyOtp = async (e) => {
         if (e) e.preventDefault();
         const otpString = otp.join('');
@@ -111,6 +102,9 @@ export const useLogin = () => {
                 localStorage.setItem('user_access', response.data.access);
                 localStorage.setItem('user_refresh', response.data.refresh);
                 localStorage.setItem('user_role', response.data.role);
+
+                dispatch(mergeCartOnLogin());
+
                 toast.success("Welcome back!");
                 const origin = location.state?.from || '/';
                 setTimeout(() => {
@@ -118,14 +112,12 @@ export const useLogin = () => {
                 }, 1500);
             }
         } catch (err) {
-            const errMsg = extractErrorMessages(err);
-            setError(errMsg);
+            setError(extractErrorMessages(err));
         } finally {
             setLoading(false);
         }
     };
 
-    // 3. Resend OTP
     const resendOtp = async () => {
         setLoading(true);
         try {
@@ -137,29 +129,15 @@ export const useLogin = () => {
                 setOtp(['', '', '', '', '', '']);
             }
         } catch (err) {
-            const errMsg = extractErrorMessages(err);
-            setError(errMsg);
+            setError(extractErrorMessages(err));
         } finally {
             setLoading(false);
         }
     };
 
     return {
-        // State
-        step, setStep,
-        mobile, setMobile,
-        otp, setOtp,
-        loading,
-        error,
-        timer,
-        canResend,
-        inputRefs,
-        // Methods
-        formatTime,
-        handleOtpChange,
-        handleKeyDown,
-        sendOtp,
-        verifyOtp,
-        resendOtp
+        step, setStep, mobile, setMobile, otp, setOtp,
+        loading, error, timer, canResend, inputRefs,
+        formatTime, handleOtpChange, handleKeyDown, sendOtp, verifyOtp, resendOtp
     };
 };

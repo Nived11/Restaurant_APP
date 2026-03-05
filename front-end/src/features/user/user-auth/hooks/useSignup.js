@@ -1,21 +1,21 @@
 import { useState, useEffect, useRef } from 'react';
+import { useDispatch } from 'react-redux'; 
 import api from '../../../../api/axios';
 import { extractErrorMessages } from '../../../../utils/extractErrorMessages';
+import { mergeCartOnLogin } from '../../../../redux/cartSlice'; 
 import { toast } from 'sonner';
 
 export const useSignup = () => {
+    const dispatch = useDispatch();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [step, setStep] = useState(1);
     const [formData, setFormData] = useState({ name: '', phone: '', email: '' });
     const [otp, setOtp] = useState(['', '', '', '', '', '']);
-
-    // Timer States
     const [timer, setTimer] = useState(120);
     const [canResend, setCanResend] = useState(false);
     const inputRefs = useRef([]);
 
-    // Timer Countdown Logic
     useEffect(() => {
         let interval;
         if (step === 2 && timer > 0) {
@@ -27,7 +27,6 @@ export const useSignup = () => {
         return () => clearInterval(interval);
     }, [step, timer]);
 
-    // Clear errors after 5 seconds
     useEffect(() => {
         if (error) {
             const t = setTimeout(() => setError(null), 5000);
@@ -41,7 +40,6 @@ export const useSignup = () => {
         return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
     };
 
-    // OTP Input Logic
     const handleOtpChange = (value, index) => {
         if (isNaN(value)) return;
         const newOtp = [...otp];
@@ -56,21 +54,17 @@ export const useSignup = () => {
         }
     };
 
-    // 1. Register - Send OTP
     const handleRegisterSubmit = async (e) => {
         if (e) e.preventDefault();
         setError(null);
-
         if (formData.name.trim().length < 3) {
             setError("Name must be at least 3 characters long.");
             return;
         }
-
         if (formData.phone.length !== 10) {
             setError("Invalid phone number. Please enter 10 digits.");
             return;
         }
-
         setLoading(true);
         try {
             const response = await api.post('/auth/register/', {
@@ -78,32 +72,23 @@ export const useSignup = () => {
                 email: formData.email,
                 phone_number: formData.phone
             });
-
             if (response.data.status) {
                 toast.success("OTP Sent to your phone!");
                 setStep(2);
                 setTimer(120);
                 setCanResend(false);
             }
-
-            if (response.data.data?.test_otp) {
-                console.log("OTP (Test Mode):", response.data.data.test_otp);
-                toast.info(`Test OTP: ${response.data.data.test_otp}`);
-            }
         } catch (err) {
-            const errMsg = extractErrorMessages(err);
-            setError(errMsg);
+            setError(extractErrorMessages(err));
         } finally {
             setLoading(false);
         }
     };
 
-    // 2. Verify OTP
     const handleVerifySubmit = async (e) => {
         if (e) e.preventDefault();
         setError(null);
         const otpString = otp.join('');
-
         if (otpString.length < 6) {
             setError("Please enter the 6-digit code.");
             return;
@@ -121,27 +106,24 @@ export const useSignup = () => {
                 localStorage.setItem('user_refresh', response.data.refresh);
                 localStorage.setItem('user_role', response.data.role);
 
-                toast.success("Successfully Registered! Welcome!");
+                dispatch(mergeCartOnLogin());
 
+                toast.success("Successfully Registered! Welcome!");
                 setTimeout(() => {
                     window.location.href = '/';
                 }, 1500);
             }
         } catch (err) {
-            const errMsg = extractErrorMessages(err);
-            setError(errMsg);
+            setError(extractErrorMessages(err));
         } finally {
             setLoading(false);
         }
     };
 
-    // 3. Resend OTP
     const handleResend = async () => {
         setLoading(true);
         try {
-            const response = await api.post('/auth/resend-otp/', {
-                phone_number: formData.phone
-            });
+            const response = await api.post('/auth/resend-otp/', { phone_number: formData.phone });
             if (response.data.status) {
                 toast.success("OTP Resent!");
                 setTimer(120);
@@ -156,17 +138,9 @@ export const useSignup = () => {
     };
 
     return {
-        step, setStep,
-        formData, setFormData,
-        otp, setOtp,
-        loading, error,
-        timer, canResend,
-        inputRefs,
-        formatTime,
-        handleOtpChange,
-        handleKeyDown,
-        handleRegisterSubmit,
-        handleVerifySubmit,
-        handleResend
+        step, setStep, formData, setFormData, otp, setOtp,
+        loading, error, timer, canResend, inputRefs,
+        formatTime, handleOtpChange, handleKeyDown,
+        handleRegisterSubmit, handleVerifySubmit, handleResend
     };
 };

@@ -3,7 +3,7 @@ import { X, Plus, Minus, ShoppingBag, Leaf, Flame, Clock, Tag, ArrowRight, PlusC
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { useDispatch, useSelector } from "react-redux";
-import { addToCart } from "../../redux/cartSlice"; 
+import { addToCart, syncCartUpdate } from "../../redux/cartSlice"; // syncCartUpdate ഇമ്പോർട്ട് ചെയ്തു
 import { useNavigate } from "react-router-dom"; 
 
 const ProductModal = ({ item, onClose }) => {
@@ -44,7 +44,15 @@ const ProductModal = ({ item, onClose }) => {
 
   const handleAddToCart = () => {
     if (quantity > 0) {
+      // 1. ലോക്കൽ സ്റ്റേറ്റ് അപ്‌ഡേറ്റ്
       dispatch(addToCart({ item, quantity }));
+      
+      // 2. ബാക്കെൻഡ് സിങ്ക് (യൂസർ ലോഗിൻ ചെയ്തിട്ടുണ്ടെങ്കിൽ മാത്രം)
+      const token = localStorage.getItem('user_access'); // നിങ്ങളുടെ ടോക്കൺ കീ ഇവിടെ നൽകുക
+      if (token) {
+        dispatch(syncCartUpdate({ itemId: item.id, actionType: 'add' }));
+      }
+
       toast.success(`${item.name} added to cart!`);
       setIsAdded(true); 
     }
@@ -59,7 +67,6 @@ const ProductModal = ({ item, onClose }) => {
     discountPercent = Math.round(((actualPrice - offerPrice) / actualPrice) * 100);
   }
 
-  // --- ONLY ANIMATION LOGIC UPDATED FOR SMOOTHNESS ---
   const modalVariants = {
     initial: isMobile ? { y: "100%" } : { y: 30, opacity: 0, scale: 0.95 },
     animate: { 
@@ -75,8 +82,8 @@ const ProductModal = ({ item, onClose }) => {
       opacity: isMobile ? 1 : 0, 
       scale: isMobile ? 1 : 0.95, 
       transition: { 
-        duration: 0.25, // Closing time കുറച്ചു
-        ease: [0.4, 0, 1, 1], // Power 4 out easing for faster exit
+        duration: 0.25, 
+        ease: [0.4, 0, 1, 1], 
       }
     },
   };
@@ -103,7 +110,6 @@ const ProductModal = ({ item, onClose }) => {
         onDragEnd={(e, { offset, velocity }) => {
           if (offset.y > 100 || velocity.y > 600) onClose();
         }}
-        // GPU optimization for smooth mobile animation
         className="relative bg-white w-full md:max-w-5xl rounded-t-[2rem] md:rounded-[3rem] shadow-2xl overflow-hidden h-fit md:h-auto flex flex-col md:flex-row will-change-transform"
         onClick={(e) => e.stopPropagation()}
       >
@@ -116,7 +122,6 @@ const ProductModal = ({ item, onClose }) => {
           <X size={isMobile ? 16 : 22} />
         </button>
 
-        {/* --- IMAGE SECTION --- */}
         <div className="w-full md:w-[45%] h-60  md:h-[506px] relative shrink-0 overflow-hidden">
           <img 
             src={item.image} 
@@ -131,7 +136,6 @@ const ProductModal = ({ item, onClose }) => {
           </div>
         </div>
 
-        {/* --- CONTENT SECTION --- */}
         <div className="w-full md:w-[55%] flex flex-col bg-white">
           <div className="p-5 md:p-12 flex flex-col gap-3 md:gap-5">
             <div className="space-y-0.5 md:space-y-1.5">
@@ -165,7 +169,6 @@ const ProductModal = ({ item, onClose }) => {
               </div>
             </div>
 
-            {/* Actions Bar */}
             <div className="mt-1 pt-4 border-t border-primary/20 ">
               {isAdded || maxAvailableToAdd > 0 ? (
                 <>
