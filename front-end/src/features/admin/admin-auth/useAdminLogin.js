@@ -35,7 +35,10 @@ export const useAdminLogin = () => {
                 localStorage.setItem("admin_role", res.data.role); 
                 
                 toast.success("successfully logged in!");
-                navigate("/admin/dashboard");
+                setTimeout(() => {
+                     window.location.href = '/admin/dashboard';
+                }, 1500);
+               
             } else {
                 setError(res.data.message || "Unauthorized access.");
         

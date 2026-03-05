@@ -10,11 +10,17 @@ export const useLocationPicker = (initialPos) => {
   const [searchResults, setSearchResults] = useState([]);
   
   const searchTimeoutRef = useRef(null);
+  const debounceTimerRef = useRef(null); 
 
   const updatePosition = useCallback(async (newPos) => {
     setPosition(newPos);
-    const res = await fetchLocationDetails(newPos.lat, newPos.lng);
-    if (res) setDetails({ address: res.formattedAddress, pincode: res.pincode });
+    
+    if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
+
+    debounceTimerRef.current = setTimeout(async () => {
+        const res = await fetchLocationDetails(newPos.lat, newPos.lng);
+        if (res) setDetails({ address: res.formattedAddress, pincode: res.pincode });
+    }, 800);
   }, []);
 
   const handleSearch = useCallback(async (query) => {
@@ -31,13 +37,10 @@ export const useLocationPicker = (initialPos) => {
         const response = await fetch(
           `https://us1.locationiq.com/v1/search.php?key=${TOKEN}&q=${encodeURIComponent(query)}&format=json`
         );
-
         if (!response.ok) throw new Error("Search failed");
-
         const data = await response.json();
         setSearchResults(data);
       } catch (error) {
-        console.error("Search error:", error);
         setSearchResults([]); 
       } finally {
         setIsSearching(false);

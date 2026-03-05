@@ -1,4 +1,6 @@
 import React from 'react';
+import { useDispatch } from 'react-redux'; 
+import { clearCart } from '../../../../redux/cartSlice';
 import { Trash2, ArrowRight, ReceiptText, Plus, AlertCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -13,11 +15,10 @@ export const CartSection = ({ cartItems, subTotal, totalAmount, incrementQty, de
           Checkout <span className="text-[#f9a602]">Details</span>
         </h2>
         {!isCartEmpty &&
-        
-        <Link to="/menu" className="group flex items-center gap-1.5 text-[8px] bg-gray-100 p-2 rounded-lg  md:text-[10px]  font-black uppercase tracking-widest text-gray-700 hover:text-[#f9a602] transition-colors">
-          <Plus size={12} className="group-hover:rotate-90 transition-transform" />
-          Add More Items
-        </Link>
+          <Link to="/menu" className="group flex items-center gap-1.5 text-[8px] bg-gray-100 p-2 rounded-lg  md:text-[10px]  font-black uppercase tracking-widest text-gray-700 hover:text-[#f9a602] transition-colors">
+            <Plus size={12} className="group-hover:rotate-90 transition-transform" />
+            Add More Items
+          </Link>
         }
       </div>
       
@@ -26,15 +27,19 @@ export const CartSection = ({ cartItems, subTotal, totalAmount, incrementQty, de
         <div className={`${isCartEmpty ? 'lg:col-span-3' : 'lg:col-span-2'} space-y-4`}>
           {!isCartEmpty ? (
             cartItems.map((item) => {
-              const isMaxReached = item.quantity >= (item.total_stock || 0);
+              const currentStock = item.currentStock || 0;
+              const isMaxReached = item.quantity >= currentStock;
+              const isOutOfStock = item.isOutOfStock;
               
               return (
-                <div key={item.id} className="p-4 bg-white border border-gray-100 rounded-[1.5rem] flex flex-col gap-2 shadow-md  hover:shadow-sm transition-all">
+                <div 
+                  key={item.id} 
+                  className={`p-4 bg-white border ${isOutOfStock ? 'border-red-500 bg-red-50/30' : 'border-gray-100'} rounded-[1.5rem] flex flex-col gap-2 shadow-md hover:shadow-sm transition-all`}
+                >
                   <div className="flex items-center gap-4">
                     <img src={item.image} className="w-16 h-16 md:w-20 md:h-20 rounded-2xl object-cover bg-gray-50 shadow-inner" alt={item.name} />
                     
                     <div className="flex-1 min-w-0">
-                      {/* Font size reduced for mobile: text-[11px] */}
                       <h3 className="font-black text-black text-[11px] md:text-sm uppercase truncate tracking-tight">
                         {item.name}
                       </h3>
@@ -61,8 +66,21 @@ export const CartSection = ({ cartItems, subTotal, totalAmount, incrementQty, de
                     </div>
                   </div>
 
-                  {isMaxReached && (
-                    <div className="flex items-center gap-1.5 text-red-500 bg-red-50/50 p-2 rounded-xl border border-red-100">
+                  {/* റിയൽ-ടൈം സ്റ്റോക്ക് എറർ കാണിക്കുന്നു */}
+                  {isOutOfStock && (
+                    <div className="flex items-center gap-1.5 text-red-600 bg-red-100/50 p-2 rounded-xl border border-red-200 animate-pulse">
+                      <AlertCircle size={12} />
+                      <span className="text-[9px] font-bold uppercase tracking-tight">
+                        {currentStock === 0 
+                          ? "Out of Stock! Please remove this item from bag." 
+                          : `Only ${currentStock} units left! Please reduce quantity.`
+                        }
+                      </span>
+                    </div>
+                  )}
+
+                  {!isOutOfStock && isMaxReached && (
+                    <div className="flex items-center gap-1.5 text-orange-500 bg-orange-50/50 p-2 rounded-xl border border-orange-100">
                       <AlertCircle size={12} />
                       <span className="text-[9px] font-bold uppercase tracking-tight">Maximum available stock reached</span>
                     </div>
@@ -78,7 +96,7 @@ export const CartSection = ({ cartItems, subTotal, totalAmount, incrementQty, de
           )}
         </div>
 
-        {/* Right Side: Summary Card (Only shows if cart is NOT empty) */}
+        {/* Right Side: Summary Card */}
         {!isCartEmpty && (
           <div className="lg:sticky lg:top-32">
             <div className="bg-white border-2 border-gray-100 rounded-[2.5rem] p-6 md:p-8 shadow-sm relative overflow-hidden">
@@ -100,8 +118,16 @@ export const CartSection = ({ cartItems, subTotal, totalAmount, incrementQty, de
                   </div>
                 </div>
               </div>
-              <button onClick={onNext} className="cursor-pointer w-full bg-black text-white py-4 rounded-2xl font-black uppercase tracking-[0.2em] text-[10px] mt-8 hover:bg-[#f9a602] hover:text-black transition-all active:scale-95 flex items-center justify-center gap-3 shadow-lg">
-                 confirm Items <ArrowRight size={14}/>
+              
+              <button 
+                onClick={onNext} 
+                disabled={cartItems.some(item => item.isOutOfStock)}
+                className={`cursor-pointer w-full py-4 rounded-2xl font-black uppercase tracking-[0.2em] text-[10px] mt-8 transition-all active:scale-95 flex items-center justify-center gap-3 shadow-lg 
+                  ${cartItems.some(item => item.isOutOfStock) 
+                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed' 
+                    : 'bg-black text-white hover:bg-[#f9a602] hover:text-black'}`}
+              >
+                  confirm Items <ArrowRight size={14}/>
               </button>
             </div>
           </div>
