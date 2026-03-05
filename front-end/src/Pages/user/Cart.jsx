@@ -58,7 +58,6 @@ export default function Cart() {
   };
 
   const handlePlaceOrder = () => {
-    // This will be called after successful API response
     navigate("/profile?tab=orders");
   };
 
@@ -86,7 +85,7 @@ export default function Cart() {
             cartItems={cartItems} subTotal={subTotal} totalAmount={totalAmount} 
             onPlaceOrder={handlePlaceOrder} onBack={() => handleBack(2)} 
             selectedAddress={selectedAddress} 
-            setIsOrderProcessing={setIsOrderProcessing} // Passing the animation setter
+            setIsOrderProcessing={setIsOrderProcessing} 
           />
         )}
       </main>

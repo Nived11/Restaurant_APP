@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import api from '../api/axios'; 
-import { extractErrorMessages } from '../utils/extractErrorMessages'; // നിങ്ങളുടെ പ്രോജക്റ്റിലെ കൃത്യമായ പാത്ത് നൽകുക
+import { extractErrorMessages } from '../utils/extractErrorMessages'; 
 
 const loadCart = () => {
   if (typeof window !== 'undefined') {
@@ -32,7 +32,7 @@ export const fetchCart = createAsyncThunk(
       const response = await api.get('/orders/cart/');
       return response.data; 
     } catch (err) {
-      return rejectWithValue(extractErrorMessages(err)); // Utils ഉപയോഗിച്ചു
+      return rejectWithValue(extractErrorMessages(err)); 
     }
   }
 );

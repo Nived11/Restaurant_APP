@@ -3,8 +3,8 @@ import { X, Plus, Minus, ShoppingBag, Leaf, Flame, Clock, Tag, ArrowRight, PlusC
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { useDispatch, useSelector } from "react-redux";
-import { addToCart, syncCartUpdate } from "../../redux/cartSlice"; // syncCartUpdate ഇമ്പോർട്ട് ചെയ്തു
-import { useNavigate } from "react-router-dom"; 
+import { addToCart, syncCartUpdate } from "../../redux/cartSlice"; 
+import { useNavigate } from "react-router-dom";
 
 const ProductModal = ({ item, onClose }) => {
   const dispatch = useDispatch();
@@ -13,13 +13,13 @@ const ProductModal = ({ item, onClose }) => {
 
   const cartItems = useSelector((state) => state.cart.items);
   const existingInCart = cartItems.find((i) => i.id === item.id);
-  
+
   const alreadyInCartQty = existingInCart ? existingInCart.quantity : 0;
   const availableStock = item.quantity || 0;
   const maxAvailableToAdd = availableStock - alreadyInCartQty;
 
   const [quantity, setQuantity] = useState(maxAvailableToAdd > 0 ? 1 : 0);
-  const [isAdded, setIsAdded] = useState(false); 
+  const [isAdded, setIsAdded] = useState(false);
 
   useEffect(() => {
     document.body.style.overflow = "hidden";
@@ -44,17 +44,15 @@ const ProductModal = ({ item, onClose }) => {
 
   const handleAddToCart = () => {
     if (quantity > 0) {
-      // 1. ലോക്കൽ സ്റ്റേറ്റ് അപ്‌ഡേറ്റ്
       dispatch(addToCart({ item, quantity }));
-      
-      // 2. ബാക്കെൻഡ് സിങ്ക് (യൂസർ ലോഗിൻ ചെയ്തിട്ടുണ്ടെങ്കിൽ മാത്രം)
-      const token = localStorage.getItem('user_access'); // നിങ്ങളുടെ ടോക്കൺ കീ ഇവിടെ നൽകുക
+
+      const token = localStorage.getItem('user_access'); 
       if (token) {
         dispatch(syncCartUpdate({ itemId: item.id, actionType: 'add' }));
       }
 
       toast.success(`${item.name} added to cart!`);
-      setIsAdded(true); 
+      setIsAdded(true);
     }
   };
 
@@ -69,21 +67,21 @@ const ProductModal = ({ item, onClose }) => {
 
   const modalVariants = {
     initial: isMobile ? { y: "100%" } : { y: 30, opacity: 0, scale: 0.95 },
-    animate: { 
-      y: 0, 
-      opacity: 1, 
+    animate: {
+      y: 0,
+      opacity: 1,
       scale: 1,
-      transition: isMobile 
-        ? { duration: 0.4, ease: [0.32, 0.72, 0, 1] } 
+      transition: isMobile
+        ? { duration: 0.4, ease: [0.32, 0.72, 0, 1] }
         : { duration: 0.3, ease: "easeOut" }
     },
-    exit: { 
-      y: "100%", 
-      opacity: isMobile ? 1 : 0, 
-      scale: isMobile ? 1 : 0.95, 
-      transition: { 
-        duration: 0.25, 
-        ease: [0.4, 0, 1, 1], 
+    exit: {
+      y: "100%",
+      opacity: isMobile ? 1 : 0,
+      scale: isMobile ? 1 : 0.95,
+      transition: {
+        duration: 0.25,
+        ease: [0.4, 0, 1, 1],
       }
     },
   };
@@ -123,10 +121,10 @@ const ProductModal = ({ item, onClose }) => {
         </button>
 
         <div className="w-full md:w-[45%] h-60  md:h-[506px] relative shrink-0 overflow-hidden">
-          <img 
-            src={item.image} 
-            alt={item.name} 
-            className="w-full h-full object-cover object-center rounded-t-[2rem] md:rounded-l-[3rem] md:rounded-tr-none transition-transform duration-500 hover:scale-105" 
+          <img
+            src={item.image}
+            alt={item.name}
+            className="w-full h-full object-cover object-center rounded-t-[2rem] md:rounded-l-[3rem] md:rounded-tr-none transition-transform duration-500 hover:scale-105"
           />
           <div className="absolute top-4 left-4">
             <span className={`flex items-center gap-1 px-2.5 py-1 rounded-full backdrop-blur-md border border-white/30 text-[8px] md:text-[10px] font-black uppercase tracking-wider text-white shadow-lg ${isVeg ? 'bg-green-500/80' : 'bg-red-500/80'}`}>
@@ -181,7 +179,7 @@ const ProductModal = ({ item, onClose }) => {
                     </div>
 
                     <div className="flex items-center bg-slate-200 gap-1 rounded-xl p-1 border border-slate-100 scale-90 md:scale-100 origin-right">
-                      <button 
+                      <button
                         onClick={handleDecrease}
                         className="cursor-pointer w-8 h-8 flex items-center justify-center bg-white rounded-lg shadow-sm active:scale-90"
                         disabled={quantity <= 1 || isAdded}
@@ -191,11 +189,10 @@ const ProductModal = ({ item, onClose }) => {
                       <span className="w-10 text-center font-black text-base text-slate-900">
                         {isAdded ? (existingInCart?.quantity || quantity) : quantity}
                       </span>
-                      <button 
+                      <button
                         onClick={handleIncrease}
-                        className={`cursor-pointer w-8 h-8 flex items-center justify-center rounded-lg shadow-sm active:scale-90 transition-all ${
-                          quantity >= maxAvailableToAdd || isAdded ? 'bg-gray-300 text-gray-500' : 'bg-white text-black'
-                        }`}
+                        className={`cursor-pointer w-8 h-8 flex items-center justify-center rounded-lg shadow-sm active:scale-90 transition-all ${quantity >= maxAvailableToAdd || isAdded ? 'bg-gray-300 text-gray-500' : 'bg-white text-black'
+                          }`}
                         disabled={isAdded}
                       >
                         <Plus size={14} strokeWidth={3} />
@@ -224,7 +221,7 @@ const ProductModal = ({ item, onClose }) => {
                         <PlusCircle size={16} strokeWidth={2.5} />
                         Add More
                       </motion.button>
-                      
+
                       <motion.button
                         initial={{ opacity: 0, x: 10 }}
                         animate={{ opacity: 1, x: 0 }}
@@ -243,7 +240,11 @@ const ProductModal = ({ item, onClose }) => {
                   <div className="flex items-center gap-3 bg-red-50 border border-red-100 p-4 rounded-2xl">
                     <AlertCircle className="text-red-500 shrink-0" size={20} />
                     <p className="text-red-600 font-bold text-[8px] md:text-xs leading-tight">
-                      Maximum limit reached for this item in your cart.
+                      {availableStock === 0 ? (
+                        "Sold Out! This item is currently out of stock."
+                      ) : (
+                        `Hurry! Only ${maxAvailableToAdd} left in your limit.`
+                      )}
                     </p>
                   </div>
                   <motion.button
