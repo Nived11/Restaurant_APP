@@ -14,10 +14,10 @@ const Profile = () => {
   }, [location]);
 
   return (
-    <div className="min-h-screen bg-[#FAFAFA] pt-6 md:pt-12 pb-20 px-4">
+    <div className="min-h-screen bg-white  pt-3 md:pt-12 pb-20 px- sm:px-4">
       <div className="max-w-[1440px] mx-auto">
         {/* Main Container */}
-        <div className="bg-white rounded-[1rem] md:rounded-[1.5rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100/50 overflow-hidden">
+        <div className="bg-white   md:rounded-[1.5rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100/50 overflow-hidden">
           
           {/* Navigation Tabs */}
           <ProfileTabs activeTab={activeTab} setActiveTab={setActiveTab} />
