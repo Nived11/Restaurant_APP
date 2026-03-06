@@ -11,7 +11,7 @@ import {
 import { toast } from 'sonner';
 
 export default function Cart() {
-  const { cartItems, subTotal, totalAmount, incrementQty, decrementQty, removeItem } = useCart();
+  const { cartItems, subTotal, totalAmount, incrementQty, decrementQty, removeItem, isStoreClosed } = useCart();
   const [step, setStep] = useState(1);
   const navigate = useNavigate();
   const [isOrderProcessing, setIsOrderProcessing] = useState(false);
@@ -29,6 +29,11 @@ export default function Cart() {
 
   const handleNextStep = () => {
     if (step === 1) {
+      if (isStoreClosed) {
+        toast.error("Sorry, the store is currently closed for new orders.");
+        return;
+      }
+
       const hasStockError = cartItems.some(item => item.isOutOfStock);
       if (hasStockError) {
         toast.error("Please resolve the stock issues before proceeding.");
@@ -72,6 +77,7 @@ export default function Cart() {
             cartItems={cartItems} subTotal={subTotal} totalAmount={totalAmount} 
             incrementQty={incrementQty} decrementQty={decrementQty} removeItem={removeItem} 
             onNext={handleNextStep}
+            isStoreClosed={isStoreClosed}
           />
         )}
         {step === 2 && (

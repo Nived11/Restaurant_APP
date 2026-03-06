@@ -1,5 +1,5 @@
 import React from 'react';
-import { Trash2, ArrowRight, ReceiptText, Plus, AlertCircle, RefreshCw } from 'lucide-react';
+import { Trash2, ArrowRight, ReceiptText, Plus, AlertCircle, RefreshCw, Clock } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const CartSkeleton = () => (
@@ -17,9 +17,6 @@ const CartSkeleton = () => (
   </div>
 );
 
-/**
- * 2. ERROR UI
- */
 const ErrorState = ({ message }) => (
   <div className="p-10 text-center bg-white border-2 border-red-50 rounded-[2.5rem] my-10 space-y-4 shadow-sm">
     <div className="bg-red-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto">
@@ -33,9 +30,6 @@ const ErrorState = ({ message }) => (
   </div>
 );
 
-/**
- * 3. MAIN CART SECTION COMPONENT
- */
 export const CartSection = ({ 
   cartItems, 
   subTotal, 
@@ -45,15 +39,17 @@ export const CartSection = ({
   removeItem, 
   onNext,
   loading,
-  error 
+  error,
+  isStoreClosed 
 }) => {
   const isCartEmpty = cartItems.length === 0;
 
   if (error) return <ErrorState message={error} />;
 
+  const isDisableConfirm = cartItems.some(item => item.isOutOfStock) || isStoreClosed;
+
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-      {/* Header */}
       <div className="flex items-end justify-between border-b border-gray-100 pb-4">
         <h2 className="text-md md:text-3xl font-black uppercase tracking-tight italic text-black">
           Checkout <span className="text-[#f9a602]">Details</span>
@@ -128,6 +124,14 @@ export const CartSection = ({
           <div className="lg:sticky lg:top-32">
             <div className="bg-white border-2 border-gray-100 rounded-[2.5rem] p-6 md:p-8 shadow-sm relative overflow-hidden">
               <ReceiptText className="absolute left-0 -top-4 text-primary/10 w-24 h-24 -rotate-30" />
+              
+              {isStoreClosed && (
+                <div className="relative z-20 mb-4 p-3 bg-red-50 border border-red-100 rounded-2xl flex items-center gap-2 text-red-600">
+                  <Clock size={16} />
+                  <span className="text-[10px] font-black uppercase tracking-tight">Store is Closed for Orders</span>
+                </div>
+              )}
+
               <h4 className="relative z-10 text-[10px] font-black text-gray-600 uppercase tracking-[0.2em] mb-6">Order Summary</h4>
               
               <div className="relative z-10 space-y-3">
@@ -149,11 +153,11 @@ export const CartSection = ({
 
               <button 
                 onClick={onNext} 
-                disabled={cartItems.some(item => item.isOutOfStock)}
+                disabled={isDisableConfirm}
                 className={`w-full py-4 rounded-2xl font-black uppercase tracking-[0.2em] text-[10px] mt-8 flex items-center justify-center gap-3 shadow-lg transition-all
-                  ${cartItems.some(item => item.isOutOfStock) ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : 'bg-black text-white hover:bg-[#f9a602] hover:text-black active:scale-95'}`}
+                  ${isDisableConfirm ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : 'bg-black text-white hover:bg-[#f9a602] hover:text-black active:scale-95'}`}
               >
-                Confirm Items <ArrowRight size={14}/>
+                {isStoreClosed ? "Store Closed" : "Confirm Items"} <ArrowRight size={14}/>
               </button>
             </div>
           </div>
