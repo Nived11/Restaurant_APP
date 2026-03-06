@@ -1,135 +1,237 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  Package, ChevronDown, Clock, CheckCircle2, 
-  Truck, Calendar, ShoppingBag 
-} from "lucide-react";
+import { ChevronDown, CheckCircle2, ShoppingBag, XCircle, AlertCircle, Clock, Calendar, UtensilsCrossed } from "lucide-react";
+import { useOrderHistory } from "../hooks/useOrderHistory";
+import { useNavigate } from "react-router-dom";
+
+// --- Skeleton UI ---
+const OrderSkeleton = () => (
+  <div className="space-y-4">
+    {[1, 2, 3].map((i) => (
+      <div key={i} className="h-28 w-full bg-gray-100 animate-pulse rounded-[1.5rem]" />
+    ))}
+  </div>
+);
 
 const OrderHistory = () => {
+  const { orders, isLoading, error, cancelOrder, isCancelling } = useOrderHistory();
   const [expandedOrder, setExpandedOrder] = useState(null);
-  const [visibleCount, setVisibleCount] = useState(8);
+  const [orderToCancel, setOrderToCancel] = useState(null);
 
-  // Mock Data Structure
-  const allOrders = Array.from({ length: 15 }).map((_, i) => ({
-    id: `ORD-2026-${1000 + i}`,
-    date: "14 Feb 2026",
-    total: 850,
-    status: i === 0 ? "Waiting for Delivery" : "Delivered",
-    itemCount: 3,
-    items: [
-      { id: 1, name: "Premium Beef Burger", price: 350, discountPrice: 299, qty: 1, image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=100" },
-      { id: 2, name: "Crispy French Fries", price: 150, discountPrice: 120, qty: 2, image: "https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=100" },
-    ]
-  }));
+  const navigate = useNavigate();
 
-  const toggleOrder = (id) => {
-    setExpandedOrder(expandedOrder === id ? null : id);
-  };
+  if (isLoading) return <OrderSkeleton />;
+
+  if (error) return (
+    <div className="p-10 flex flex-col items-center  text-center">
+      <AlertCircle className="text-red-500 mb-2" size={32} />
+      <p className="text-red-600 font-black text-xs uppercase tracking-widest">{error}</p>
+    </div>
+  );
+
+  if (!orders || orders.length === 0) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="flex flex-col items-center justify-center py-4 px-4 text-center"
+      >
+        <div className="w-20 h-20  rounded-full flex items-center justify-center mb-6 shadow-lg shadow-gray-200">
+          <UtensilsCrossed className="text-primary" size={40} />
+        </div>
+        <h2 className="text-lg font-black text-black uppercase tracking-tight">No Orders Yet</h2>
+        <p className="text-xs text-gray-500 mt-2 mb-8 max-w-[350px] font-medium leading-relaxed">
+          Looks like you haven't placed any orders yet. Time to grab something delicious!
+        </p>
+        <button
+          onClick={() => navigate("/menu")}
+          className="bg-black text-white px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:scale-105 active:scale-95 transition-all shadow-xl shadow-black/10"
+        >
+          Order Now
+        </button>
+      </motion.div>
+    );
+  }
 
   return (
     <div className="space-y-4">
-      <div className="grid gap-3">
-        {allOrders.slice(0, visibleCount).map((order) => (
-          <div 
-            key={order.id} 
-            className="bg-gray-50/50 border border-gray-100 rounded-[1.5rem]  overflow-hidden transition-all hover:shadow-md"
-          >
-            {/* --- TOP ROW (Summary) --- */}
-            <div 
-              className="p-4 md:p-6 flex items-center justify-between cursor-pointer"
-              onClick={() => toggleOrder(order.id)}
-            >
-              <div className="flex items-center gap-3 md:gap-5">
-                {/* Status Icon with Animation */}
-                <div className="relative">
-                  <div className={`p-2 md:p-4 rounded-xl md:rounded-2xl shadow-sm ${
-                    order.status === "Delivered" ? "bg-green-100 text-green-600" : "bg-amber-100 text-amber-600"
-                  }`}>
-                    {order.status === "Delivered" ? <CheckCircle2 size={20} /> : <Truck size={20} className="animate-bounce" />}
-                  </div>
-                </div>
+      <div className="grid gap-4">
+        {orders.map((order) => {
+          const isPending = order.order_status === "PLACED" || order.order_status === "PENDING";
+          const isPaid = order.payment_status === "COMPLETED" || order.payment_status === "PAID";
+          const isExpanded = expandedOrder === order.id;
 
-                <div>
-                  <div className="flex items-center gap-2">
-                    <p className="font-black text-[10px] md:text-sm uppercase tracking-widest text-gray-800">{order.id}</p>
-                    <span className={`text-[7px] md:text-[9px] px-2 py-0.5 rounded-full font-bold uppercase ${
-                      order.status === "Delivered" ? "bg-green-50 text-green-500" : "bg-amber-50 text-amber-500"
-                    }`}>
-                      {order.status}
-                    </span>
-                  </div>
-                  <p className="text-[8px] md:text-[11px] font-bold text-gray-500 uppercase mt-1 flex items-center gap-3">
-                    <span className="flex items-center gap-1"><Calendar size={10}/> {order.date}</span>
-                    <span className="flex items-center gap-1"><ShoppingBag size={10}/> {order.itemCount} Items</span>
-                  </p>
-                </div>
-              </div>
+          return (
+            <div key={order.id} className="relative bg-white border border-gray-100 rounded-[1.5rem] overflow-hidden shadow-sm hover:shadow-md transition-all">
 
-              <div className="flex items-center gap-4">
-                <div className="text-right hidden sm:block">
-                  <p className="text-[10px] font-black text-gray-500 uppercase">Total Amount</p>
-                  <p className="text-sm md:text-lg font-black text-primary">₹{order.total}</p>
-                </div>
-                <motion.div
-                  animate={{ rotate: expandedOrder === order.id ? 180 : 0 }}
-                  className="p-2 bg-white rounded-full shadow-sm text-gray-500"
-                >
-                  <ChevronDown size={18} />
-                </motion.div>
-              </div>
-            </div>
+              <div
+                className="p-5 md:p-6 cursor-pointer"
+                onClick={() => setExpandedOrder(isExpanded ? null : order.id)}
+              >
+                {/* Main Flex Container */}
+                <div className="flex justify-between items-start md:items-center">
 
-            {/* --- EXPANDED SECTION (Details) --- */}
-            <AnimatePresence>
-              {expandedOrder === order.id && (
-                <motion.div
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: "auto", opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  className="border-t border-gray-100 bg-white"
-                >
-                  <div className="p-4 md:p-8 space-y-4">
-                    <h4 className="text-[9px] md:text-xs font-black uppercase tracking-widest text-primary border-b border-gray-50 pb-2">Items in this order</h4>
-                    {order.items.map((item) => (
-                      <div key={item.id} className="flex items-center justify-between group">
-                        <div className="flex items-center gap-4">
-                          <img src={item.image} alt={item.name} className="w-12 h-12 md:w-16 md:h-16 object-cover rounded-2xl shadow-sm group-hover:scale-105 transition-transform" />
-                          <div>
-                            <p className="font-black text-[10px] md:text-sm uppercase text-gray-800">{item.name}</p>
-                            <p className="text-[8px] md:text-xs font-bold text-gray-500">Qty: {item.qty}</p>
-                          </div>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-[8px] md:text-xs text-gray-400 line-through font-bold">₹{item.price}</p>
-                          <p className="text-[10px] md:text-sm font-black text-gray-800">₹{item.discountPrice}</p>
-                        </div>
+                  {/* LEFT SIDE: ID, Date, and Status (Mobile: Stacked) */}
+                  <div className="flex flex-col gap-3 md:flex-row md:items-center md:gap-10 flex-1">
+                    <div className="flex items-center gap-4">
+                      <div className="bg-gray-100 p-3 rounded-2xl hidden md:block">
+                        <ShoppingBag className="text-gray-600" size={24} />
                       </div>
-                    ))}
-                    <div className="pt-4 mt-4 border-t border-dashed border-gray-100 flex justify-between items-center">
-                       <p className="text-[9px] md:text-xs font-black uppercase text-gray-500">Grand Total Paid</p>
-                       <p className="text-sm md:text-xl font-black text-primary">₹{order.total}</p>
+                      <div>
+                        <h3 className="text-[10px] font-black text-gray-500  tracking-tighter leading-none mb-1">ORDER-#{order.id}</h3>
+                        <p className="text-sm font-black text-black uppercase flex items-center gap-1">
+                          <Calendar size={14} className="text-gray-500" />
+                          {new Date(order.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Status Badge */}
+                    <div>
+                      <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full font-black text-[9px] uppercase tracking-wide ${order.order_status === "DELIVERED" ? "bg-green-100 text-green-600" : "bg-orange-100 text-orange-600"
+                        }`}>
+                        {order.order_status === "DELIVERED" ? <CheckCircle2 size={12} /> : <Clock size={12} />}
+                        {order.order_status}
+                      </span>
                     </div>
                   </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-        ))}
+
+                  {/* RIGHT SIDE: Cancel, Total, Details (Stacked in Mobile) */}
+                  <div className="flex flex-col items-end justify-between min-h-[90px] md:min-h-0 md:gap-1">
+                    {/* Top: Cancel Button */}
+                    <div className="h-8">
+                      {isPending && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setOrderToCancel(order.id);
+                          }}
+                          className="flex items-center gap-1 px-3 py-1.5 bg-red-50 text-red-500 rounded-xl text-[9px] font-black uppercase hover:bg-red-500 hover:text-white transition-all border border-red-100"
+                        >
+                          <XCircle size={14} /> Cancel
+                        </button>
+                      )}
+                    </div>
+
+                    {/* Center: Total Amount */}
+                    <div className="py-1">
+                      <p className="text-lg font-black text-black tracking-tight flex flex-col md:flex-row items-end md:items-center md:gap-1">
+                        <span className="text-[8px] md:text-[9px] font-black text-gray-500 uppercase">Total</span>
+                        ₹{Math.round(order.total_amount)}
+                      </p>
+                    </div>
+
+                    {/* Bottom: Details Button */}
+                    <div className="flex items-center gap-1 text-[9px] font-black text-gray-700 uppercase tracking-widest">
+                      Details <ChevronDown size={14} className={`transition-transform duration-300 ${isExpanded ? "rotate-180" : ""}`} />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* --- Expanded Section --- */}
+              <AnimatePresence>
+                {isExpanded && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: "auto", opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    className="border-t border-gray-50 bg-gray-50/40"
+                  >
+                    <div className="p-6 space-y-4">
+                      {order.items.map((item, idx) => (
+                        <div key={idx} className="flex justify-between items-center bg-white p-3 rounded-2xl border border-gray-100 shadow-sm">
+                          <div className="flex items-center gap-4">
+                            <div className="w-12 h-12 bg-gray-50 rounded-xl flex-shrink-0 overflow-hidden border border-gray-100">
+                              {item.image ? (
+                                <img
+                                  src={item.image}
+                                  alt={item.item_name}
+                                  className="w-full h-full object-cover"
+                                />
+                              ) : (
+                                <div className="w-full h-full flex items-center justify-center">
+                                  <ShoppingBag size={18} className="text-gray-300" />
+                                </div>
+                              )}
+                            </div>
+                            <div>
+                              <p className="text-xs font-black uppercase text-gray-800 leading-tight mb-1">{item.item_name}</p>
+                              <p className="text-[10px] font-bold text-gray-500 uppercase">Qty: {item.quantity} <span className="text-[8px]">x</span> ₹{Math.round(item.price)}</p>
+                            </div>
+                          </div>
+                          <p className="text-sm font-black text-black">₹{Math.round(item.price * item.quantity)}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          );
+        })}
       </div>
 
-      {/* --- SEE MORE BUTTON --- */}
-      {visibleCount < allOrders.length && (
-        <div className="pt-6 flex justify-center">
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => setVisibleCount(prev => prev + 4)}
-            className="px-8 py-3 bg-white border border-gray-100 rounded-full shadow-sm text-[10px] font-black uppercase tracking-widest text-primary hover:bg-primary hover:text-white transition-all"
-          >
-            See More Orders
-          </motion.button>
-        </div>
-      )}
+      {/* --- Cancel Modal --- */}
+      <AnimatePresence>
+        {orderToCancel && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white rounded-[2rem] p-8 max-w-sm w-full shadow-2xl text-center"
+            >
+              <div className="w-14 h-14 bg-red-100 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <AlertCircle size={28} />
+              </div>
+
+              <h2 className="text-base font-black text-black uppercase">Cancel Order?</h2>
+              <p className="text-[11px] text-gray-500 mt-2 font-medium">
+                Are you sure you want to cancel this order?
+              </p>
+
+              <div className="grid grid-cols-2 gap-3 mt-8">
+                {/* Cancel Button - Disabled during API call */}
+                <button
+                  onClick={() => setOrderToCancel(null)}
+                  disabled={isCancelling}
+                  className={`py-3 rounded-2xl text-[9px] font-black uppercase transition-all ${isCancelling ? "bg-gray-50 text-gray-300" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                    }`}
+                >
+                  Close
+                </button>
+
+                {/* Confirm Button - Shows loading state */}
+                <button
+                  onClick={async () => {
+                    // onSuccess ലഭിക്കുന്നത് വരെ മോഡൽ ക്ലോസ് ചെയ്യില്ല
+                    cancelOrder(orderToCancel, {
+                      onSuccess: () => {
+                        setOrderToCancel(null);
+                      }
+                    });
+                  }}
+                  disabled={isCancelling}
+                  className={`py-3 rounded-2xl text-[9px] font-black uppercase shadow-lg transition-all flex items-center justify-center gap-2 ${isCancelling
+                    ? "bg-red-300 text-white shadow-none cursor-not-allowed"
+                    : "bg-red-500 text-white hover:bg-red-600 shadow-red-100"
+                    }`}
+                >
+                  {isCancelling ? (
+                    <>
+                      <div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      Wait...
+                    </>
+                  ) : (
+                    "Yes, Cancel"
+                  )}
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
