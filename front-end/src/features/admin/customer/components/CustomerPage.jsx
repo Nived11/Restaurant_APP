@@ -23,7 +23,7 @@ const CustomerPage = () => {
   return (
     <div className="w-full min-h-screen bg-[#FDFDFD] font-sans text-[#2D3748] flex flex-col" onClick={() => setIsFilterOpen(false)}>
       
-      {/* ✅ NORMAL HEADER (Removed 'sticky top-0 z-50') */}
+      {/* HEADER */}
       <div className="bg-white/80 backdrop-blur-xl border-b border-gray-100 px-4 md:px-12 py-5">
         <div className="max-w-[1440px] mx-auto flex items-center justify-between gap-4">
           <div>
@@ -97,7 +97,7 @@ const CustomerPage = () => {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-gray-50/50 border-b border-gray-50">
-                  <th className="py-6 px-10 text-[10px] font-black text-gray-400 uppercase tracking-widest">Profile</th>
+                  <th className="py-6 px-10 text-[10px] font-black text-gray-400 uppercase tracking-widest">Profile & Contact</th>
                   <th className="py-6 px-8 text-[10px] font-black text-gray-400 uppercase tracking-widest">Engagement</th>
                   <th className="py-6 px-10 text-[10px] font-black text-gray-400 uppercase tracking-widest text-right">Actions</th>
                 </tr>
@@ -116,7 +116,11 @@ const CustomerPage = () => {
                         </div>
                         <div>
                           <h3 className="font-bold text-[#1A202C]">{customer.first_name} {customer.last_name}</h3>
-                          <p className="text-xs text-gray-400">{customer.email}</p>
+                          {/* ✅ ADDED PHONE NUMBER HERE */}
+                          <div className="flex flex-col gap-1 mt-1">
+                            <p className="text-xs text-gray-400 flex items-center gap-1.5"><Mail size={12}/> {customer.email || 'No email'}</p>
+                            <p className="text-xs text-gray-400 flex items-center gap-1.5"><Phone size={12}/> {customer.phone_number}</p>
+                          </div>
                         </div>
                       </div>
                     </td>
@@ -144,17 +148,21 @@ const CustomerPage = () => {
               <div className="p-5"><CustomerSkeleton /></div>
             ) : customers.map((customer) => (
               <div key={customer.id} className="p-5 flex flex-col gap-4">
-                <div className="flex items-center gap-4">
-                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center font-bold text-lg ${customer.is_blocked ? 'bg-red-50 text-red-400' : 'bg-[#f9a602]/10 text-[#f9a602]'}`}>
+                <div className="flex items-start gap-4">
+                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center font-bold text-lg shrink-0 ${customer.is_blocked ? 'bg-red-50 text-red-400' : 'bg-[#f9a602]/10 text-[#f9a602]'}`}>
                     {customer.first_name?.charAt(0).toUpperCase()}
                   </div>
-                  <div className="flex-1">
-                    <h3 className="font-bold text-sm text-[#1A202C]">{customer.first_name} {customer.last_name}</h3>
-                    <p className="text-[11px] text-gray-400 truncate max-w-[180px]">{customer.email}</p>
+                  <div className="flex-1 overflow-hidden">
+                    <h3 className="font-bold text-sm text-[#1A202C] truncate">{customer.first_name} {customer.last_name}</h3>
+                    {/* ✅ ADDED PHONE NUMBER HERE */}
+                    <div className="flex flex-col gap-0.5 mt-1">
+                      <p className="text-[11px] text-gray-400 truncate flex items-center gap-1"><Mail size={10}/> {customer.email || 'N/A'}</p>
+                      <p className="text-[11px] text-gray-400 truncate flex items-center gap-1"><Phone size={10}/> {customer.phone_number}</p>
+                    </div>
                   </div>
                   <button 
                     onClick={() => { setUserToToggle(customer); setShowBlockModal(true); }}
-                    className={`px-4 py-2 rounded-lg text-[9px] font-bold uppercase ${customer.is_blocked ? 'bg-emerald-500 text-white' : 'border border-red-100 text-red-500'}`}
+                    className={`px-4 py-2 rounded-lg text-[9px] font-bold uppercase shrink-0 ${customer.is_blocked ? 'bg-emerald-500 text-white' : 'border border-red-100 text-red-500'}`}
                   >
                     {customer.is_blocked ? 'Unblock' : 'Block'}
                   </button>
