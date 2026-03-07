@@ -135,7 +135,7 @@ const ProductSection = () => {
             onClose={() => { resetForm(); setIsModalOpen(false); }} 
             onSubmit={async (e) => {
               const success = await handleSubmit(e);
-              if (success) setIsModalOpen(false);
+              if (success) setIsModalOpen(true); // Keep modal open if submission is successful to show success message, otherwise close it
             }}
           />
         )}

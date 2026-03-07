@@ -31,15 +31,20 @@ export const useSettings = () => {
   const [searchResults, setSearchResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [error, setError] = useState(null);
 
   const fetchSettings = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
     try {
       const response = await api.get('/site-settings/info/');
       if (response.data) {
         setSettings(prev => ({ ...prev, ...response.data }));
       }
     } catch (error) {
-      toast.error(extractErrorMessages(error));
+     const msg = extractErrorMessages(error);
+      setError(msg); 
+      toast.error(msg);
     } finally {
       setIsLoading(false);
     }
@@ -158,7 +163,7 @@ export const useSettings = () => {
   }, [searchQuery]);
 
   return {
-    settings, isLoading, isSaving, isLocating, getCurrentLocation,
+    settings, isLoading,error, fetchSettings, isSaving, isLocating, getCurrentLocation,
     handleChange, handleNestedChange, handleMapClick, saveSettings,
     toggleShopStatus, searchQuery, setSearchQuery, searchResults, 
     isSearching, showDropdown, setShowDropdown
