@@ -11,22 +11,45 @@ const locationSlice = createSlice({
       lng: null,
       pincode: ""
     },
-    isChecking: false,
+    workingHours: null, 
+    isOpen: true, // പുതിയ സ്റ്റേറ്റ്
+    isChecking: true, 
     errorPopup: null, 
   },
   reducers: {
     setLocation: (state, action) => {
-      state.currentLocation = action.payload;
+      const data = action.payload;
+      const { workingHours, isOpen, ...locationData } = data;
+      
+      state.currentLocation = {
+        ...state.currentLocation,
+        ...locationData
+      };
+      
+      if (workingHours) {
+        state.workingHours = workingHours;
+      }
+
+      if (isOpen !== undefined) {
+        state.isOpen = isOpen;
+      }
+      
       state.isChecking = false;
       state.errorPopup = null;
       
-      localStorage.setItem("user_location", JSON.stringify(action.payload));
+      localStorage.setItem("user_location", JSON.stringify(state.currentLocation));
     },
     setChecking: (state, action) => {
       state.isChecking = action.payload;
     },
     setErrorPopup: (state, action) => {
-      state.errorPopup = action.payload;
+      if (typeof action.payload === 'object' && action.payload.workingHours) {
+          state.workingHours = action.payload.workingHours;
+          state.errorPopup = action.payload.message;
+          if (action.payload.isOpen !== undefined) state.isOpen = action.payload.isOpen;
+      } else {
+          state.errorPopup = action.payload;
+      }
       state.isChecking = false;
     },
     clearError: (state) => {

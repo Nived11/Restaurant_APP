@@ -1,28 +1,28 @@
-import { Bell } from "lucide-react";
+import ShopStatus from "./ShopStatus";
+import NotificationBadge from "./NotificationBadge";
+import { useSettings } from "../../features/admin/settings/hooks/useSettings";
 
-const AdminHeader = ({ user }) => {
-  const notificationCount = 5;
+const AdminHeader = ({ user , shopData}) => {
+
 
   return (
     <header className="h-24 bg-[#1A1A1A] border-b border-white/5 sticky top-0 z-40 px-6 md:px-10 flex items-center justify-end shadow-2xl">
       
-      <div className="flex items-center gap-8">
+      <div className="flex items-center gap-6">
         
-        {/* --- NOTIFICATION --- */}
-        <button className="cursor-pointer relative p-3.5 bg-white/5 border border-white/10 text-white hover:border-primary hover:bg-white/10 transition-all duration-300 group rounded-2xl">
-          <Bell size={20} className="group-hover:rotate-12 transition-transform text-primary group-hover:text-primary" />
-          
-          {notificationCount > 0 && (
-            <span className="absolute -top-1.5 -right-1.5 min-w-[20px] h-5 bg-primary text-[#1A1A1A] text-[10px] font-black px-1 flex items-center justify-center rounded-lg border-2 border-[#1A1A1A] shadow-lg uppercase">
-              {notificationCount}
-            </span>
-          )}
-        </button>
+     <ShopStatus 
+  isOpen={shopData?.settings?.isOpen} 
+  isManuallyOpen={shopData?.settings?.isManuallyOpen}
+  onToggle={shopData?.toggleShopStatus} 
+  isUpdating={shopData?.isLoading}
+  openingTime={shopData?.settings?.openingTime}
+  closingTime={shopData?.settings?.closingTime}
+/>
+          <NotificationBadge />
 
         {/* --- PROFILE SECTION --- */}
         <div className="flex items-center gap-5 pl-8 border-l border-white/10">
           <div className="text-right hidden sm:block">
-            {/* --- DISPLAYING MODE BASED ON ROLE --- */}
             <p className="text-[13px] font-black text-white leading-tight uppercase tracking-widest ">
               {user?.role === "admin" ? "Admin" : "Staff"} <span className="text-primary not-italic">Mode</span>
             </p>
@@ -42,7 +42,6 @@ const AdminHeader = ({ user }) => {
                 className="w-full h-full object-cover"
               />
             </div>
-            {/* Online Status Indicator */}
             <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-500 border-[3px] border-[#1A1A1A] rounded-full shadow-sm"></div>
           </div>
         </div>

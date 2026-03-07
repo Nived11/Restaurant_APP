@@ -3,14 +3,20 @@ import { useDispatch } from 'react-redux';
 import { clearCart } from '../../../../redux/cartSlice'; 
 import { MapPin, ShoppingBag, Banknote, ChevronLeft, CheckCircle2, Timer } from 'lucide-react';
 import { useOrder } from '../hook/useOrder';
+import { toast } from 'sonner';
 
-export const OrderSection = ({ selectedAddress, cartItems, subTotal, totalAmount, onPlaceOrder, onBack, setIsOrderProcessing }) => {
+
+export const OrderSection = ({ selectedAddress, cartItems, subTotal, totalAmount, onPlaceOrder, onBack, setIsOrderProcessing ,isStoreClosed}) => {
   const { placeOrder, isSubmitting } = useOrder();
   const dispatch = useDispatch(); 
 
   const finalPayable = subTotal;
 
   const handleConfirmOrder = async () => {
+    if (isStoreClosed) {
+      toast.error("Sorry, the store just closed. We cannot accept this order now.");
+      return;
+    }
     setIsOrderProcessing(true);
 
     const result = await placeOrder(selectedAddress, cartItems, finalPayable);
@@ -122,11 +128,11 @@ export const OrderSection = ({ selectedAddress, cartItems, subTotal, totalAmount
 
             <div className="relative z-10 space-y-2 mt-8">
               <button 
-                onClick={handleConfirmOrder} 
-                disabled={isSubmitting}
+               onClick={handleConfirmOrder} 
+      disabled={isSubmitting || isStoreClosed}
                 className="cursor-pointer w-full bg-[#f9a602] text-black py-4 md:py-5 rounded-2xl font-black uppercase tracking-widest text-[10px] md:text-xs hover:bg-primary/80 transition-all active:scale-95 shadow-lg flex items-center justify-center gap-3 disabled:opacity-50"
               >
-                Place Order Now
+              {isStoreClosed ? "Store Closed" : "Place Order Now"}
               </button>
 
               <button 

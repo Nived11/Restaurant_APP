@@ -18,7 +18,6 @@ export const AddressSection = ({ selectedAddress, setSelectedAddress, onNext, on
   const dispatch = useDispatch();
   const { errorPopup } = useSelector((state) => state.location);
 
-  // Default address സെലക്ട് ചെയ്യാൻ വേണ്ടിയുള്ള useEffect
   useEffect(() => {
     if (addresses && addresses.length > 0 && !selectedAddress) {
       const defaultAddr = addresses.find(addr => addr.is_default) || addresses[0];
@@ -43,12 +42,19 @@ export const AddressSection = ({ selectedAddress, setSelectedAddress, onNext, on
     setShowForm(true);
   };
 
+  // 1. handleFormSubmit
   const handleFormSubmit = async (data) => {
     try {
+      let updatedAddr;
       if (editingAddress) {
-        await updateAddress({ id: editingAddress.id, data });
+        updatedAddr = await updateAddress({ id: editingAddress.id, data });
+
+        if (selectedAddress?.id === editingAddress.id) {
+          setSelectedAddress(updatedAddr);
+        }
       } else {
-        await addAddress(data);
+        updatedAddr = await addAddress(data);
+        setSelectedAddress(updatedAddr);
       }
       setShowForm(false);
     } catch (err) {
@@ -63,7 +69,7 @@ export const AddressSection = ({ selectedAddress, setSelectedAddress, onNext, on
     }
 
     if (!selectedAddress.latitude || !selectedAddress.longitude) {
-      toast.error("Location details missing");
+      toast.error("Location details missing. Please edit address.");
       handleEdit(null, selectedAddress);
       return;
     }
@@ -71,7 +77,11 @@ export const AddressSection = ({ selectedAddress, setSelectedAddress, onNext, on
     setIsVerifying(true);
     try {
       const isDeliverable = await dispatch(
-        handleLocationUpdate(selectedAddress.latitude, selectedAddress.longitude, true)
+        handleLocationUpdate(
+          Number(selectedAddress.latitude),
+          Number(selectedAddress.longitude),
+          false
+        )
       );
 
       if (isDeliverable) {
@@ -99,12 +109,12 @@ export const AddressSection = ({ selectedAddress, setSelectedAddress, onNext, on
     <div className="space-y-6 md:space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
       {/* Heading Section */}
       <div className="flex items-center justify-between border-b border-gray-100 pb-4">
-        <h2 className="text-xl md:text-3xl font-black uppercase tracking-tight italic text-black">
+        <h2 className="text-md md:text-3xl font-black uppercase tracking-tight italic text-black">
           Delivery <span className="text-[#f9a602]">Address</span>
         </h2>
         <button
           onClick={handleAddNew}
-          className="cursor-pointer group flex items-center gap-1.5 px-4 py-2.5 bg-gray-100 rounded-xl text-[9px] md:text-[10px] font-black uppercase tracking-widest text-gray-600 hover:bg-black hover:text-[#f9a602] transition-all"
+          className="cursor-pointer group flex items-center gap-1.5 px-4 py-2.5 bg-gray-100 rounded-xl text-[8px] md:text-[10px] font-black uppercase tracking-widest text-gray-600 hover:bg-black hover:text-[#f9a602] transition-all"
         >
           <Plus size={14} className="group-hover:rotate-90 transition-transform" />
           Add New
@@ -126,8 +136,8 @@ export const AddressSection = ({ selectedAddress, setSelectedAddress, onNext, on
                 key={addr.id}
                 onClick={() => setSelectedAddress(addr)}
                 className={`p-5 md:p-8 rounded-[1.8rem] md:rounded-[2.5rem] border-2 cursor-pointer transition-all duration-300 group relative overflow-hidden min-h-[140px] md:min-h-[160px] flex flex-col justify-center ${selectedAddress?.id === addr.id
-                    ? 'border-black bg-white shadow-xl ring-1 ring-black/5'
-                    : 'border-gray-200 bg-white hover:border-gray-400 shadow-sm'
+                  ? 'border-black bg-white shadow-xl ring-1 ring-black/5'
+                  : 'border-gray-200 bg-white hover:border-gray-400 shadow-sm'
                   }`}
               >
                 {/* Edit Icon - Top Right with safe padding */}

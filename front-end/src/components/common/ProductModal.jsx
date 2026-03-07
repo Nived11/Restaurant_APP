@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Plus, Minus, ShoppingBag, Leaf, Flame, Clock, Tag, ArrowRight, PlusCircle, AlertCircle } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { toast } from "sonner";
 import { useDispatch, useSelector } from "react-redux";
 import { addToCart, syncCartUpdate } from "../../redux/cartSlice"; 
@@ -12,6 +12,7 @@ const ProductModal = ({ item, onClose }) => {
   const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
 
   const cartItems = useSelector((state) => state.cart.items);
+  const { workingHours, isOpen } = useSelector((state) => state.location); 
   const existingInCart = cartItems.find((i) => i.id === item.id);
 
   const alreadyInCartQty = existingInCart ? existingInCart.quantity : 0;
@@ -20,6 +21,9 @@ const ProductModal = ({ item, onClose }) => {
 
   const [quantity, setQuantity] = useState(maxAvailableToAdd > 0 ? 1 : 0);
   const [isAdded, setIsAdded] = useState(false);
+
+  // സങ്കീർണ്ണമായ Time Calculation മാറ്റി ബാക്കെൻഡ് റിസൾട്ട് ഉപയോഗിക്കുന്നു
+  const isStoreClosed = isOpen === false;
 
   useEffect(() => {
     document.body.style.overflow = "hidden";
@@ -43,6 +47,11 @@ const ProductModal = ({ item, onClose }) => {
   };
 
   const handleAddToCart = () => {
+    if (isStoreClosed) {
+      toast.error("Store is currently closed!");
+      return;
+    }
+
     if (quantity > 0) {
       dispatch(addToCart({ item, quantity }));
 
@@ -120,7 +129,7 @@ const ProductModal = ({ item, onClose }) => {
           <X size={isMobile ? 16 : 22} />
         </button>
 
-        <div className="w-full md:w-[45%] h-60  md:h-[506px] relative shrink-0 overflow-hidden">
+        <div className="w-full md:w-[45%] h-60  md:h-[520px] relative shrink-0 overflow-hidden">
           <img
             src={item.image}
             alt={item.name}
@@ -168,6 +177,13 @@ const ProductModal = ({ item, onClose }) => {
             </div>
 
             <div className="mt-1 pt-4 border-t border-primary/20 ">
+              {isStoreClosed && !isAdded && (
+                <div className="flex items-center gap-2 text-red-600 mb-4">
+                  <Clock size={14} />
+                  <span className="text-[10px] font-black uppercase tracking-tight">Store is Closed</span>
+                </div>
+              )}
+
               {isAdded || maxAvailableToAdd > 0 ? (
                 <>
                   <div className="flex items-center justify-between mb-4 md:mb-6">
@@ -182,7 +198,7 @@ const ProductModal = ({ item, onClose }) => {
                       <button
                         onClick={handleDecrease}
                         className="cursor-pointer w-8 h-8 flex items-center justify-center bg-white rounded-lg shadow-sm active:scale-90"
-                        disabled={quantity <= 1 || isAdded}
+                        disabled={quantity <= 1 || isAdded || isStoreClosed}
                       >
                         <Minus size={14} strokeWidth={3} />
                       </button>
@@ -191,9 +207,9 @@ const ProductModal = ({ item, onClose }) => {
                       </span>
                       <button
                         onClick={handleIncrease}
-                        className={`cursor-pointer w-8 h-8 flex items-center justify-center rounded-lg shadow-sm active:scale-90 transition-all ${quantity >= maxAvailableToAdd || isAdded ? 'bg-gray-300 text-gray-500' : 'bg-white text-black'
+                        className={`cursor-pointer w-8 h-8 flex items-center justify-center rounded-lg shadow-sm active:scale-90 transition-all ${quantity >= maxAvailableToAdd || isAdded || isStoreClosed ? 'bg-gray-300 text-gray-500' : 'bg-white text-black'
                           }`}
-                        disabled={isAdded}
+                        disabled={isAdded || isStoreClosed}
                       >
                         <Plus size={14} strokeWidth={3} />
                       </button>
@@ -204,10 +220,12 @@ const ProductModal = ({ item, onClose }) => {
                     <motion.button
                       whileTap={{ scale: 0.98 }}
                       onClick={handleAddToCart}
-                      className="cursor-pointer w-full bg-slate-900 text-white font-black py-3 md:py-5 rounded-xl md:rounded-2xl flex items-center justify-center gap-2 md:gap-3 shadow-xl text-[10px] md:text-sm uppercase tracking-widest hover:bg-primary transition-all duration-300"
+                      disabled={isStoreClosed}
+                      className={`cursor-pointer w-full font-black py-3 md:py-5 rounded-xl md:rounded-2xl flex items-center justify-center gap-2 md:gap-3 shadow-xl text-[10px] md:text-sm uppercase tracking-widest transition-all duration-300 
+                        ${isStoreClosed ? 'bg-gray-400 text-white cursor-not-allowed' : 'bg-slate-900 text-white hover:bg-primary'}`}
                     >
                       <ShoppingBag size={16} strokeWidth={2.5} />
-                      Add to Cart
+                      {isStoreClosed ? "Store Closed" : "Add to Cart"}
                     </motion.button>
                   ) : (
                     <div className="flex flex-col sm:flex-row gap-3">

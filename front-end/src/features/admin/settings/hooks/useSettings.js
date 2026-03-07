@@ -6,11 +6,19 @@ import { extractErrorMessages } from '../../../../utils/extractErrorMessages';
 
 export const useSettings = () => {
   const [settings, setSettings] = useState({
-    appName: "", email: "", phone: "", 
-    address: "", 
-    type_address: "", 
-    latitude: null, longitude: null, deliveryRadius: 0,
+    appName: "",
+    email: "",
+    phone: "",
+    address: "",
+    type_address: "",
+    latitude: null,
+    longitude: null,
+    deliveryRadius: 0,
     footerDescription: "",
+    openingTime: "10:00:00",
+    closingTime: "02:00:00",
+    isManuallyOpen: true,
+    isOpen: true,
     workingHours: { weekdays: "", sunday: "" },
     socials: { instagram: "", facebook: "", twitter: "", whatsapp: "" }
   });
@@ -19,7 +27,6 @@ export const useSettings = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [isLocating, setIsLocating] = useState(false);
 
-  // --- MAP SEARCH STATES ---
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
@@ -28,10 +35,11 @@ export const useSettings = () => {
   const fetchSettings = useCallback(async () => {
     try {
       const response = await api.get('/site-settings/info/');
-      if (response.data) setSettings(prev => ({ ...prev, ...response.data }));
+      if (response.data) {
+        setSettings(prev => ({ ...prev, ...response.data }));
+      }
     } catch (error) {
-      const errorMessage = extractErrorMessages(error);
-      toast.error(errorMessage);
+      toast.error(extractErrorMessages(error));
     } finally {
       setIsLoading(false);
     }
@@ -52,143 +60,107 @@ export const useSettings = () => {
     }));
   };
 
-  const truncateCoordinate = (coord) => {
-    if (coord === null || coord === undefined || coord === "") return null;
-    return Number(Number(coord).toFixed(6));
-  };
+  const toggleShopStatus = useCallback(async () => {
+    const previousStatus = settings.isManuallyOpen;
+    const newStatus = !previousStatus;
+    setSettings(prev => ({ ...prev, isManuallyOpen: newStatus }));
 
-  // --- LOCATION IQ SEARCH LOGIC ---
-  useEffect(() => {
-    const fetchSearchResults = async () => {
-      if (searchQuery.trim().length < 3) {
-        setSearchResults([]);
-        return;
-      }
-      
-      setIsSearching(true);
-      try {
-        const TOKEN = import.meta.env.VITE_LOCATION_IQ_TOKEN;
-        const response = await fetch(`https://us1.locationiq.com/v1/search.php?key=${TOKEN}&q=${searchQuery}&format=json&addressdetails=1&limit=5`);
-        
-        if (response.ok) {
-          const data = await response.json();
-          setSearchResults(Array.isArray(data) ? data : []);
-          setShowDropdown(true);
-        }
-      } catch (error) {
-        console.error("Search API Error:", error);
-      } finally {
-        setIsSearching(false);
-      }
-    };
-
-    const delayDebounceFn = setTimeout(() => {
-      fetchSearchResults();
-    }, 500);
-
-    return () => clearTimeout(delayDebounceFn);
-  }, [searchQuery]);
-
-  const handleSelectSearchResult = useCallback((result) => {
-    const lat = parseFloat(result.lat);
-    const lon = parseFloat(result.lon);
-    
-    handleChange('latitude', lat);
-    handleChange('longitude', lon);
-    handleChange('address', result.display_name); 
-    
-    setSearchQuery(result.display_name); 
-    setShowDropdown(false);
-  }, []);
-
-  const handleMapClick = async (lat, lng, isMapLocked) => {
-    if (isMapLocked) return;
-
-    handleChange('latitude', lat);
-    handleChange('longitude', lng);
-    
     try {
-      const locationData = await fetchLocationDetails(lat, lng);
-      if (locationData && locationData.formattedAddress) {
-        handleChange('address', locationData.formattedAddress);
-        setSearchQuery(""); 
+      const response = await api.put('/site-settings/info/', {
+        ...settings,
+        isManuallyOpen: newStatus 
+      });
+      if (response.data) {
+        setSettings(prev => ({ ...prev, ...response.data }));
       }
+      toast.success(`Shop is now manually ${newStatus ? 'OPEN' : 'CLOSED'}`);
     } catch (error) {
-      console.error("Error fetching location details:", error);
+      setSettings(prev => ({ ...prev, isManuallyOpen: previousStatus }));
+      toast.error("Could not update shop status");
     }
-  };
+  }, [settings]);
 
-  const handleGetCurrentLocation = useCallback(() => {
-    setIsLocating(true);
-    if ("geolocation" in navigator) {
-      navigator.geolocation.getCurrentPosition(
-        async (position) => {
-          const lat = position.coords.latitude;
-          const lng = position.coords.longitude;
-          handleChange('latitude', lat);
-          handleChange('longitude', lng);
-          try {
-            const locationData = await fetchLocationDetails(lat, lng);
-            if (locationData && locationData.formattedAddress) {
-              handleChange('address', locationData.formattedAddress);
-              setSearchQuery("");
-            }
-          } catch (error) {
-            console.error("Address fetch error", error);
-          }
-          toast.success("Location fetched!");
-          setIsLocating(false);
-        },
-        () => {
-          toast.error("Location access denied.");
-          setIsLocating(false);
-        },
-        { enableHighAccuracy: true }
-      );
-    }
-  }, []);
-
-  const saveSettings = useCallback(async (e) => {
-    if (e) e.preventDefault();
+  const saveSettings = useCallback(async () => {
     setIsSaving(true);
-    const toastId = toast.loading("Saving settings...");
-
+    const toastId = toast.loading("Updating settings...");
     try {
-      const cleanNested = (obj) => {
-        const filtered = {};
-        Object.keys(obj || {}).forEach(key => {
-          if (obj[key] && String(obj[key]).trim() !== "") filtered[key] = obj[key];
-        });
-        return filtered;
+      const ensureSeconds = (timeStr) => {
+        if (!timeStr) return null;
+        const parts = timeStr.split(':');
+        if (parts.length === 2) return `${timeStr}:00`;
+        return timeStr;
       };
 
       const payload = {
         ...settings,
-        deliveryRadius: Number(settings.deliveryRadius) || 0,
-        latitude: truncateCoordinate(settings.latitude),
-        longitude: truncateCoordinate(settings.longitude),
-        workingHours: cleanNested(settings.workingHours),
-        socials: cleanNested(settings.socials)
+        deliveryRadius: parseInt(settings.deliveryRadius) || 0,
+        latitude: settings.latitude ? parseFloat(settings.latitude) : null,
+        longitude: settings.longitude ? parseFloat(settings.longitude) : null,
+        openingTime: ensureSeconds(settings.openingTime),
+        closingTime: ensureSeconds(settings.closingTime),
       };
 
       const response = await api.put('/site-settings/info/', payload);
-      
-      if (response.status === 200 || response.status === 201) {
+      if (response.data) {
         setSettings(prev => ({ ...prev, ...response.data }));
-        toast.success("Settings saved successfully! ✅", { id: toastId });
       }
+      toast.success("Details updated successfully!", { id: toastId });
     } catch (error) {
-      const errorMessage = extractErrorMessages(error);
-      toast.error(errorMessage, { id: toastId });
+      toast.error(extractErrorMessages(error), { id: toastId });
     } finally {
       setIsSaving(false);
     }
   }, [settings]);
 
+  const handleMapClick = async (lat, lng, isLocked) => {
+    if (isLocked) return;
+    const fixedLat = parseFloat(lat.toFixed(6));
+    const fixedLng = parseFloat(lng.toFixed(6));
+    setSettings(prev => ({ ...prev, latitude: fixedLat, longitude: fixedLng }));
+    try {
+      const locationData = await fetchLocationDetails(fixedLat, fixedLng);
+      if (locationData?.formattedAddress) {
+        setSettings(prev => ({ ...prev, address: locationData.formattedAddress }));
+        setSearchQuery("");
+      }
+    } catch (error) { console.error(error); }
+  };
+
+  const getCurrentLocation = useCallback(() => {
+    if (!navigator.geolocation) { toast.error("Geolocation not supported"); return; }
+    setIsLocating(true);
+    navigator.geolocation.getCurrentPosition(async (pos) => {
+        await handleMapClick(pos.coords.latitude, pos.coords.longitude, false);
+        setIsLocating(false);
+        toast.success("Location updated!");
+      }, () => { setIsLocating(false); toast.error("Location access denied"); }
+    );
+  }, [handleMapClick]);
+
+  useEffect(() => {
+    const delayDebounceFn = setTimeout(async () => {
+      if (searchQuery.trim().length < 3) {
+        setSearchResults([]);
+        setShowDropdown(false);
+        return;
+      }
+      setIsSearching(true);
+      try {
+        const TOKEN = import.meta.env.VITE_LOCATION_IQ_TOKEN;
+        const res = await fetch(`https://us1.locationiq.com/v1/search.php?key=${TOKEN}&q=${searchQuery}&format=json&limit=5`);
+        if (res.ok) {
+          setSearchResults(await res.json());
+          setShowDropdown(true);
+        }
+      } catch (e) { console.error(e); } finally { setIsSearching(false); }
+    }, 600);
+    return () => clearTimeout(delayDebounceFn);
+  }, [searchQuery]);
+
   return {
-    settings, isLoading, isSaving, isLocating, 
-    handleChange, handleNestedChange, handleGetCurrentLocation, saveSettings,
-    searchQuery, setSearchQuery, searchResults, isSearching,
-    showDropdown, setShowDropdown, handleSelectSearchResult, handleMapClick
+    settings, isLoading, isSaving, isLocating, getCurrentLocation,
+    handleChange, handleNestedChange, handleMapClick, saveSettings,
+    toggleShopStatus, searchQuery, setSearchQuery, searchResults, 
+    isSearching, showDropdown, setShowDropdown
   };
 };
