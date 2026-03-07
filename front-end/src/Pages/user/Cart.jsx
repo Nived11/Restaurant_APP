@@ -92,9 +92,11 @@ export default function Cart() {
             onPlaceOrder={handlePlaceOrder} onBack={() => handleBack(2)} 
             selectedAddress={selectedAddress} 
             setIsOrderProcessing={setIsOrderProcessing} 
+            isStoreClosed={isStoreClosed}
           />
         )}
       </main>
     </div>
   );
 }
+

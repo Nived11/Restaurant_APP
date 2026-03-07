@@ -6,7 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Provider, useSelector } from "react-redux";
 import { store } from "./redux/store";
 import { AnimatePresence } from "framer-motion"; 
-import SiteLaunchLoader from "./components/common/SiteLaunchLoader"; 
+import SiteLaunchLoader from "./components/ui/SiteLaunchLoader"; 
 
 const queryClient = new QueryClient();
 

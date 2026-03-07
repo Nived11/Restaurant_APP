@@ -40,12 +40,14 @@ export const CartSection = ({
   onNext,
   loading,
   error,
+  // Cart.js-ൽ നിന്ന് വരുന്നത് isStoreClosed ആയതുകൊണ്ട് അത് തന്നെ ഇവിടെയും ഉപയോഗിക്കുന്നു
   isStoreClosed 
 }) => {
   const isCartEmpty = cartItems.length === 0;
 
   if (error) return <ErrorState message={error} />;
 
+  // isStoreClosed പ്രോപ്പർട്ടി ആയി കിട്ടുന്നതിനാൽ പ്രത്യേകം വേരിയബിൾ ആവശ്യമില്ല
   const isDisableConfirm = cartItems.some(item => item.isOutOfStock) || isStoreClosed;
 
   return (
@@ -125,13 +127,6 @@ export const CartSection = ({
             <div className="bg-white border-2 border-gray-100 rounded-[2.5rem] p-6 md:p-8 shadow-sm relative overflow-hidden">
               <ReceiptText className="absolute left-0 -top-4 text-primary/10 w-24 h-24 -rotate-30" />
               
-              {isStoreClosed && (
-                <div className="relative z-20 mb-4 p-3 bg-red-50 border border-red-100 rounded-2xl flex items-center gap-2 text-red-600">
-                  <Clock size={16} />
-                  <span className="text-[10px] font-black uppercase tracking-tight">Store is Closed for Orders</span>
-                </div>
-              )}
-
               <h4 className="relative z-10 text-[10px] font-black text-gray-600 uppercase tracking-[0.2em] mb-6">Order Summary</h4>
               
               <div className="relative z-10 space-y-3">
@@ -151,14 +146,24 @@ export const CartSection = ({
                 </div>
               </div>
 
-              <button 
-                onClick={onNext} 
-                disabled={isDisableConfirm}
-                className={`w-full py-4 rounded-2xl font-black uppercase tracking-[0.2em] text-[10px] mt-8 flex items-center justify-center gap-3 shadow-lg transition-all
-                  ${isDisableConfirm ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : 'bg-black text-white hover:bg-[#f9a602] hover:text-black active:scale-95'}`}
-              >
-                {isStoreClosed ? "Store Closed" : "Confirm Items"} <ArrowRight size={14}/>
-              </button>
+              {/* Error/Status Message right above the button */}
+              <div className="mt-8 relative z-10 space-y-2">
+                {isStoreClosed && (
+                  <div className="p-3 bg-red-50 border border-red-200 rounded-2xl flex items-center gap-2 text-red-600">
+                    <Clock size={16} className="shrink-0" />
+                    <span className="text-[9px] font-black uppercase tracking-tight">Store is closed.</span>
+                  </div>
+                )}
+
+                <button 
+                  onClick={onNext} 
+                  disabled={isDisableConfirm}
+                  className={`w-full py-4 rounded-2xl font-black uppercase tracking-[0.2em] text-[10px] flex items-center justify-center gap-3 shadow-lg transition-all
+                    ${isDisableConfirm ? 'bg-black text-white  cursor-not-allowed border border-gray-100' : 'bg-black text-white hover:bg-[#f9a602] hover:text-black active:scale-95'}`}
+                >
+                  {isStoreClosed ? "Store Closed" : "Confirm Items"} <ArrowRight size={14}/>
+                </button>
+              </div>
             </div>
           </div>
         )}

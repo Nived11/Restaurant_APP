@@ -31,7 +31,7 @@ export const useSiteInfo = () => {
     },
    
     placeholderData: DEFAULT_INFO,
-    staleTime: 1000 * 60 * 5,
+    staleTime: 0,
     retry: 1, 
   });
 };

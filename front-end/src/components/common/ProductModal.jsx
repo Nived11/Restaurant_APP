@@ -12,7 +12,7 @@ const ProductModal = ({ item, onClose }) => {
   const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
 
   const cartItems = useSelector((state) => state.cart.items);
-  const { workingHours } = useSelector((state) => state.location); 
+  const { workingHours, isOpen } = useSelector((state) => state.location); 
   const existingInCart = cartItems.find((i) => i.id === item.id);
 
   const alreadyInCartQty = existingInCart ? existingInCart.quantity : 0;
@@ -22,37 +22,8 @@ const ProductModal = ({ item, onClose }) => {
   const [quantity, setQuantity] = useState(maxAvailableToAdd > 0 ? 1 : 0);
   const [isAdded, setIsAdded] = useState(false);
 
-  const isStoreClosed = useMemo(() => {
-    if (!workingHours) return false;
-
-    const now = new Date();
-    const day = now.getDay(); 
-    const currentTime = now.getHours() * 60 + now.getMinutes();
-
-    const parseTime = (timeStr) => {
-      if (!timeStr) return 0;
-      const parts = timeStr.trim().split(/\s+/);
-      if (parts.length < 2) return 0;
-      const [time, modifier] = parts;
-      let [hours, minutes] = time.split(":").map(Number);
-      if (modifier === "PM" && hours < 12) hours += 12;
-      if (modifier === "AM" && hours === 12) hours = 0;
-      return hours * 60 + (minutes || 0);
-    };
-
-    try {
-      const hoursStr = day === 0 ? workingHours.sunday : workingHours.weekdays;
-      if (!hoursStr || hoursStr.toLowerCase() === "closed") return true;
-
-      const [startStr, endStr] = hoursStr.split("-").map(s => s.trim());
-      const startTime = parseTime(startStr);
-      const endTime = parseTime(endStr);
-
-      return currentTime < startTime || currentTime > endTime;
-    } catch (e) {
-      return false;
-    }
-  }, [workingHours]);
+  // സങ്കീർണ്ണമായ Time Calculation മാറ്റി ബാക്കെൻഡ് റിസൾട്ട് ഉപയോഗിക്കുന്നു
+  const isStoreClosed = isOpen === false;
 
   useEffect(() => {
     document.body.style.overflow = "hidden";

@@ -1,46 +1,39 @@
 import React, { useState, useEffect } from "react";
-import { useOutletContext, Outlet, useNavigate,useLocation } from "react-router-dom";
+import { useOutletContext, Outlet, useLocation } from "react-router-dom";
 import AdminSidebar from "../components/common/AdminSidebar";
 import AdminHeader from "../components/common/AdminHeader";
-import { Menu, Bell } from "lucide-react";
+import { Menu } from "lucide-react";
 import logoCrunch from "../assets/Logocrunch.png";
-import  api  from "../api/axios";
+import api from "../api/axios";
+import ShopStatus from "../components/common/ShopStatus";
+import NotificationBadge from "../components/common/NotificationBadge";
+import { useSettings } from "../features/admin/settings/hooks/useSettings";
 
 const AdminLayout = () => {
   const { user } = useOutletContext();
+  
+  // സിംഗിൾ സോഴ്സ് ഓഫ് ട്രൂത്ത് - ലേഔട്ടിൽ മാത്രം ഹുക്ക് വിളിക്കുന്നു
+  const settingsProps = useSettings();
+  const { settings, toggleShopStatus, isLoading } = settingsProps;
+
   const [isExpanded, setIsExpanded] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
   const location = useLocation();
 
   useEffect(() => {
     const verifySession = async () => {
       const token = localStorage.getItem('admin_token');
-      if (!token) {
-        window.location.href = '/admin/login';
-        return;
-      }
-
-      try {
-        await api.get('/auth/verify-session/'); 
-      } catch (error) {
-
-      }
+      if (!token) { window.location.href = '/admin/login'; return; }
+      try { await api.get('/auth/verify-session/'); } catch (error) {}
     };
-
     verifySession();
   }, [location.pathname]);
 
   return (
     <div className="flex h-screen overflow-hidden bg-[#F8F8F8] text-[#1A1A1A] font-sans antialiased">
-      
-      {/* 1. SIDEBAR */}
-      <div 
-        className={`fixed inset-y-0 left-0 z-[100] transition-transform duration-500 
+      <div className={`fixed inset-y-0 left-0 z-[100] transition-transform duration-500 
           ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
-          ${isExpanded ? "lg:w-60" : "lg:w-24"} 
-        `}
-      >
+          ${isExpanded ? "lg:w-60" : "lg:w-24"}`}>
         <AdminSidebar
           isExpanded={isExpanded}
           setIsExpanded={setIsExpanded}
@@ -50,48 +43,39 @@ const AdminLayout = () => {
         />
       </div>
 
-      {/* Mobile Backdrop */}
       {isMobileMenuOpen && (
-        <div
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[90] lg:hidden"
-          onClick={() => setIsMobileMenuOpen(false)}
-        />
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[90] lg:hidden" onClick={() => setIsMobileMenuOpen(false)} />
       )}
 
-      {/* 2. MAIN BODY */}
-      <div className={`flex-1 flex flex-col min-w-0 h-screen transition-all duration-500 
-        ${isExpanded ? "lg:ml-60" : "lg:ml-24"}`}>
-
-        {/* --- HEADER --- */}
+      <div className={`flex-1 flex flex-col min-w-0 h-screen transition-all duration-500 ${isExpanded ? "lg:ml-60" : "lg:ml-24"}`}>
         <header className="lg:hidden h-20 bg-[#1A1A1A] px-6 flex items-center justify-between sticky top-0 z-40 border-b border-white/5 flex-shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 relative  overflow-hidden">
+            <div className="w-12 h-12 relative overflow-hidden">
               <img src={logoCrunch} alt="logo" className="w-full h-full" />
             </div>
           </div>
-
           <div className="flex items-center gap-4">
-            <button className="text-white relative p-2">
-              <Bell size={22} className="text-primary" />
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border-2 border-[#1A1A1A]"></span>
-            </button>
-            <button
-              onClick={() => setIsMobileMenuOpen(true)}
-              className="text-white bg-white/10 p-2 rounded-xl active:scale-95 transition-transform"
-            >
-              <Menu size={24} />
-            </button>
+            <ShopStatus 
+  isOpen={settings.isOpen} 
+  isManuallyOpen={settings.isManuallyOpen} 
+  onToggle={toggleShopStatus} 
+  isUpdating={isLoading}
+  openingTime={settings.openingTime}
+  closingTime={settings.closingTime}
+/>
+            <NotificationBadge />
+            <button onClick={() => setIsMobileMenuOpen(true)} className="text-white bg-white/10 p-2 rounded-xl active:scale-95 transition-transform"><Menu size={24} /></button>
           </div>
         </header>
 
         <div className="hidden lg:block flex-shrink-0">
-          <AdminHeader user={user} />
+          <AdminHeader user={user} shopData={{ settings, toggleShopStatus, isLoading }} />
         </div>
 
-        {/* 4. CONTENT AREA */}
-        <main className="flex-1 overflow-y-auto p-4 md:p-10  bg-white">
-          <div className="max-w-7xl mx-auto ">
-            <Outlet context={{ user }} />
+        <main className="flex-1 overflow-y-auto p-4 md:p-10 bg-white">
+          <div className="max-w-7xl mx-auto">
+            {/* എല്ലാ സെറ്റിംഗ്‌സ് പ്രോപ്‌സും ഇവിടെ പാസ് ചെയ്യുന്നു */}
+            <Outlet context={{ user, ...settingsProps }} />
           </div>
         </main>
       </div>

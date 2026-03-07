@@ -1,40 +1,7 @@
+// locationActions.js
 import { setLocation, setChecking, setErrorPopup } from '../redux/locationSlice';
 import { fetchLocationDetails } from '../utils/addressHelper';
 import api from '../api/axios'; 
-
-const isStoreOpen = (workingHours) => {
-    if (!workingHours) return true;
-    const now = new Date();
-    const day = now.getDay();
-    const currentTime = now.getHours() * 60 + now.getMinutes();
-
-    const parseTime = (timeStr) => {
-        if (!timeStr) return 0;
-        const match = timeStr.trim().match(/(\d+)(?::(\d+))?\s*(AM|PM)/i);
-        if (!match) return 0;
-        
-        let [_, hours, minutes, modifier] = match;
-        hours = parseInt(hours);
-        minutes = minutes ? parseInt(minutes) : 0;
-        
-        if (modifier.toUpperCase() === "PM" && hours < 12) hours += 12;
-        if (modifier.toUpperCase() === "AM" && hours === 12) hours = 0;
-        return hours * 60 + minutes;
-    };
-
-    try {
-        const hoursStr = day === 0 ? workingHours.sunday : workingHours.weekdays;
-        if (!hoursStr || hoursStr.toLowerCase() === "closed") return false;
-        
-        const [startStr, endStr] = hoursStr.split("-").map(s => s.trim());
-        const startTime = parseTime(startStr);
-        const endTime = parseTime(endStr);
-        
-        return currentTime >= startTime && currentTime < endTime;
-    } catch (e) {
-        return true; 
-    }
-};
 
 const calculateDistance = (lat1, lon1, lat2, lon2) => {
     const R = 6371; 
@@ -48,10 +15,7 @@ const calculateDistance = (lat1, lon1, lat2, lon2) => {
 };
 
 export const checkInitialStatus = (isSilent = false, showPopup = true) => async (dispatch, getState) => {
-    if (!isSilent) {
-        dispatch(setChecking(true));
-    }
-    
+    if (!isSilent) dispatch(setChecking(true));
     const minimumDelay = isSilent ? Promise.resolve() : new Promise(resolve => setTimeout(resolve, 2000));
 
     try {
@@ -60,39 +24,42 @@ export const checkInitialStatus = (isSilent = false, showPopup = true) => async 
             minimumDelay
         ]);
 
-        const { workingHours } = response.data;
-        
-        if (workingHours) {
-            const currentLoc = getState().location.currentLocation;
-            dispatch(setLocation({
-                ...currentLoc,
-                workingHours: workingHours
-            }));
-        }
+        const { workingHours, isOpen } = response.data;
+        const currentLoc = getState().location.currentLocation;
 
-        if (!isStoreOpen(workingHours)) {
-            if (showPopup) {
-                dispatch(setErrorPopup({
-                    message: `Sorry, we are currently closed. We'll be back soon!`,
-                    workingHours
-                }));
-            }
+        dispatch(setLocation({
+            ...currentLoc,
+            workingHours,
+            isOpen // Redux-ലേക്ക് അയക്കുന്നു
+        }));
+
+        if (isOpen === false && showPopup) {
+            dispatch(setErrorPopup({
+                message: `Sorry, we are currently closed. We'll be back soon!`,
+                workingHours,
+                isOpen
+            }));
             return "CLOSED";
         }
-
         return "OPEN";
     } catch (error) {
-        console.error("Status check failed", error);
         dispatch(setChecking(false));
         return "ERROR";
     }
 };
-
 export const handleLocationUpdate = (lat, lng, isBackground = false) => async (dispatch) => {
     try {
         const response = await api.get(`/site-settings/info/?t=${new Date().getTime()}`);
         const settings = response.data;
-        const { latitude: SHOP_LAT, longitude: SHOP_LNG, deliveryRadius: MAX_RADIUS, workingHours } = settings;
+        
+        // ബാക്കെൻഡ് തരുന്ന എല്ലാ പ്രധാന ഡാറ്റയും എടുക്കുന്നു
+        const { 
+            latitude: SHOP_LAT, 
+            longitude: SHOP_LNG, 
+            deliveryRadius: MAX_RADIUS, 
+            workingHours,
+            isOpen 
+        } = settings;
 
         const details = await fetchLocationDetails(lat, lng);
         const distance = calculateDistance(lat, lng, SHOP_LAT, SHOP_LNG);
@@ -107,6 +74,18 @@ export const handleLocationUpdate = (lat, lng, isBackground = false) => async (d
 
         dispatch(setLocation(locationData));
 
+        // 1. ആദ്യം ഷോപ്പ് തുറന്നിട്ടുണ്ടോ എന്ന് നോക്കുന്നു
+        if (isOpen === false) {
+            if (!isBackground) {
+                dispatch(setErrorPopup({
+                    message: `Sorry, we are currently closed. We'll be back soon!`,
+                    workingHours
+                }));
+            }
+            return "CLOSED";
+        }
+
+        // 2. രണ്ടാമത് ഡെലിവറി റേഞ്ച് നോക്കുന്നു
         if (!isDeliverable) {
             if (!isBackground) {
                 dispatch(setErrorPopup(`Delivery is not available in your area.`));

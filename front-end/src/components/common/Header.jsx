@@ -6,7 +6,7 @@ import {
   RiHome4Fill, RiHome4Line, RiRestaurantLine,
   RiUserFill, RiUserLine, RiShoppingBag3Fill, RiShoppingBag3Line,
   RiUserStarLine, RiChatSmile3Line,
-RiStore2Line
+  RiStore2Line
 } from "react-icons/ri";
 import { IoFastFoodOutline, IoFastFood } from "react-icons/io5";
 import { X, MapPin } from "lucide-react";
@@ -34,7 +34,8 @@ const Header = () => {
 
   const dispatch = useDispatch();
   const cartItems = useSelector((state) => state.cart.items);
-  const { currentLocation, errorPopup } = useSelector((state) => state.location);
+  // Redux-ൽ നിന്ന് isOpen സ്റ്റേറ്റ് കൂടി എടുത്തു
+  const { currentLocation, errorPopup, isOpen } = useSelector((state) => state.location);
 
   const searchRef = useRef(null);
   const location = useLocation();
@@ -51,14 +52,13 @@ const Header = () => {
     }
   }, [dispatch]);
 
-  // Real-time store status check (Sync with Admin/Time)
+  // Real-time store status check
   useEffect(() => {
     const checkStatus = async () => {
-      // Silent check every 30 seconds to update workingHours in Redux
       await dispatch(checkInitialStatus(true, false));
     };
 
-    const interval = setInterval(checkStatus, 30000); 
+    const interval = setInterval(checkStatus, 20000); 
     return () => clearInterval(interval);
   }, [dispatch]);
 
@@ -67,6 +67,7 @@ const Header = () => {
     const initializeApp = async () => {
       const status = await dispatch(checkInitialStatus(false, true));
 
+      // status "OPEN" ആണെങ്കിൽ മാത്രം ലൊക്കേഷൻ ചോദിക്കുക
       if (status === "OPEN" && !currentLocation.lat) {
         askForLocation();
       }
@@ -106,7 +107,6 @@ const Header = () => {
   const { scrollY } = useScroll();
   const lastScrollY = useRef(0);
 
-  // Prevent background scroll when location picker is open
   useEffect(() => {
     if (showLocationPicker) {
       document.body.style.overflow = "hidden";
@@ -116,7 +116,6 @@ const Header = () => {
     return () => { document.body.style.overflow = "unset"; };
   }, [showLocationPicker]);
 
-  // Scroll visibility logic for location bar
   useMotionValueEvent(scrollY, "change", (latest) => {
     const diff = latest - lastScrollY.current;
     if (diff > 10 && latest > 50) {
@@ -155,9 +154,9 @@ const Header = () => {
     return typeof errorPopup === 'object' ? errorPopup.message : errorPopup;
   };
 
+  // Redux-ലെ isOpen ഉപയോഗിച്ച് ചെക്ക് ചെയ്യുന്നു
   const isStoreClosedError = () => {
-    const msg = getErrorMessage().toLowerCase();
-    return msg.includes("closed");
+    return isOpen === false;
   };
 
   return (
@@ -320,6 +319,7 @@ const Header = () => {
                 onClick={() => {
                   const closed = isStoreClosedError();
                   dispatch(clearError());
+                  // സ്റ്റോർ ക്ലോസ്ഡ് അല്ലെങ്കിൽ മാത്രം ലൊക്കേഷൻ മാറ്റാൻ ഓപ്ഷൻ നൽകുക
                   if (!closed) {
                     setShowLocationPicker(true);
                   }

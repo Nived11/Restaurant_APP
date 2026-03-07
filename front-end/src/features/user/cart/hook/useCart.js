@@ -1,6 +1,6 @@
 import { useSelector, useDispatch } from 'react-redux';
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect } from 'react';
 import api from "../../../../api/axios";
 import { 
   removeFromCart, 
@@ -14,10 +14,8 @@ const useCart = () => {
   const dispatch = useDispatch();
   
   const { items: cartItems, loading, error: reduxError } = useSelector((state) => state.cart);
-  const { workingHours } = useSelector((state) => state.location);
+  const { isOpen } = useSelector((state) => state.location); // പുതിയ ഫീൽഡ് എടുത്തു
   const token = localStorage.getItem('user_access');
-
-  const [now, setNow] = useState(new Date());
 
   useEffect(() => {
     if (token) {
@@ -25,54 +23,8 @@ const useCart = () => {
     }
   }, [dispatch, token]);
 
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setNow(new Date());
-    }, 60000); 
-    return () => clearInterval(timer);
-  }, []);
-
-  const isStoreClosed = useMemo(() => {
-    if (!workingHours) return false;
-
-    const day = now.getDay(); 
-    const currentTimeInMinutes = now.getHours() * 60 + now.getMinutes();
-
-    const parseTime = (timeStr) => {
-      if (!timeStr) return 0;
-      const match = timeStr.match(/(\d+)(?::(\d+))?\s*(AM|PM)/i);
-      if (!match) return 0;
-
-      let [ , hours, minutes, modifier] = match;
-      hours = parseInt(hours);
-      minutes = minutes ? parseInt(minutes) : 0;
-
-      if (modifier.toUpperCase() === "PM" && hours < 12) hours += 12;
-      if (modifier.toUpperCase() === "AM" && hours === 12) hours = 0;
-      
-      return hours * 60 + minutes;
-    };
-
-    try {
-      const hoursStr = day === 0 ? workingHours.sunday : workingHours.weekdays;
-      
-      if (!hoursStr || hoursStr.toLowerCase() === "closed") return true;
-
-      const [startStr, endStr] = hoursStr.split("-").map(s => s.trim());
-      const startTime = parseTime(startStr);
-      const endTime = parseTime(endStr);
-
-      if (endTime < startTime) {
-         const isOpen = currentTimeInMinutes >= startTime || currentTimeInMinutes < endTime;
-         return !isOpen;
-      }
-
-      return currentTimeInMinutes < startTime || currentTimeInMinutes >= endTime;
-    } catch (e) {
-      console.error("Error calculating store status:", e);
-      return false;
-    }
-  }, [workingHours, now]); 
+  // ഇന്റേണൽ ടൈം പാർസിംഗിന് പകരം ലളിതമായ ചെക്ക്
+  const isStoreClosed = isOpen === false;
 
   const { 
     data: latestProducts = [], 

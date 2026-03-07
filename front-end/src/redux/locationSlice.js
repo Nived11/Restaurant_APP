@@ -12,13 +12,14 @@ const locationSlice = createSlice({
       pincode: ""
     },
     workingHours: null, 
+    isOpen: true, // പുതിയ സ്റ്റേറ്റ്
     isChecking: true, 
     errorPopup: null, 
   },
   reducers: {
     setLocation: (state, action) => {
       const data = action.payload;
-      const { workingHours, ...locationData } = data;
+      const { workingHours, isOpen, ...locationData } = data;
       
       state.currentLocation = {
         ...state.currentLocation,
@@ -27,6 +28,10 @@ const locationSlice = createSlice({
       
       if (workingHours) {
         state.workingHours = workingHours;
+      }
+
+      if (isOpen !== undefined) {
+        state.isOpen = isOpen;
       }
       
       state.isChecking = false;
@@ -41,6 +46,7 @@ const locationSlice = createSlice({
       if (typeof action.payload === 'object' && action.payload.workingHours) {
           state.workingHours = action.payload.workingHours;
           state.errorPopup = action.payload.message;
+          if (action.payload.isOpen !== undefined) state.isOpen = action.payload.isOpen;
       } else {
           state.errorPopup = action.payload;
       }
