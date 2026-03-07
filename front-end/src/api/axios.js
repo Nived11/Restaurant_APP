@@ -36,15 +36,42 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// Response Interceptor (Token Refresh Logic)
+// Response Interceptor
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
+    const { context } = getAuthData();
 
+    // 🔴 1. INSTANT KICK-OUT LOGIC (New Feature)
+    if (error.response?.status === 403) {
+      const errorDetail = error.response.data.detail;
+
+      if (errorDetail === "Your account has been blocked by the admin. You are logged out.") {
+        console.warn("[Security] User blocked by admin. Clearing session...");
+        
+        // Clear all storage
+        localStorage.clear();
+
+        // Show professional warning
+        toast.error("Your account has been blocked by Crunch.", {
+          description: "Access denied. Logging you out now.",
+          duration: 6000,
+        });
+
+        // Redirect instantly
+        setTimeout(() => {
+          window.location.href = context === 'admin_panel' ? '/admin/login' : '/';
+        }, 1500);
+
+        return Promise.reject(error);
+      }
+    }
+
+    // 🔄 2. TOKEN REFRESH LOGIC (Existing)
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
-      const { refresh, context } = getAuthData();
+      const { refresh } = getAuthData();
 
       if (!refresh) return Promise.reject(error);
 
@@ -68,16 +95,11 @@ api.interceptors.response.use(
       } catch (refreshError) {
         console.error("Refresh failed, clearing storage...");
         localStorage.clear();
-
         toast.error('Session expired. Please login again.');
-
-        if (context === 'admin_panel') {
-          window.location.href = '/admin/login';
-        } else {
-          window.location.href = '/';
-        }
+        window.location.href = context === 'admin_panel' ? '/admin/login' : '/';
       }
     }
+
     return Promise.reject(error);
   }
 );
