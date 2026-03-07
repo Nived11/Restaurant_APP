@@ -43,7 +43,7 @@ api.interceptors.response.use(
     const originalRequest = error.config;
     const { context } = getAuthData();
 
-    // 🔴 1. INSTANT KICK-OUT LOGIC (New Feature)
+    // 1. INSTANT KICK-OUT LOGIC 
     if (error.response?.status === 403) {
       const errorDetail = error.response.data.detail;
 
@@ -54,7 +54,7 @@ api.interceptors.response.use(
         localStorage.clear();
 
         // Show professional warning
-        toast.error("Your account has been blocked by Crunch.", {
+        toast.error("Your account has been blocked by the admin.", {
           description: "Access denied. Logging you out now.",
           duration: 6000,
         });
@@ -68,7 +68,7 @@ api.interceptors.response.use(
       }
     }
 
-    // 🔄 2. TOKEN REFRESH LOGIC (Existing)
+    // 2. TOKEN REFRESH LOGIC 
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
       const { refresh } = getAuthData();

@@ -28,7 +28,6 @@ export const useCustomer = () => {
       setCustomers(prev => isAppend ? [...prev, ...newData] : newData);
       setHasMore(!!response.data.next); 
     } catch (error) {
-      // ✅ Using extractErrorMessages here
       toast.error(extractErrorMessages(error) || "Failed to load customers.");
     } finally {
       setIsLoading(false);

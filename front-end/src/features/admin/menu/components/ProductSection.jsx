@@ -17,10 +17,10 @@ const ProductSection = () => {
   const { categories, fetchCategories } = useCategory();
   
   const { 
-    items, formData, setFormData, editingId, loading, 
-    fetching, error, fileInputRef, handleImageChange, 
+    items,totalCount, formData, setFormData, editingId, loading, 
+    fetching, isLoading, error, fileInputRef, handleImageChange, 
     handleSubmit, handleEdit, handleDelete, resetForm,
-    fetchMenuItems, nextPage 
+    fetchMenuItems, hasNextPage 
   } = useMenu({ activeSection, activeCategory, searchQuery });
   
   const sections = ["All", "BANNER", "COMBO MENU", "BEST SELLER", "TODAY'S SPECIAL", "OTHERS"];
@@ -38,22 +38,17 @@ const ProductSection = () => {
 
   return (
     <div className="space-y-6 border-t-2 border-slate-50 pt-10 min-h-[400px]">
-      {/* Header Section */}
       <div className="flex flex-col gap-4">
-        
-        {/* 1. Title & Count */}
         <div className="flex items-center gap-3">
           <h2 className="text-xl font-black uppercase tracking-tight text-slate-900">Menu Items</h2>
-          {!fetching && !error && (
+          {!isLoading && !error && (
             <span className="bg-slate-100 text-slate-600 text-[10px] font-bold px-2 py-1 rounded-full">
-              {items.length} Items
+              {totalCount} Items
             </span>
           )}
         </div>
 
-        {/* 2. Mobile order management using Flexbox */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-          
           <div className="order-first md:order-last">
             <button 
               onClick={handleOpenAdd} 
@@ -75,12 +70,10 @@ const ProductSection = () => {
               setSearchQuery={setSearchQuery}
             />
           </div>
-
         </div>
       </div>
 
-      {/* Product Display Area */}
-      {fetching && items.length === 0 ? (
+      {isLoading && items.length === 0 ? (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {[...Array(8)].map((_, i) => <ProductCardSkeleton key={i} />)}
         </div>
@@ -96,10 +89,16 @@ const ProductSection = () => {
         </div>
       ) : items.length > 0 ? (
         <>
-          <MenuGrid items={items} onEdit={(item) => { handleEdit(item); setIsModalOpen(true); }} onDelete={handleDelete} />
-          
+          <div className="transition-opacity duration-200 opacity-100">
+            <MenuGrid 
+              items={items} 
+              onEdit={(item) => { handleEdit(item); setIsModalOpen(true); }} 
+              onDelete={handleDelete} 
+            />
+          </div>
+
           <div className="flex flex-col items-center justify-center gap-4 py-10">
-            {nextPage ? (
+            {hasNextPage ? (
               <button 
                 onClick={() => fetchMenuItems(true)}
                 disabled={fetching}
@@ -108,7 +107,7 @@ const ProductSection = () => {
                 {fetching ? <RefreshCcw size={14} className="animate-spin" /> : <ChevronDown size={14} />}
                 Show More Items
               </button>
-            ) : items.length > 12 ? (
+            ) : items.length > 8 ? (
               <button 
                 onClick={handleSeeLess}
                 className="cursor-pointer flex items-center gap-2 text-slate-600 hover:text-slate-900 text-[10px] font-black uppercase transition-all"
@@ -125,7 +124,6 @@ const ProductSection = () => {
         </div>
       )}
 
-      {/* Modal */}
       <AnimatePresence>
         {isModalOpen && (
           <MenuFormModal 
@@ -135,7 +133,7 @@ const ProductSection = () => {
             onClose={() => { resetForm(); setIsModalOpen(false); }} 
             onSubmit={async (e) => {
               const success = await handleSubmit(e);
-              if (success) setIsModalOpen(true); // Keep modal open if submission is successful to show success message, otherwise close it
+              if (success) setIsModalOpen(false);
             }}
           />
         )}
