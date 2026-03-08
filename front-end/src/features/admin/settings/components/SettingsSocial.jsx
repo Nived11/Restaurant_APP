@@ -1,6 +1,6 @@
 import React from 'react';
-import { Instagram, Facebook, Twitter, MessageCircle ,Share2} from 'lucide-react';
-import EditableField from './EditableField'; 
+import { Instagram, Facebook, Twitter, MessageCircle, Share2 } from 'lucide-react';
+import EditableField from './EditableField';
 
 const SettingsSocial = ({ settings, handleNestedChange, onSave }) => {
   return (
@@ -16,34 +16,40 @@ const SettingsSocial = ({ settings, handleNestedChange, onSave }) => {
           Manage your external links. These appear in the website footer.
         </p>
       </div>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-        <EditableField 
-          icon={Instagram} 
-          label="Instagram URL" 
-          value={settings?.socials?.instagram} 
-          onChange={(val) => handleNestedChange('socials', 'instagram', val)} 
+        <EditableField
+          icon={Instagram}
+          label="Instagram ID"
+          value={settings?.socials?.instagram}
+          onChange={(val) => handleNestedChange('socials', 'instagram', val)}
           onSave={onSave}
         />
-        <EditableField 
-          icon={Facebook} 
-          label="Facebook URL" 
-          value={settings?.socials?.facebook} 
-          onChange={(val) => handleNestedChange('socials', 'facebook', val)} 
+        <EditableField
+          icon={Facebook}
+          label="Facebook ID"
+          value={settings?.socials?.facebook}
+          onChange={(val) => handleNestedChange('socials', 'facebook', val)}
           onSave={onSave}
         />
-        <EditableField 
-          icon={Twitter} 
-          label="Twitter (X) URL" 
-          value={settings?.socials?.twitter} 
-          onChange={(val) => handleNestedChange('socials', 'twitter', val)} 
+        <EditableField
+          icon={Twitter}
+          label="Twitter (X) ID"
+          value={settings?.socials?.twitter}
+          onChange={(val) => handleNestedChange('socials', 'twitter', val)}
           onSave={onSave}
         />
-        <EditableField 
-          icon={MessageCircle} 
-          label="WhatsApp URL" 
-          value={settings?.socials?.whatsapp} 
-          onChange={(val) => handleNestedChange('socials', 'whatsapp', val)} 
+        <EditableField
+          icon={MessageCircle}
+          label="WhatsApp NO"
+          value={settings?.socials?.whatsapp}
+          onChange={(val) => {
+            const onlyNums = val.replace(/[^0-9]/g, '');
+
+            if (onlyNums.length <= 10) {
+              handleNestedChange('socials', 'whatsapp', onlyNums);
+            }
+          }}
           onSave={onSave}
         />
       </div>

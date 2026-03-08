@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import api from '../../../../api/axios';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { extractErrorMessages } from '../../../../utils/extractErrorMessages';
 
 export const useContact = () => {
+   const queryClient = useQueryClient();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -54,6 +56,7 @@ export const useContact = () => {
 
       if (response.data.status === true) {
         toast.success(response.data.message || "Message sent successfully!");
+         queryClient.invalidateQueries({ queryKey: ['messages'] });
         
         setFormData({ name: '', email: '', subject: '', message: '' });
       } else {

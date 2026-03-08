@@ -1,24 +1,37 @@
 import React, { useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
-import { Globe, Layout, Map, Share2, Loader2 } from 'lucide-react';
+import { Globe, Layout, Map, Share2, Loader2, } from 'lucide-react';
+import { AlertCircle, RefreshCcw } from 'lucide-react';
 import { 
   SettingsWebData, 
   SettingsTimeMap, 
-  SettingsSocial 
+  SettingsSocial ,
+  SettingsSkeleton
 } from '../../features/admin/settings';
 
 const Settings = () => {
   const { 
-    settings, isLoading, handleChange, handleNestedChange, saveSettings,
+    settings, isLoading, handleChange,error, fetchSettings, handleNestedChange, saveSettings,
     searchQuery, setSearchQuery, searchResults, showDropdown, setShowDropdown, 
     handleMapClick, getCurrentLocation, isLocating 
   } = useOutletContext();
 
   const [activeTab, setActiveTab] = useState('webdata');
 
-  if (isLoading) return (
-    <div className="flex items-center justify-center min-h-screen">
-      <Loader2 className="animate-spin text-[#f9a602]" size={40} />
+  if (isLoading) return ( <SettingsSkeleton />);
+
+  if (error) return (
+    <div className="flex flex-col items-center justify-center min-h-[60vh] p-4 text-center">
+      <div className="bg-red-50 p-4 rounded-full mb-6">
+        <AlertCircle className="text-red-500" size={30}  />
+      </div>
+      <h2 className="text-sm md:text-xl font-black text-gray-900 mb-6   italic uppercase">{error}</h2>
+      <button 
+        onClick={() => fetchSettings()} 
+        className="cursor-pointer flex items-center gap-2 bg-black text-white px-8 py-3 rounded-2xl font-black uppercase text-sm hover:bg-[#f9a602] hover:text-black transition-all shadow-lg"
+      >
+        <RefreshCcw size={18} /> Try Again
+      </button>
     </div>
   );
 
@@ -30,20 +43,21 @@ const Settings = () => {
         </h1>
       </div>
 
-      <div className="flex flex-wrap gap-2 mb-8 bg-gray-50 p-2 rounded-2xl border border-gray-100 w-fit">
+      <div className="flex flex-wrap gap-2 mb-8 bg-gray-100 p-2 rounded-2xl border border-gray-200 w-fit">
         {[
           { id: 'webdata', label: 'Web Data', icon: Layout, color: 'text-blue-500' },
           { id: 'timemap', label: 'Time & Map', icon: Map, color: 'text-orange-500' },
           { id: 'social', label: 'Social Media', icon: Share2, color: 'text-pink-500' }
         ].map((tab) => (
-          <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-bold transition-all ${activeTab === tab.id ? 'bg-white shadow-sm ring-1 ring-gray-200/50' : 'text-gray-500'}`}>
-            <tab.icon size={16} className={activeTab === tab.id ? tab.color : 'text-gray-400'} />
+          <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`cursor-pointer flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-bold transition-all ${activeTab === tab.id ? 'bg-white shadow-sm ring-1 ring-gray-200/50 shadow-xl' : 'text-gray-600'}`}>
+            <tab.icon size={16} className={activeTab === tab.id ? tab.color : 'text-gray-600'} />
             {tab.label}
           </button>
         ))}
       </div>
 
       <div className="bg-white p-6 md:p-8 rounded-[2rem] border border-gray-100 shadow-sm">
+
         {activeTab === 'webdata' && <SettingsWebData settings={settings} handleChange={handleChange} handleNestedChange={handleNestedChange} onSave={saveSettings} />}
         
         {activeTab === 'timemap' && (

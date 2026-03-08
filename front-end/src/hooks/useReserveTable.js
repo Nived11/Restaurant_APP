@@ -1,9 +1,11 @@
 import { useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import api from '../api/axios';
 import { toast } from 'sonner';
 import { extractErrorMessages } from '../utils/extractErrorMessages';
 
 export const useReserveTable = (onSuccess) => {
+  const queryClient = useQueryClient();
   const [formData, setFormData] = useState({
     full_name: '',
     phone: '',
@@ -74,6 +76,7 @@ export const useReserveTable = (onSuccess) => {
       const response = await api.post('/bookings/create/', formData);
 
       if (response.data.status === "success" || response.data.status === true) {
+        queryClient.invalidateQueries({ queryKey: ["bookings"] });
         toast.success(response.data.message || "Table booked successfully!");
         
         // Reset form

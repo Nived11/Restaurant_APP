@@ -57,7 +57,7 @@ const BannerSection = ({ data: banners = [], onBannerClick }) => {
                 onClick={() => onBannerClick?.(item)} 
               >
                 <img 
-                  src={item.image} 
+                 src={item.banner_image || item.image} 
                   alt={item.name} 
                   loading="eager" 
                   decoding="sync"
