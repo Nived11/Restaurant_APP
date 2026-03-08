@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
-import { Search, Download, Calendar, Phone, Mail, ShoppingBag, Ban, UserCheck, Filter, Check, Loader2, ChevronDown } from 'lucide-react';
-import { useCustomer } from '../hooks/useCustomer';
+import React, { useState, useEffect } from 'react';
+import { Search, Download, Phone, Mail, Filter, Loader2, ChevronDown, ShoppingBag, Calendar } from 'lucide-react';
+import useCustomer from '../hooks/useCustomer'; 
+import { toast } from 'react-hot-toast';
 
 const CustomerSkeleton = () => (
   <div className="space-y-4 animate-pulse">
@@ -13,12 +14,19 @@ const CustomerSkeleton = () => (
 const CustomerPage = () => {
   const { 
     customers, searchTerm, setSearchTerm, statusFilter, setStatusFilter,
-    isLoading, isMoreLoading, hasMore, loadMore, toggleBlockStatus, exportToCSV, isExporting
+    isLoading, isMoreLoading, hasMore, loadMore, toggleBlockStatus, exportToCSV, isExporting,
+    error 
   } = useCustomer();
   
   const [isFilterOpen, setIsFilterOpen] = useState(false); 
   const [showBlockModal, setShowBlockModal] = useState(false);
   const [userToToggle, setUserToToggle] = useState(null);
+
+  useEffect(() => {
+    if (error) {
+      toast.error(error);
+    }
+  }, [error]);
 
   return (
     <div className="w-full min-h-screen bg-[#FDFDFD] font-sans text-[#2D3748] flex flex-col" onClick={() => setIsFilterOpen(false)}>
@@ -55,7 +63,7 @@ const CustomerPage = () => {
               type="text" 
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search customers..." 
+              placeholder="Search by name or phone..." 
               className="w-full pl-12 pr-6 py-4 bg-white border border-gray-100 rounded-2xl text-sm font-semibold outline-none focus:ring-4 focus:ring-[#f9a602]/5 transition-all"
             />
           </div>
@@ -84,29 +92,28 @@ const CustomerPage = () => {
               )}
             </div>
             <div className="bg-white border border-gray-100 px-5 py-4 rounded-2xl font-bold text-xs text-gray-400">
-               <span className="text-[#1A202C]">{isLoading ? ".." : customers.length}</span> RECS
+               <span className="text-[#1A202C]">{isLoading ? ".." : customers.length}</span> RECORDS
             </div>
           </div>
         </div>
 
-        {/* DATA AREA - Responsive Table/Cards */}
+        {/* DATA AREA */}
         <div className="bg-white border border-gray-100 rounded-[2rem] shadow-sm overflow-hidden">
           
-          {/* DESKTOP TABLE */}
           <div className="hidden md:block overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-gray-50/50 border-b border-gray-50">
                   <th className="py-6 px-10 text-[10px] font-black text-gray-400 uppercase tracking-widest">Profile & Contact</th>
-                  <th className="py-6 px-8 text-[10px] font-black text-gray-400 uppercase tracking-widest">Engagement</th>
+                  <th className="py-6 px-8 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">Engagement</th>
                   <th className="py-6 px-10 text-[10px] font-black text-gray-400 uppercase tracking-widest text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
-                {isLoading ? (
-                  <tr>
-                    <td colSpan="3" className="p-8"><CustomerSkeleton /></td>
-                  </tr>
+                {isLoading && customers.length === 0 ? (
+                  <tr><td colSpan="3" className="p-8"><CustomerSkeleton /></td></tr>
+                ) : customers.length === 0 ? (
+                  <tr><td colSpan="3" className="p-20 text-center font-bold text-gray-400 tracking-widest uppercase text-xs">No customers found.</td></tr>
                 ) : customers.map((customer) => (
                   <tr key={customer.id} className="hover:bg-gray-50/30 transition-colors">
                     <td className="py-6 px-10">
@@ -116,24 +123,33 @@ const CustomerPage = () => {
                         </div>
                         <div>
                           <h3 className="font-bold text-[#1A202C]">{customer.first_name} {customer.last_name}</h3>
-                          {/* ✅ ADDED PHONE NUMBER HERE */}
                           <div className="flex flex-col gap-1 mt-1">
-                            <p className="text-xs text-gray-400 flex items-center gap-1.5"><Mail size={12}/> {customer.email || 'No email'}</p>
-                            <p className="text-xs text-gray-400 flex items-center gap-1.5"><Phone size={12}/> {customer.phone_number}</p>
+                            <p className="text-xs text-gray-400 flex items-center gap-1.5"><Mail size={12} className="text-gray-300"/> {customer.email || 'No email'}</p>
+                            <p className="text-xs text-gray-400 flex items-center gap-1.5"><Phone size={12} className="text-gray-300"/> {customer.phone_number}</p>
                           </div>
                         </div>
                       </div>
                     </td>
-                    <td className="py-6 px-8">
-                      <span className="text-sm font-bold block">{customer.total_orders || 0} Orders</span>
-                      <span className="text-[10px] text-gray-400 font-medium uppercase">Since {new Date(customer.date_joined).toLocaleDateString()}</span>
+                    
+                    {/* DETAILS COLUMN - NOW SHOWING ORDERS */}
+                    <td className="py-6 px-8 text-center">
+                      <div className="flex flex-col items-center gap-1">
+                         <div className="flex items-center gap-2 px-3 py-1 bg-gray-50 rounded-full">
+                            <ShoppingBag size={12} className="text-[#f9a602]"/>
+                            <span className="text-sm font-bold text-[#1A202C]">{customer.total_orders || 0} Orders</span>
+                         </div>
+                         <span className="text-[10px] text-gray-400 font-medium uppercase tracking-widest flex items-center gap-1">
+                            <Calendar size={10}/> Joined {new Date(customer.date_joined).toLocaleDateString('en-GB')}
+                         </span>
+                      </div>
                     </td>
+
                     <td className="py-6 px-10 text-right">
                       <button 
                         onClick={() => { setUserToToggle(customer); setShowBlockModal(true); }}
-                        className={`px-5 py-2.5 rounded-xl text-[10px] font-bold uppercase tracking-wider transition-all ${customer.is_blocked ? 'bg-emerald-500 text-white' : 'bg-white text-red-500 border border-red-100 hover:bg-red-50'}`}
+                        className={`px-5 py-2.5 rounded-xl text-[10px] font-bold uppercase tracking-wider transition-all ${customer.is_blocked ? 'bg-red-50 text-red-500 hover:bg-red-100 border border-red-100' : 'bg-white text-gray-600 border border-gray-100 hover:bg-gray-50'}`}
                       >
-                        {customer.is_blocked ? 'Unblock' : 'Block'}
+                        {customer.is_blocked ? 'Blocked' : 'Active'}
                       </button>
                     </td>
                   </tr>
@@ -144,7 +160,7 @@ const CustomerPage = () => {
 
           {/* MOBILE LIST */}
           <div className="md:hidden divide-y divide-gray-50">
-            {isLoading ? (
+            {isLoading && customers.length === 0 ? (
               <div className="p-5"><CustomerSkeleton /></div>
             ) : customers.map((customer) => (
               <div key={customer.id} className="p-5 flex flex-col gap-4">
@@ -154,7 +170,6 @@ const CustomerPage = () => {
                   </div>
                   <div className="flex-1 overflow-hidden">
                     <h3 className="font-bold text-sm text-[#1A202C] truncate">{customer.first_name} {customer.last_name}</h3>
-                    {/* ✅ ADDED PHONE NUMBER HERE */}
                     <div className="flex flex-col gap-0.5 mt-1">
                       <p className="text-[11px] text-gray-400 truncate flex items-center gap-1"><Mail size={10}/> {customer.email || 'N/A'}</p>
                       <p className="text-[11px] text-gray-400 truncate flex items-center gap-1"><Phone size={10}/> {customer.phone_number}</p>
@@ -162,27 +177,27 @@ const CustomerPage = () => {
                   </div>
                   <button 
                     onClick={() => { setUserToToggle(customer); setShowBlockModal(true); }}
-                    className={`px-4 py-2 rounded-lg text-[9px] font-bold uppercase shrink-0 ${customer.is_blocked ? 'bg-emerald-500 text-white' : 'border border-red-100 text-red-500'}`}
+                    className={`px-4 py-2 rounded-lg text-[9px] font-bold uppercase shrink-0 ${customer.is_blocked ? 'bg-red-50 text-red-500' : 'bg-gray-50 text-gray-600'}`}
                   >
-                    {customer.is_blocked ? 'Unblock' : 'Block'}
+                    {customer.is_blocked ? 'Blocked' : 'Active'}
                   </button>
                 </div>
-                <div className="flex items-center justify-between bg-gray-50/50 p-3 rounded-xl text-[10px] font-bold text-gray-500 uppercase">
-                  <span>{customer.total_orders || 0} Orders</span>
-                  <span>Joined {new Date(customer.date_joined).toLocaleDateString()}</span>
+                <div className="flex items-center justify-between px-4 py-2 bg-gray-50/50 rounded-xl">
+                   <span className="text-[10px] font-bold text-gray-500 uppercase">{customer.total_orders || 0} Orders</span>
+                   <span className="text-[10px] font-bold text-gray-400 uppercase">Joined {new Date(customer.date_joined).toLocaleDateString()}</span>
                 </div>
               </div>
             ))}
           </div>
         </div>
 
-        {/* STANDALONE "SEE MORE" BUTTON */}
+        {/* SEE MORE BUTTON */}
         {hasMore && (
           <div className="mt-8 flex justify-center">
             <button 
               onClick={loadMore} 
               disabled={isMoreLoading} 
-              className="flex items-center gap-2 px-8 py-3.5 bg-black text-white rounded-full text-[11px] font-extrabold uppercase tracking-widest transition-all hover:-translate-y-1 shadow-xl hover:shadow-2xl active:scale-95 disabled:opacity-70 disabled:hover:translate-y-0"
+              className="flex items-center gap-2 px-8 py-3.5 bg-black text-white rounded-full text-[11px] font-extrabold uppercase tracking-widest transition-all hover:-translate-y-1 shadow-xl hover:shadow-2xl active:scale-95 disabled:opacity-70"
             >
               {isMoreLoading ? (
                 <>
@@ -197,16 +212,16 @@ const CustomerPage = () => {
             </button>
           </div>
         )}
-
       </div>
 
       {/* MODAL */}
       {showBlockModal && userToToggle && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/10 backdrop-blur-md">
-           <div className="bg-white rounded-[2rem] p-8 max-w-sm w-full animate-in zoom-in-95 duration-200 border border-gray-100 shadow-2xl">
-            <h3 className="text-xl font-bold text-center mb-6">Confirm Change?</h3>
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/10 backdrop-blur-md" onClick={() => setShowBlockModal(false)}>
+           <div className="bg-white rounded-[2rem] p-8 max-w-sm w-full animate-in zoom-in-95 duration-200 border border-gray-100 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+            <h3 className="text-xl font-bold text-center mb-6">Confirm Status Change?</h3>
+            <p className="text-sm text-gray-400 text-center mb-8 font-medium">Are you sure you want to change the status for {userToToggle.first_name}?</p>
             <div className="flex flex-col gap-3">
-              <button onClick={() => { toggleBlockStatus(userToToggle.id, userToToggle.is_blocked); setShowBlockModal(false); }} className={`py-4 font-bold rounded-xl text-white ${userToToggle.is_blocked ? 'bg-emerald-500' : 'bg-red-500'}`}>YES, PROCEED</button>
+              <button onClick={() => { toggleBlockStatus(userToToggle.id); setShowBlockModal(false); }} className={`py-4 font-bold rounded-xl text-white ${userToToggle.is_blocked ? 'bg-emerald-500' : 'bg-red-500'}`}>YES, PROCEED</button>
               <button onClick={() => setShowBlockModal(false)} className="py-4 bg-gray-50 text-gray-400 font-bold rounded-xl">CANCEL</button>
             </div>
           </div>

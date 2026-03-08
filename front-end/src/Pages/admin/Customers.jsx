@@ -1,8 +1,11 @@
 import { CustomerPage } from "../../features/admin/customer";
+
 const Customers = () => {
   return (
-    <div><CustomerPage/></div>
-  )
-}
+    <div>
+      <CustomerPage />
+    </div>
+  );
+};
 
-export default Customers
+export default Customers;
