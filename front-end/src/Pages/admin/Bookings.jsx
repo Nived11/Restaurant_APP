@@ -10,6 +10,7 @@ const Bookings = () => {
 
   return (
     <div className="min-h-screen mt-4 sm:mt-0 px-2 md:p-6 lg:p-8 font-sans text-[#0A0A0A] ">
+       <div id="top-of-bookings"></div>
       <div className="max-w-7xl mx-auto space-y-8">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
           <div className="flex flex-col">

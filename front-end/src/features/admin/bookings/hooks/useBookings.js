@@ -1,71 +1,83 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState } from "react";
+import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import api from "../../../../api/axios";
-import { extractErrorMessages } from '../../../../utils/extractErrorMessages';
+import { extractErrorMessages } from "../../../../utils/extractErrorMessages"; 
 
-
-const useBookings = () => {
-  const [bookings, setBookings] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [loadingMore, setLoadingMore] = useState(false);
-  const [error, setError] = useState(null);
-  
+export const useBookings = () => {
+  const queryClient = useQueryClient(); 
   const [searchTerm, setSearchTerm] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [hasNextPage, setHasNextPage] = useState(false);
   const [expandedRow, setExpandedRow] = useState(null);
 
-  const fetchBookings = useCallback(async (search = "", page = 1, isLoadMore = false) => {
-    try {
-      if (isLoadMore) setLoadingMore(true);
-      else setLoading(true);
-
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useInfiniteQuery({
+    queryKey: ["bookings", searchTerm],
+    queryFn: async ({ pageParam = 1 }) => {
       const response = await api.get(`/bookings/all/`, {
-        params: { search: search, page: page }
+        params: { search: searchTerm, page: pageParam },
       });
-
-      if (response.data.status) {
-        const newData = response.data.data;
-        
-        setBookings(prev => isLoadMore ? [...prev, ...newData] : newData);
-        
-        setHasNextPage(!!response.data.next_page_url);
-        setCurrentPage(page);
+      return response.data;
+    },
+    getNextPageParam: (lastPage) => {
+      if (lastPage.next_page_url) {
+        const url = new URL(lastPage.next_page_url);
+        return url.searchParams.get("page");
       }
-      setError(null);
-    } catch (err) {
-      setError(extractErrorMessages(err));
-    } finally {
-      setLoading(false);
-      setLoadingMore(false);
-    }
-  }, []);
+      return undefined;
+    },
+    staleTime: 0,
+    refetchInterval: 5000,
+    refetchIntervalInBackground: true,
+  });
 
-  useEffect(() => {
-    const delayDebounceFn = setTimeout(() => {
-      fetchBookings(searchTerm, 1, false);
-    }, 600);
-    return () => clearTimeout(delayDebounceFn);
-  }, [searchTerm, fetchBookings]);
+  const bookings = data?.pages.flatMap((page) => page.data) || [];
 
   const loadMore = () => {
-    if (!loadingMore && hasNextPage) {
-      fetchBookings(searchTerm, currentPage + 1, true);
+    if (hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
     }
   };
 
   const showLess = () => {
-    fetchBookings(searchTerm, 1, false);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    queryClient.setQueryData(["bookings", searchTerm], (oldData) => {
+      if (!oldData) return undefined;
+      return {
+        pages: [oldData.pages[0]],
+        pageParams: [oldData.pageParams[0]],
+      };
+    });
+
+     const topElement = document.getElementById('top-of-bookings');
+  if (topElement) {
+    topElement.scrollIntoView({ behavior: 'smooth' });
+  }
   };
 
-  const toggleRow = (id) => setExpandedRow(prev => (prev === id ? null : id));
+  const toggleRow = (id) => setExpandedRow((prev) => (prev === id ? null : id));
   const clearFilters = () => setSearchTerm("");
 
   return {
-    searchTerm, setSearchTerm, expandedRow, toggleRow,
-    bookings, clearFilters, loading, loadingMore,
-    hasNextPage, loadMore, showLess, currentPage, error,
-    refresh: () => fetchBookings(searchTerm, 1, false)
+    searchTerm,
+    setSearchTerm,
+    expandedRow,
+    toggleRow,
+    bookings,
+    clearFilters,
+    loading: isLoading,
+    loadingMore: isFetchingNextPage,
+    hasNextPage,
+    loadMore,
+    showLess,
+    currentPage: data?.pages.length || 1,
+    error: isError ? extractErrorMessages(error) : null, 
+    refresh: refetch,
   };
 };
 

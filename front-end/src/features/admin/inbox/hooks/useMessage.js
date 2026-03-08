@@ -1,112 +1,95 @@
-import { useState, useEffect, useCallback } from 'react';
-import api from '../../../../api/axios'
+import { useState } from 'react';
+import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import api from '../../../../api/axios';
 import { toast } from 'sonner';
-import { extractErrorMessages } from '../../../../utils/extractErrorMessages';
 
 export const useMessage = () => {
-  const [messages, setMessages] = useState([]);
-  const [expandedId, setExpandedId] = useState(null);
-  
-  // API loading states
-  const [isLoading, setIsLoading] = useState(true);
-  const [loadingMore, setLoadingMore] = useState(false);
-  const [error, setError] = useState(null);
-
-  // SERVER-SIDE SEARCH & PAGINATION STATES
+  const queryClient = useQueryClient();
   const [searchQuery, setSearchQuery] = useState("");
-  const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(false);
-  const [totalItems, setTotalItems] = useState(0);
+  const [expandedId, setExpandedId] = useState(null);
 
-  // 1. Fetch Messages from Backend (Handles both first load and load more)
-  const fetchMessages = useCallback(async (currentPage = 1, query = "", isLoadMore = false) => {
-    if (isLoadMore) {
-      setLoadingMore(true);
-    } else {
-      setIsLoading(true);
-    }
-    setError(null);
-
-    try {
+  // 1. TanStack Infinite Query for Fetching & Searching
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading,
+    isError,
+    refetch,
+  } = useInfiniteQuery({
+    queryKey: ['messages', searchQuery],
+    queryFn: async ({ pageParam = 1 }) => {
       const response = await api.get('/admin/contacts/', {
-        params: {
-          page: currentPage,
-          search: query
-        }
+        params: { page: pageParam, search: searchQuery },
       });
-      
-      const responseData = response.data;
-      const newMessages = responseData.data || [];
-
-      if (isLoadMore) {
-        // Append new messages to existing ones
-        setMessages(prev => [...prev, ...newMessages]);
-      } else {
-        // Replace messages for new search or initial load
-        setMessages(newMessages);
+      return response.data;
+    },
+    getNextPageParam: (lastPage) => {
+      if (lastPage.next_page_url) {
+        const url = new URL(lastPage.next_page_url);
+        return url.searchParams.get("page");
       }
+      return undefined;
+    },
+    staleTime: 5000,
+    refetchInterval: 10000, 
+    refetchIntervalInBackground: true,
+  });
 
-      // Check if there is a next page based on backend response
-      setHasMore(!!responseData.next_page_url);
-      setTotalItems(responseData.total_items || 0);
+  // Flat existing pages into a single messages array
+  const messages = data?.pages.flatMap((page) => page.data) || [];
+  const totalItems = data?.pages[0]?.total_items || 0;
 
-    } catch (err) {
-      toast.error("Failed to load messages. Please try again."); 
-      setError(extractErrorMessages(err));
-    } finally {
-      setIsLoading(false);
-      setLoadingMore(false);
-    }
-  }, []);
-
-  // 2. Initial Load & Search Effect (With Debounce to avoid spamming API)
-  useEffect(() => {
-    setPage(1); // Reset to page 1 on new search
-    const delayDebounceFn = setTimeout(() => {
-      fetchMessages(1, searchQuery, false);
-    }, 500); // Waits 500ms after user stops typing before making API call
-
-    return () => clearTimeout(delayDebounceFn);
-  }, [searchQuery, fetchMessages]);
-
-  // 3. Pagination Handlers
-  const handleSeeMore = () => {
-    if (!hasMore || loadingMore) return;
-    const nextPage = page + 1;
-    setPage(nextPage);
-    fetchMessages(nextPage, searchQuery, true);
-  };
-
-  const handleShowLess = () => {
-    setPage(1);
-    setMessages(prev => prev.slice(0, 12)); // Keep only first 12 items locally
-    setHasMore(true); // Re-enable "See More" since we know there are more
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const toggleMessage = (id) => {
-    setExpandedId(expandedId === id ? null : id);
-  };
-
-  // 4. Send Reply Logic
-  const sendReply = async (id, replyText) => {
-    try {
-      await api.post(`/admin/contacts/${id}/reply/`, {
+  // 2. Mutation for Sending Reply
+  const replyMutation = useMutation({
+    mutationFn: async ({ id, replyText }) => {
+      const response = await api.post(`/admin/contacts/${id}/reply/`, {
         reply_message: replyText
       });
-      
-      // Update the message in the list instantly on success
-      setMessages(prevMsgs => prevMsgs.map(msg => 
-        msg.id === id 
-          ? { ...msg, reply_message: replyText, replied_at: new Date().toISOString() } 
-          : msg
-      ));
+      return { id, replyText, ...response.data };
+    },
+    onSuccess: () => {
+      // ഡാറ്റ റിഫ്രഷ് ചെയ്യാതെ തന്നെ ലിസ്റ്റിൽ അപ്ഡേറ്റ് കാണാൻ
+      queryClient.invalidateQueries(['messages']);
       toast.success("Reply sent successfully!");
-      
-      return true; // Success
-    } catch (err) {
+    },
+    onError: () => {
       toast.error("Failed to send reply. Please try again.");
-      return false; // Failed
+    }
+  });
+
+  const handleSeeMore = () => {
+    if (hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  };
+
+const handleShowLess = () => {
+  queryClient.setQueryData(['messages', searchQuery], (oldData) => {
+    if (!oldData) return undefined;
+    return {
+      pages: [oldData.pages[0]],
+      pageParams: [oldData.pageParams[0]],
+    };
+  });
+
+  const topElement = document.getElementById('top-of-page');
+  if (topElement) {
+    topElement.scrollIntoView({ behavior: 'smooth' });
+  }
+};
+
+  const toggleMessage = (id) => {
+    setExpandedId(prev => (prev === id ? null : id));
+  };
+
+  const sendReply = async (id, replyText) => {
+    try {
+      await replyMutation.mutateAsync({ id, replyText });
+      return true;
+    } catch {
+      return false;
     }
   };
 
@@ -114,15 +97,15 @@ export const useMessage = () => {
     messages, 
     searchQuery,
     setSearchQuery,
-    hasMore,
-    loadingMore,
-    page,
+    hasMore: hasNextPage,
+    loadingMore: isFetchingNextPage,
+    page: data?.pages.length || 1,
     totalItems,
     handleSeeMore,
     handleShowLess,
     expandedId, 
     isLoading, 
-    error, 
+    error: isError ? "Failed to load messages" : null, 
     toggleMessage, 
     sendReply 
   };

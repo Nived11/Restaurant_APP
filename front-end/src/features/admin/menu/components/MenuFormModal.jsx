@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ImageIcon, ChevronDown, X, Loader2 } from "lucide-react";
+import { ImageIcon, ChevronDown, X, Loader2, Eye, EyeOff } from "lucide-react";
 
 const MenuFormModal = ({ 
   formData, 
@@ -99,6 +99,27 @@ const MenuFormModal = ({
 
               {/* Right Side: Details */}
               <div className="md:col-span-8 space-y-4">
+                
+                {/* Availability Toggle - Right Aligned at Top of Form Content */}
+                <div className="flex justify-end items-center mb-2">
+                   <div 
+                    onClick={() => !loading && setFormData({ ...formData, is_available: !formData.is_available })}
+                    className={`flex items-center gap-2 px-3 py-1.5 rounded-xl border-2 transition-all cursor-pointer ${
+                      formData.is_available 
+                      ? 'border-green-200 bg-green-50' 
+                      : 'border-slate-200 bg-slate-50'
+                    }`}
+                  >
+                    {formData.is_available ? <Eye size={12} className="text-green-600"/> : <EyeOff size={12} className="text-slate-400"/>}
+                    <span className={`text-[9px] font-black uppercase tracking-tight ${formData.is_available ? 'text-green-700' : 'text-slate-500'}`}>
+                      {formData.is_available ? 'Available' : 'Unavailable'}
+                    </span>
+                    <div className={`relative w-8 h-4 rounded-full transition-colors ${formData.is_available ? 'bg-green-500' : 'bg-slate-300'}`}>
+                      <div className={`absolute top-0.5 w-3 h-3 bg-white rounded-full transition-all ${formData.is_available ? 'right-0.5' : 'left-0.5'}`} />
+                    </div>
+                  </div>
+                </div>
+
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1.5">
                     <label className={labelClass}>Menu Section</label>
