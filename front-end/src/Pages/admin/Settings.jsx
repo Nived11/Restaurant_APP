@@ -36,7 +36,7 @@ const Settings = () => {
   );
 
   return (
-    <div className="w-full min-h-screen bg-white p-5 md:p-10 max-w-7xl mx-auto">
+    <div className="w-full min-h-screen bg-white px-2 pt-4 sm:px-2 pt-0 sm:pt-8 max-w-7xl mx-auto">
       <div className="mb-10">
         <h1 className="text-3xl md:text-4xl font-black text-[#0A0A0A] tracking-tight flex items-center gap-3">
           <Globe className="text-[#f9a602]" size={36} /> WEB<span className="text-[#f9a602]">SETTINGS.</span>
@@ -56,7 +56,7 @@ const Settings = () => {
         ))}
       </div>
 
-      <div className="bg-white p-6 md:p-8 rounded-[2rem] border border-gray-100 shadow-sm">
+      <div className="bg-white p-4 sm:p-8 rounded-[2rem] border border-gray-100 shadow-sm">
 
         {activeTab === 'webdata' && <SettingsWebData settings={settings} handleChange={handleChange} handleNestedChange={handleNestedChange} onSave={saveSettings} />}
         

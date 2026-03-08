@@ -98,7 +98,7 @@ export const useSettings = () => {
 
       const payload = {
         ...settings,
-        deliveryRadius: parseInt(settings.deliveryRadius) || 0,
+        deliveryRadius: parseFloat(settings.deliveryRadius) || 0,
         latitude: settings.latitude ? parseFloat(settings.latitude) : null,
         longitude: settings.longitude ? parseFloat(settings.longitude) : null,
         openingTime: ensureSeconds(settings.openingTime),

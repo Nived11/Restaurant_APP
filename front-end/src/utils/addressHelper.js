@@ -1,12 +1,12 @@
 export const fetchLocationDetails = async (lat, lon) => {
   if (!lat || !lon) return null;
-  
+
   try {
     const TOKEN = import.meta.env.VITE_LOCATION_IQ_TOKEN;
     const response = await fetch(
       `https://us1.locationiq.com/v1/reverse.php?key=${TOKEN}&lat=${lat}&lon=${lon}&format=json&accept-language=en    `
     );
-    
+
     if (!response.ok) return null;
     const data = await response.json();
     const addr = data.address;
@@ -20,8 +20,12 @@ export const fetchLocationDetails = async (lat, lon) => {
     const addressParts = [place, subDistrict, district, state]
       .map(item => item?.replace(/\s*(taluk|district)\s*/gi, "").trim())
       .filter(Boolean);
+    if (pincode) {
+      addressParts.push(pincode);
+    }
 
     const finalAddress = [...new Set(addressParts)].join(", ");
+
 
     return {
       formattedAddress: finalAddress || data.display_name,

@@ -12,7 +12,7 @@ const locationSlice = createSlice({
       pincode: ""
     },
     workingHours: null, 
-    isOpen: true, // പുതിയ സ്റ്റേറ്റ്
+    isOpen: true, 
     isChecking: true, 
     errorPopup: null, 
   },

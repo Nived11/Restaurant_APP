@@ -37,47 +37,48 @@ const EditableField = ({ icon: Icon, label, value, onChange, onSave, isTextArea 
   };
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-2 w-full">
       <label className="text-[11px] font-black text-gray-500 uppercase tracking-widest pl-1">
         {label}
       </label>
       
-      <div className={`relative flex items-center border rounded-2xl transition-all ${
+      <div className={`relative flex items-center border rounded-2xl transition-all w-full overflow-hidden ${
         isEditing 
           ? 'border-[#f9a602] bg-white ring-4 ring-[#f9a602]/10' 
           : 'border-gray-200 bg-gray-50'
       }`}>
         
-        <div className="pl-4 pr-2 text-gray-500">
+        <div className="pl-4 pr-2 text-gray-500 shrink-0">
           <Icon size={18} />
         </div>
         
-        {isEditing ? (
-          isTextArea ? (
-            <textarea
-              ref={inputRef}
-              value={value || ""}
-              onChange={(e) => onChange(e.target.value)}
-              className="flex-1 py-3.5 px-2 bg-transparent border-none focus:outline-none text-sm font-semibold text-gray-800 resize-none"
-            />
+        <div className="flex-1 min-w-0 flex items-center">
+          {isEditing ? (
+            isTextArea ? (
+              <textarea
+                ref={inputRef}
+                value={value || ""}
+                onChange={(e) => onChange(e.target.value)}
+                className="w-full py-3.5 px-2 bg-transparent border-none focus:outline-none text-sm font-semibold text-gray-800 resize-none"
+              />
+            ) : (
+              <input 
+                ref={inputRef}
+                type={type} 
+                value={(type === 'time' && value) ? value.slice(0, 5) : (value || "")}
+                onChange={(e) => onChange(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleConfirm()}
+                className="w-full py-3.5 px-2 bg-transparent border-none focus:outline-none text-sm font-bold text-gray-800"
+              />
+            )
           ) : (
-            <input 
-              ref={inputRef}
-              type={type} 
-              
-              value={(type === 'time' && value) ? value.slice(0, 5) : (value || "")}
-              onChange={(e) => onChange(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleConfirm()}
-              className="flex-1 py-3.5 px-2 bg-transparent border-none focus:outline-none text-sm font-bold text-gray-800"
-            />
-          )
-        ) : (
-          <div className="flex-1 py-3.5 px-2 text-sm font-bold text-gray-800 cursor-default">
-            {type === 'time' ? formatDisplayTime(value) : (value || "Not set")}
-          </div>
-        )}
+            <div className="w-full py-3.5 px-2 text-sm font-bold text-gray-800 cursor-default truncate">
+              {type === 'time' ? formatDisplayTime(value) : (value || "Not set")}
+            </div>
+          )}
+        </div>
 
-        <div className="pr-3">
+        <div className="pr-3 shrink-0">
           {isSavingLocal ? (
             <Loader2 size={16} className="animate-spin text-[#f9a602]" />
           ) : isEditing ? (
