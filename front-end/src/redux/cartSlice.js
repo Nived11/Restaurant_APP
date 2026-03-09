@@ -61,11 +61,12 @@ export const mergeCartOnLogin = createAsyncThunk(
 
 export const syncCartUpdate = createAsyncThunk(
   'cart/syncUpdate',
-  async ({ itemId, actionType }, { rejectWithValue }) => {
+  async ({ itemId, actionType, quantity = 1 }, { rejectWithValue }) => {
     try {
       const response = await api.post('/orders/cart/update/', {
         item_id: itemId,
-        action: actionType 
+        action: actionType,
+        quantity: quantity
       });
       return response.data; 
     } catch (err) {
@@ -137,6 +138,7 @@ const cartSlice = createSlice({
       .addCase(syncCartUpdate.fulfilled, (state, action) => {
         if (action.payload?.items) {
           state.items = formatCartItems(action.payload.items);
+          saveToLocal(state.items);
         }
       })
       .addCase(syncCartUpdate.rejected, (state, action) => {

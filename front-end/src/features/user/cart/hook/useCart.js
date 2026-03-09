@@ -14,7 +14,7 @@ const useCart = () => {
   const dispatch = useDispatch();
   
   const { items: cartItems, loading, error: reduxError } = useSelector((state) => state.cart);
-  const { isOpen } = useSelector((state) => state.location); // പുതിയ ഫീൽഡ് എടുത്തു
+  const { isOpen } = useSelector((state) => state.location); 
   const token = localStorage.getItem('user_access');
 
   useEffect(() => {
@@ -23,7 +23,6 @@ const useCart = () => {
     }
   }, [dispatch, token]);
 
-  // ഇന്റേണൽ ടൈം പാർസിംഗിന് പകരം ലളിതമായ ചെക്ക്
   const isStoreClosed = isOpen === false;
 
   const { 
@@ -65,11 +64,11 @@ const useCart = () => {
   }, 0);
 
   const incrementQty = (item) => {
-    const itemId = item.item_id || item.id;
-    if (item.quantity < item.currentStock) {
-      dispatch(updateQuantity({ id: item.id, quantity: item.quantity + 1 }));
-      if (token) dispatch(syncCartUpdate({ itemId, actionType: 'add' }));
-    } else {
+  const itemId = item.item_id || item.id;
+  if (item.quantity < item.currentStock) {
+    dispatch(updateQuantity({ id: item.id, quantity: item.quantity + 1 }));
+    if (token) dispatch(syncCartUpdate({ itemId, actionType: 'add' })); 
+  } else {
       toast.error(`Stock limit reached! Only ${item.currentStock} available.`);
     }
   };

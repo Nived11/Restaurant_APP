@@ -34,7 +34,6 @@ const Header = () => {
 
   const dispatch = useDispatch();
   const cartItems = useSelector((state) => state.cart.items);
-  // Redux-ൽ നിന്ന് isOpen സ്റ്റേറ്റ് കൂടി എടുത്തു
   const { currentLocation, errorPopup, isOpen } = useSelector((state) => state.location);
 
   const searchRef = useRef(null);
@@ -67,7 +66,6 @@ const Header = () => {
     const initializeApp = async () => {
       const status = await dispatch(checkInitialStatus(false, true));
 
-      // status "OPEN" ആണെങ്കിൽ മാത്രം ലൊക്കേഷൻ ചോദിക്കുക
       if (status === "OPEN" && !currentLocation.lat) {
         askForLocation();
       }
@@ -101,7 +99,7 @@ const Header = () => {
         .map(cat => (typeof cat === 'object' ? cat.name : cat))
         .filter(name => name && name.toLowerCase() !== "all");
     }
-    return ["Delicious Food", "Pizza", "Burger", "Biryani"];
+    return ["Delicious Food", "Pizza", "Burger", "Biriyani"];
   }, [categories]);
 
   const { scrollY } = useScroll();
@@ -154,7 +152,6 @@ const Header = () => {
     return typeof errorPopup === 'object' ? errorPopup.message : errorPopup;
   };
 
-  // Redux-ലെ isOpen ഉപയോഗിച്ച് ചെക്ക് ചെയ്യുന്നു
   const isStoreClosedError = () => {
     return isOpen === false;
   };
@@ -319,7 +316,6 @@ const Header = () => {
                 onClick={() => {
                   const closed = isStoreClosedError();
                   dispatch(clearError());
-                  // സ്റ്റോർ ക്ലോസ്ഡ് അല്ലെങ്കിൽ മാത്രം ലൊക്കേഷൻ മാറ്റാൻ ഓപ്ഷൻ നൽകുക
                   if (!closed) {
                     setShowLocationPicker(true);
                   }

@@ -22,7 +22,6 @@ const ProductModal = ({ item, onClose }) => {
   const [quantity, setQuantity] = useState(maxAvailableToAdd > 0 ? 1 : 0);
   const [isAdded, setIsAdded] = useState(false);
 
-  // സങ്കീർണ്ണമായ Time Calculation മാറ്റി ബാക്കെൻഡ് റിസൾട്ട് ഉപയോഗിക്കുന്നു
   const isStoreClosed = isOpen === false;
 
   useEffect(() => {
@@ -47,24 +46,27 @@ const ProductModal = ({ item, onClose }) => {
   };
 
   const handleAddToCart = () => {
-    if (isStoreClosed) {
-      toast.error("Store is currently closed!");
-      return;
+  if (isStoreClosed) {
+    toast.error("Store is currently closed!");
+    return;
+  }
+
+  if (quantity > 0) {
+    dispatch(addToCart({ item, quantity }));
+
+    const token = localStorage.getItem('user_access'); 
+    if (token) {
+      dispatch(syncCartUpdate({ 
+        itemId: item.id, 
+        actionType: 'add', 
+        quantity: quantity 
+      }));
     }
 
-    if (quantity > 0) {
-      dispatch(addToCart({ item, quantity }));
-
-      const token = localStorage.getItem('user_access'); 
-      if (token) {
-        dispatch(syncCartUpdate({ itemId: item.id, actionType: 'add' }));
-      }
-
-      toast.success(`${item.name} added to cart!`);
-      setIsAdded(true);
-    }
-  };
-
+    toast.success(`${item.name} added to cart!`);
+    setIsAdded(true);
+  }
+};
   const actualPrice = parseFloat(item.actual_price || 0);
   const offerPrice = parseFloat(item.offer_price || 0);
   const isVeg = item.dietary_preference === "VEG";
