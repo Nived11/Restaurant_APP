@@ -42,7 +42,6 @@ export const useOrderStats = () => {
           body: `You have ${currentNewOrders} new orders to process.`,
           icon: "/icon-192.png",
           badge: "/icon-192.png", 
-          vibrate: [200, 100, 200],
           requireInteraction: true,
           data: { url: window.location.origin + '/admin/orders' } 
         });
