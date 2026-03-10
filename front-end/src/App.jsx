@@ -20,40 +20,39 @@ const AppContent = () => {
   const isAdminPath = window.location.pathname.startsWith('/admin');
 
   useEffect(() => {
-    const setupFCM = async () => {
-      const isAuthorized = user?.role === 'admin' || user?.role === 'staff' || isAdminPath;
+  const setupFCM = async () => {
+    const adminToken = localStorage.getItem("admin_token");
+    
+    if (adminToken && "Notification" in window) {
+      try {
+        const permission = await Notification.requestPermission();
+        if (permission === "granted") {
+          const token = await getToken(messaging, {
+            vapidKey: import.meta.env.VITE_FIREBASE_VAPID_KEY
+          });
 
-      if (isAuthorized && "Notification" in window) {
-        try {
-          const permission = await Notification.requestPermission();
-
-          if (permission === "granted") {
-            const token = await getToken(messaging, {
-              vapidKey: import.meta.env.VITE_FIREBASE_VAPID_KEY
-            });
-
-            if (token) {
-              await api.post('/notifications/save-fcm-token/', { fcm_token: token });
-              console.log("FCM Token saved");
-            }
+          if (token) {
+            await api.post('/notifications/save-fcm-token/', { fcm_token: token });
+            console.log("FCM Token saved successfully");
           }
-        } catch (error) {
-          console.error("Error setting up FCM:", error);
         }
+      } catch (error) {
+        console.error("Error setting up FCM:", error);
       }
-    };
+    }
+  };
 
-    setupFCM();
+  setupFCM();
 
-    const unsubscribe = onMessage(messaging, (payload) => {
-      toast.success(`${payload.notification.title}: ${payload.notification.body}`, {
-        duration: 8000,
-      });
-      new Audio('/OrderNotify.mp3').play().catch(() => { });
+  const unsubscribe = onMessage(messaging, (payload) => {
+    toast.success(`${payload.notification.title}: ${payload.notification.body}`, {
+      duration: 8000,
     });
+    new Audio('/OrderNotify.mp3').play().catch(() => { });
+  });
 
-    return () => unsubscribe();
-  }, [user, isAdminPath]);
+  return () => unsubscribe();
+}, [user, isAdminPath]);
 
   return (
     <BrowserRouter>
@@ -64,7 +63,7 @@ const AppContent = () => {
       </AnimatePresence>
       <ScrollToTop />
       <Toaster position="top-center" richColors />
-      <div style={{ display: (isChecking && !isAdminPath) ? 'none' : 'block' }}>
+     <div style={{ visibility: (isChecking && !isAdminPath) ? 'hidden' : 'visible' }}>
         <AppRoutes />
       </div>
     </BrowserRouter>

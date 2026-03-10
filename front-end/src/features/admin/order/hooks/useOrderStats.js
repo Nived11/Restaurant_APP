@@ -3,7 +3,7 @@ import { useEffect, useRef } from 'react';
 import api from '../../../../api/axios';
 
 export const useOrderStats = () => {
-  const audioRef = useRef(new Audio('/OrderNotify.mp3'));
+  const audioRef = useRef(new Audio(`/OrderNotify.mp3?t=${Date.now()}`));
   const prevNewOrders = useRef(0);
 
   const { data, isLoading } = useQuery({
