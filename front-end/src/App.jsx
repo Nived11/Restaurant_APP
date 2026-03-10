@@ -1,3 +1,4 @@
+import { useEffect } from "react"; 
 import { BrowserRouter } from "react-router-dom";
 import AppRoutes from "./routes";
 import ScrollToTop from "./hooks/ScrollToTop";
@@ -12,7 +13,24 @@ const queryClient = new QueryClient();
 
 const AppContent = () => {
   const { isChecking } = useSelector((state) => state.location);
+  
+ const user = useSelector((state) => state.auth?.user); 
+  
   const isAdminPath = window.location.pathname.startsWith('/admin');
+
+  useEffect(() => {
+    const isAuthorized = user?.role === 'admin' || user?.role === 'staff' || isAdminPath;
+
+    if (isAuthorized && "Notification" in window) {
+      if (Notification.permission === "default") {
+        Notification.requestPermission().then((permission) => {
+          if (permission === "granted") {
+            console.log("Notifications enabled for authorized user");
+          }
+        });
+      }
+    }
+  }, [user, isAdminPath]);
 
   return (
     <BrowserRouter>
@@ -22,7 +40,7 @@ const AppContent = () => {
         )}
       </AnimatePresence>
       <ScrollToTop />
-      <Toaster />
+      <Toaster position="top-center" richColors /> 
       <div style={{ display: (isChecking && !isAdminPath) ? 'none' : 'block' }}>
         <AppRoutes />
       </div>

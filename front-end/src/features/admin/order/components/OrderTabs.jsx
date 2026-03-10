@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { PlusCircle, Utensils, Truck, History } from "lucide-react";
-import { useOrderStats } from "../hooks/useOrderStats"; // ഹുക്ക് ഇമ്പോർട്ട് ചെയ്യുന്നു
+import { useOrderStats } from "../hooks/useOrderStats"; 
 
 const OrderTabs = ({ tabs, activeTab, setActiveTab }) => {
   const { stats, isLoading } = useOrderStats();
@@ -18,7 +18,7 @@ const OrderTabs = ({ tabs, activeTab, setActiveTab }) => {
         {tabs.map((tabLabel) => {
           const isActive = activeTab === tabLabel;
           const config = tabConfig[tabLabel];
-          const count = stats[tabLabel]; // API-യിൽ നിന്നുള്ള കൗണ്ട്
+          const count = stats[tabLabel]; 
 
           return (
             <button
