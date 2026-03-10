@@ -10,19 +10,19 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       manifest: {
-        name: 'My Store Admin',
-        short_name: 'StoreAdmin',
-        theme_color: '#f9a602', 
+        name: 'THE CRUNCH -Order Management System',
+        short_name: 'THE CRUNCH',
+        theme_color: '#1a1a1a', 
         background_color: '#ffffff',
         display: 'standalone',
         icons: [
           {
-            src: 'icon-192.png',
+            src: 'favicon.png',
             sizes: '192x192',
             type: 'image/png'
           },
           {
-            src: 'icon-512.png',
+            src: 'favicon.png',
             sizes: '512x512',
             type: 'image/png'
           }
