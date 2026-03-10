@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import api from '../../../../api/axios'; // അല്ലെങ്കിൽ നിങ്ങളുടെ axios instance
+import api from '../../../../api/axios'; 
 import { toast } from 'sonner';
 import { extractErrorMessages } from '../../../../utils/extractErrorMessages';
 
