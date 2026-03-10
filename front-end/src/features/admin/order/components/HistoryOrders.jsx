@@ -1,5 +1,5 @@
-import React, { useRef } from 'react';
-import { Clock, User, Printer, MapPin, Info } from 'lucide-react';
+import React, { useRef, useState, useEffect } from 'react';
+import { Clock, User, Printer, MapPin, Info, Search, ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { useOrderHistory } from '../hooks/useOrderHistory';
 import { OrderSkeleton } from './OrderSkeleton';
 import { OrderError } from './OrderError';
@@ -25,16 +25,15 @@ const HistoryRow = ({ order }) => {
     <>
       <div className="hidden">
         <div ref={componentRef}>
-         <HistoryReceipt order={order} />
+          <HistoryReceipt order={order} />
         </div>
       </div>
 
       <div className="bg-white border border-gray-200 rounded-2xl mb-6 overflow-hidden shadow-sm hover:shadow-md transition-all">
-        {/* Header Section */}
         <div className="px-6 py-3 flex justify-between items-center bg-gray-50 border-b border-gray-100">
           <div className="flex items-center gap-3">
             <span className="text-sm font-black text-gray-900">
-             ORDER <span className={isDelivered ? "text-green-600" : "text-red-600"}>#{order.id}</span>
+              ORDER <span className={isDelivered ? "text-green-600" : "text-red-600"}>#{order.id}</span>
             </span>
             <div className={`text-[10px] px-2 py-0.5 rounded-full font-bold border ${statusStyles[order.order_status]}`}>
               {order.order_status}
@@ -49,13 +48,12 @@ const HistoryRow = ({ order }) => {
             onClick={() => handlePrint()}
             className="cursor-pointer flex items-center gap-1.5 text-gray-700 bg-white border border-gray-200 px-4 py-1.5 rounded-lg shadow-md hover:bg-gray-50 transition-colors"
           >
-           <Printer size={14} className={isDelivered ? 'text-green-600' : 'text-red-600'} />
+            <Printer size={14} className={isDelivered ? 'text-green-600' : 'text-red-600'} />
             <span className="text-[10px] font-black uppercase">Print</span>
           </button>
         </div>
 
         <div className="p-5 space-y-4">
-          {/* Customer & Location */}
           <div className="flex flex-col md:flex-row justify-between gap-4 border-b border-gray-50 pb-4">
             <div className="flex items-center gap-3">
               <div className="w-9 h-9 bg-gray-50 rounded-lg flex items-center justify-center text-gray-500">
@@ -79,7 +77,6 @@ const HistoryRow = ({ order }) => {
             )}
           </div>
 
-          {/* Items & Total */}
           <div className="flex justify-between items-end">
             <div className="flex-1">
               <p className="text-[8px] font-black text-gray-500 uppercase mb-1">Items Ordered</p>
@@ -98,7 +95,6 @@ const HistoryRow = ({ order }) => {
             </div>
           </div>
 
-          {/* Cancelled By Info (If applicable) */}
           {order.order_status === 'CANCELLED' && order.cancelled_by_display && (
             <div className="flex items-center gap-2 mt-2 p-2 bg-red-50 rounded-lg border border-red-100">
               <Info size={14} className="text-red-500" />
@@ -114,20 +110,138 @@ const HistoryRow = ({ order }) => {
 };
 
 const HistoryOrders = () => {
-  const { orders, isLoading, isError, error } = useOrderHistory();
+  const [page, setPage] = useState(1);
+  const [displaySearch, setDisplaySearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  
+  const topRef = useRef(null);
 
-  if (isLoading) return <OrderSkeleton />;
+  const { orders, isLoading, isError, error, hasNext, hasPrev } = useOrderHistory(page, debouncedSearch);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(displaySearch);
+      setPage(1);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [displaySearch]);
+
+  const handlePageChange = (newPage) => {
+    setPage(newPage);
+    setTimeout(() => {
+      const topElement = document.getElementById('top-of-history');
+      if (topElement) {
+        topElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 100);
+  };
+
+  const clearSearch = () => {
+    setDisplaySearch('');
+    setDebouncedSearch('');
+    setPage(1);
+    setTimeout(() => {
+      const topElement = document.getElementById('top-of-history');
+      if (topElement) {
+        topElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 100);
+  };
+
   if (isError) return <OrderError message={error} onRetry={() => window.location.reload()} />;
 
   return (
     <div className="max-w-7xl mx-auto py-4 px-4">
-      
+      <div id="top-of-history" className="scroll-mt-4" />
 
-      {orders.length > 0 ? (
-        orders.map(order => <HistoryRow key={order.id} order={order} />)
+      {/* Search Header */}
+      <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+        <div className="flex items-center gap-2">
+           <div className="w-2 h-8 bg-primary rounded-full" />
+           <h2 className="text-xl font-black text-gray-800 uppercase tracking-tighter">Order History</h2>
+        </div>
+        
+        <div className="relative w-full md:w-80 group">
+          <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none transition-colors group-focus-within:text-primary">
+            <Search size={16} className="text-gray-600 group-focus-within:text-primary" />
+          </div>
+          <input
+            type="text"
+            placeholder="SEARCH BY ORDER ID..."
+            value={displaySearch}
+            onChange={(e) => setDisplaySearch(e.target.value)}
+            className="w-full bg-white border border-gray-300 placeholder:text-gray-500 shadow-xl pl-10 pr-10 py-2.5 rounded-xl text-xs font-bold focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all"
+          />
+          {displaySearch && (
+            <button 
+              onClick={clearSearch}
+              className="absolute inset-y-0 right-3 flex items-center text-gray-400 hover:text-red-500 transition-colors"
+            >
+              <X size={16} />
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Orders List & Loading Logic */}
+      {isLoading ? (
+        <OrderSkeleton />
+      ) : orders.length > 0 ? (
+        <>
+          <div className="min-h-[400px]">
+            {orders.map(order => <HistoryRow key={order.id} order={order} />)}
+          </div>
+
+          {/* Pagination */}
+          <div className="flex justify-center items-center gap-6 mt-12 pb-16">
+            <button
+              disabled={!hasPrev}
+              onClick={() => handlePageChange(page - 1)}
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl border font-bold text-[10px] uppercase transition-all shadow-sm ${
+                !hasPrev 
+                ? 'text-gray-300 border-gray-100 bg-gray-50' 
+                : 'text-gray-700 border-gray-200 bg-white hover:bg-gray-50 hover:border-primary/30 active:scale-95 cursor-pointer'
+              }`}
+            >
+              <ChevronLeft size={16} />
+              Prev
+            </button>
+            
+            <div className="flex flex-col items-center">
+               <span className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-0.5">Page</span>
+               <span className="text-sm font-black text-primary bg-primary/5 px-3 py-1 rounded-lg">
+                {page}
+              </span>
+            </div>
+
+            <button
+              disabled={!hasNext}
+              onClick={() => handlePageChange(page + 1)}
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl border font-bold text-[10px] uppercase transition-all shadow-sm ${
+                !hasNext 
+                ? 'text-gray-300 border-gray-100 bg-gray-50' 
+                : 'text-gray-700 border-gray-200 bg-white hover:bg-gray-50 hover:border-primary/30 active:scale-95 cursor-pointer'
+              }`}
+            >
+              Next
+              <ChevronRight size={16} />
+            </button>
+          </div>
+        </>
       ) : (
-        <div className="text-center py-20 text-gray-500 font-bold uppercase tracking-widest">
-          No History Available
+        /* Only show Empty State if NOT loading and NO orders */
+        <div className="flex flex-col items-center justify-center py-32 bg-gray-50/50 rounded-3xl border border-dashed border-gray-200">
+          <div className="p-4 bg-white rounded-full shadow-sm mb-4">
+            <Search size={32} className="text-gray-200" />
+          </div>
+          <p className="text-xs font-black text-gray-400 uppercase tracking-widest">
+            {displaySearch ? `No orders found for #${displaySearch}` : 'No History Available'}
+          </p>
+          {displaySearch && (
+            <button onClick={clearSearch} className="mt-4 text-[10px] font-black text-primary underline uppercase underline-offset-4">
+              Clear Search
+            </button>
+          )}
         </div>
       )}
     </div>
