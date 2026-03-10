@@ -33,7 +33,7 @@ const AppContent = () => {
             });
 
             if (token) {
-              await api.post('/api/notifications/save-fcm-token/', { fcm_token: token });
+              await api.post('/notifications/save-fcm-token/', { fcm_token: token });
               console.log("FCM Token saved");
             }
           }
