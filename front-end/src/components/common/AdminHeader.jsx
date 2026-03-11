@@ -4,20 +4,24 @@ import { useSettings } from "../../features/admin/settings/hooks/useSettings";
 
 const AdminHeader = ({ user , shopData}) => {
 
+  const isAdmin = user?.role === "admin";
+
 
   return (
     <header className="h-24 bg-[#1A1A1A] border-b border-white/5 sticky top-0 z-40 px-6 md:px-10 flex items-center justify-end shadow-2xl">
       
       <div className="flex items-center gap-6">
         
-     <ShopStatus 
-  isOpen={shopData?.settings?.isOpen} 
-  isManuallyOpen={shopData?.settings?.isManuallyOpen}
-  onToggle={shopData?.toggleShopStatus} 
-  isUpdating={shopData?.isLoading}
-  openingTime={shopData?.settings?.openingTime}
-  closingTime={shopData?.settings?.closingTime}
-/>
+    {isAdmin && (
+          <ShopStatus 
+            isOpen={shopData?.settings?.isOpen} 
+            isManuallyOpen={shopData?.settings?.isManuallyOpen}
+            onToggle={shopData?.toggleShopStatus} 
+            isUpdating={shopData?.isLoading}
+            openingTime={shopData?.settings?.openingTime}
+            closingTime={shopData?.settings?.closingTime}
+          />
+        )}
           <NotificationBadge />
 
         {/* --- PROFILE SECTION --- */}

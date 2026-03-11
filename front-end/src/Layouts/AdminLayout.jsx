@@ -11,8 +11,7 @@ import { useSettings } from "../features/admin/settings/hooks/useSettings";
 
 const AdminLayout = () => {
   const { user } = useOutletContext();
-  
-  // സിംഗിൾ സോഴ്സ് ഓഫ് ട്രൂത്ത് - ലേഔട്ടിൽ മാത്രം ഹുക്ക് വിളിക്കുന്നു
+
   const settingsProps = useSettings();
   const { settings, toggleShopStatus, isLoading } = settingsProps;
 
@@ -24,7 +23,7 @@ const AdminLayout = () => {
     const verifySession = async () => {
       const token = localStorage.getItem('admin_token');
       if (!token) { window.location.href = '/admin/login'; return; }
-      try { await api.get('/auth/verify-session/'); } catch (error) {}
+      try { await api.get('/auth/verify-session/'); } catch (error) { }
     };
     verifySession();
   }, [location.pathname]);
@@ -55,14 +54,16 @@ const AdminLayout = () => {
             </div>
           </div>
           <div className="flex items-center gap-4">
-            <ShopStatus 
-  isOpen={settings.isOpen} 
-  isManuallyOpen={settings.isManuallyOpen} 
-  onToggle={toggleShopStatus} 
-  isUpdating={isLoading}
-  openingTime={settings.openingTime}
-  closingTime={settings.closingTime}
-/>
+            {user?.role === "admin" && (
+              <ShopStatus
+                isOpen={settings.isOpen}
+                isManuallyOpen={settings.isManuallyOpen}
+                onToggle={toggleShopStatus}
+                isUpdating={isLoading}
+                openingTime={settings.openingTime}
+                closingTime={settings.closingTime}
+              />
+            )}
             <NotificationBadge />
             <button onClick={() => setIsMobileMenuOpen(true)} className="text-white bg-white/10 p-2 rounded-xl active:scale-95 transition-transform"><Menu size={24} /></button>
           </div>
@@ -74,8 +75,9 @@ const AdminLayout = () => {
 
         <main className="flex-1 overflow-y-auto p-4 md:p-10 bg-white">
           <div className="max-w-7xl mx-auto">
-            {/* എല്ലാ സെറ്റിംഗ്‌സ് പ്രോപ്‌സും ഇവിടെ പാസ് ചെയ്യുന്നു */}
+
             <Outlet context={{ user, ...settingsProps }} />
+
           </div>
         </main>
       </div>
