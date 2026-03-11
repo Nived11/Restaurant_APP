@@ -68,7 +68,8 @@ const ComboSection = ({ data: combos = [], onItemClick }) => {
                 return (
                   <div 
                     key={combo.id} 
-                    className="snap-start min-w-[310px] md:min-w-[440px] bg-white rounded-[2rem] p-3 md:p-4 flex gap-4 md:gap-6 shadow-sm border border-gray-100 group/item items-center"
+                    onClick={() => onItemClick?.(combo)}
+                    className="cursor-pointer snap-start min-w-[310px] md:min-w-[440px] bg-white rounded-[2rem] p-3 md:p-4 flex gap-4 md:gap-6 shadow-sm border border-gray-100 group/item items-center"
                   >
                     <div className="relative shrink-0 w-28 h-28 md:w-36 md:h-40 overflow-hidden rounded-[1.5rem] md:rounded-[2rem] shadow-inner bg-gray-100">
                       <img 
@@ -103,7 +104,7 @@ const ComboSection = ({ data: combos = [], onItemClick }) => {
                           )}
                         </div>
                         
-                        <button onClick={() => onItemClick?.(combo)} className="w-full bg-black text-white py-2.5 md:py-3 rounded-xl text-[9px] md:text-xs font-black uppercase flex items-center justify-center gap-2 hover:bg-primary hover:text-black transition-all active:scale-95 shadow-lg shadow-black/5">
+                        <button  className="w-full bg-black text-white py-2.5 md:py-3 rounded-xl text-[9px] md:text-xs font-black uppercase flex items-center justify-center gap-2 hover:bg-primary hover:text-black transition-all active:scale-95 shadow-lg shadow-black/5">
                           <RiFlashlightFill size={16} className="text-primary group-hover/item:text-black" />
                           Grab Now
                         </button>

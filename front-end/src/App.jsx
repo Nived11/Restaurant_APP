@@ -23,7 +23,8 @@ const AppContent = () => {
   const setupFCM = async () => {
     const adminToken = localStorage.getItem("admin_token");
     
-    if (adminToken && "Notification" in window) {
+
+    if (isAdminPath && adminToken && "Notification" in window) {
       try {
         const permission = await Notification.requestPermission();
         if (permission === "granted") {
@@ -32,7 +33,10 @@ const AppContent = () => {
           });
 
           if (token) {
-            await api.post('/notifications/save-fcm-token/', { fcm_token: token });
+            await api.post('/notifications/save-fcm-token/', 
+              { fcm_token: token },
+              { headers: { Authorization: `Bearer ${adminToken}` } } 
+            );
             console.log("FCM Token saved successfully");
           }
         }
@@ -52,8 +56,7 @@ const AppContent = () => {
   });
 
   return () => unsubscribe();
-}, [user, isAdminPath]);
-
+}, [user, isAdminPath]); 
   return (
     <BrowserRouter>
       <AnimatePresence mode="wait">
@@ -62,7 +65,7 @@ const AppContent = () => {
         )}
       </AnimatePresence>
       <ScrollToTop />
-      <Toaster position="top-center" richColors />
+      <Toaster position="top-center" />
      <div style={{ visibility: (isChecking && !isAdminPath) ? 'hidden' : 'visible' }}>
         <AppRoutes />
       </div>

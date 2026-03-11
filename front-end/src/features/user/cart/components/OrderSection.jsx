@@ -121,7 +121,7 @@ export const OrderSection = ({ selectedAddress, cartItems, subTotal, totalAmount
               <div className="pt-6 mt-6 border-t border-gray-800">
                 <div className="flex justify-between items-end">
                   <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Total Amount</span>
-                  <span className="text-3xl md:text-4xl font-black text-[#f9a602] tracking-tighter">₹{finalPayable}</span>
+                  <span className="text-xl md:text-2xl font-black text-[#f9a602]">₹ {finalPayable}</span>
                 </div>
               </div>
             </div>

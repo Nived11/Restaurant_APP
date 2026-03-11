@@ -1,6 +1,5 @@
 import { Loader2 } from "lucide-react";
 
-// Props-ൽ openingTime, closingTime എന്നിവ സ്വീകരിക്കുന്നു
 const ShopStatus = ({ 
   isCollapsed = false, 
   isOpen, 
@@ -11,7 +10,6 @@ const ShopStatus = ({
   closingTime 
 }) => {
 
-  // സമയം മാത്രം വെച്ച് 'Working Hour' ആണോ എന്ന് നോക്കാനുള്ള ലോജിക്
   const checkIsWorkingHour = () => {
     if (!openingTime || !closingTime) return true;
     
@@ -67,7 +65,6 @@ const ShopStatus = ({
             </span>
 
             <div className="flex items-center gap-1 mt-0.5">
-              {/* മാറ്റം ഇവിടെയാണ്: ബാക്കെൻഡ് തരുന്ന isOpen-ന് പകരം isInWorkingHour ഉപയോഗിക്കുന്നു */}
               <div className={`w-1 h-1 rounded-full ${isInWorkingHour ? 'bg-emerald-500 animate-pulse' : 'bg-gray-500'}`} />
               <span className="text-[6px] text-gray-400 font-bold uppercase tracking-widest">
                 {isInWorkingHour ? 'In Working Hours' : 'Outside Hours'}

@@ -1,7 +1,7 @@
 import React from "react";
 import { AlertCircle, RefreshCcw } from "lucide-react";
 
-export default function DashboardError({ message }) {
+export default function RevenueError({ message }) {
   return (
     <div className="min-h-[60vh] flex flex-col items-center justify-center px-4 text-center">
       <div className="bg-rose-50 p-6 rounded-[2.5rem] mb-6 border border-rose-100">

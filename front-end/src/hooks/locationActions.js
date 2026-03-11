@@ -30,7 +30,7 @@ export const checkInitialStatus = (isSilent = false, showPopup = true) => async 
         dispatch(setLocation({
             ...currentLoc,
             workingHours,
-            isOpen // Redux-ലേക്ക് അയക്കുന്നു
+            isOpen 
         }));
 
         if (isOpen === false && showPopup) {

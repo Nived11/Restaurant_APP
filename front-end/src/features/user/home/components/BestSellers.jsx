@@ -35,7 +35,7 @@ const BestSellers = ({ data: bestSellers = [], onItemClick }) => {
                 <div 
                   key={item.id} 
                    onClick={() => onItemClick?.(item)}
-                  className="group bg-white rounded-xl border border-slate-200 overflow-hidden hover:shadow-md transition-all duration-300 flex flex-col h-full relative"
+                  className="cursor-pointer group bg-white rounded-xl border border-slate-200 overflow-hidden hover:shadow-md transition-all duration-300 flex flex-col h-full relative"
                 >
                   {/* Discount Badge */}
                   {discountPercent > 0 && (

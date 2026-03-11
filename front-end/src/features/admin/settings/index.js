@@ -1,4 +1,3 @@
-// src/features/admin/settings/index.js
 
 export { useSettings } from './hooks/useSettings';
 export { default as SettingsWebData } from './components/SettingsWebData';

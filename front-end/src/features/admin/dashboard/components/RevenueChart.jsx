@@ -1,7 +1,7 @@
 import { BarChart3 } from "lucide-react";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
-export default function RevenueChart({ data: apiData = [] }) {
+export default function WeeklyOrderChart({ data: apiData = [] }) {
   const chartData = apiData.map(item => ({
     name: item.day,
     orders: item.orders
@@ -14,42 +14,57 @@ export default function RevenueChart({ data: apiData = [] }) {
           <h3 className="text-lg md:text-xl font-black uppercase tracking-tight text-[#1A1A1A]">Weekly Order Volume</h3>
           <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Performance Analysis</p>
         </div>
-        <BarChart3 className="text-primary hidden sm:block" size={24} />
+        <div className="bg-primary/10 p-2.5 rounded-2xl hidden sm:block">
+          <BarChart3 className="text-primary" size={22} />
+        </div>
       </div>
+
       <div className="w-full">
         <ResponsiveContainer width="100%" aspect={window.innerWidth < 768 ? 1.5 : 2.5}>
           <AreaChart data={chartData} margin={{ left: 15, right: 15, top: 10, bottom: 20 }}>
             <defs>
-              <linearGradient id="colorSale" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="10%" stopColor="#ffb60a" stopOpacity={1} />
-                <stop offset="90%" stopColor="#ffad08" stopOpacity={0.1} />
+              <linearGradient id="colorOrderVolume" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="10%" stopColor="#ffb60a" stopOpacity={0.4} />
+                <stop offset="90%" stopColor="#ffb60a" stopOpacity={0.01} />
               </linearGradient>
             </defs>
+            
             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
+            
             <XAxis 
               dataKey="name" 
-              axisLine={true} 
-              tickLine={true} 
-              dy={10} 
+              axisLine={false} 
+              tickLine={false} 
+              dy={15} 
               interval={0} 
-              padding={{ left: 20, right: 20 }} 
-              tick={{ fill: '#020202', fontSize: 10, fontWeight: 900 }} 
+              tick={{ fill: '#1A1A1A', fontSize: 10, fontWeight: 900, textTransform: 'uppercase' }} 
             />
+            
             <YAxis hide />
+
+            {/* ടൂൾടിപ്പ് സ്റ്റൈൽ റെവന്യൂ ചാർട്ടിലേതുപോലെ മാറ്റി */}
             <Tooltip 
-              cursor={false} 
+              cursor={{ stroke: '#ffb60a', strokeWidth: 1, strokeDasharray: '5 5' }}
               contentStyle={{ 
-                borderRadius: '15px', 
+                borderRadius: '16px', 
                 border: 'none', 
-                boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' 
+                backgroundColor: '#1A1A1A', // Dark Theme Tooltip
+                color: '#fff',
+                boxShadow: '0 20px 25px -5px rgba(0,0,0,0.2)', 
+                fontWeight: '900', 
+                fontSize: '11px',
+                padding: '12px'
               }} 
+              itemStyle={{ color: '#ffb60a' }} // Value color
+              labelStyle={{ color: '#9ca3af', marginBottom: '4px', textTransform: 'uppercase', fontSize: '9px' }}
             />
+
             <Area 
               type="monotone" 
               dataKey="orders" 
-              stroke="#c68400bb" 
-              strokeWidth={3} 
-              fill="url(#colorSale)" 
+              stroke="#ffb60a" // Solid Primary Gold
+              strokeWidth={4} 
+              fill="url(#colorOrderVolume)" 
               animationDuration={1500} 
             />
           </AreaChart>

@@ -1,6 +1,5 @@
 import ShopStatus from "./ShopStatus";
 import NotificationBadge from "./NotificationBadge";
-import { useSettings } from "../../features/admin/settings/hooks/useSettings";
 
 const AdminHeader = ({ user , shopData}) => {
 
