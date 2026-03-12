@@ -64,7 +64,7 @@ export const OrderSection = ({ selectedAddress, cartItems, subTotal, totalAmount
                 <div key={item.id} className="flex justify-between items-center group">
                   <div className="flex items-center gap-4">
                     <div className="h-10 w-10 bg-gray-50 rounded-xl flex items-center justify-center font-black text-[10px] border border-gray-100">
-                      <img src={item.image} alt=" product" className="w-full h-full object-contain rounded-xl" />
+                      <img src={item.image} alt=" product" className="w-full h-full object-cover  rounded-xl " />
                     </div>
                     <div>
                       <p className="text-[11px] md:text-xs font-black uppercase text-black">

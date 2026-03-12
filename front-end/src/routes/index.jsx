@@ -5,7 +5,7 @@ import PublicLayout from "../Layouts/PublicLayout";
 
 import { UserLogin, UserSignup, AdminLogin } from "../Pages/auth";
 import { Home, Cart, Menu as UserMenu, About, Contact, Profile } from "../Pages/user";
-import { Dashboard, Orders, Menu as AdminMenu, Bookings, Inbox,Reviews, Customers, Revenue, Settings } from "../Pages/admin";
+import { Dashboard, Orders, Menu as AdminMenu, Bookings, Inbox, Reviews, Customers, Revenue, Settings } from "../Pages/admin";
 import NotFound from "../Pages/NotFound.jsx";
 
 const AppRoutes = () => {
@@ -21,25 +21,25 @@ const AppRoutes = () => {
            1. AUTH ROUTES 
       -------------------------------------------------------------- */}
       <Route
-  path="/login"
-  element={
-    getUserToken() ? (
-      <Navigate to="/" replace={true} state={{ from: null }} /> 
-    ) : (
-      <UserLogin />
-    )
-  }
-/>
-     <Route
-  path="/signup"
-  element={
-    getUserToken() ? (
-      <Navigate to="/" replace={true} state={{ from: null }} />
-    ) : (
-      <UserSignup />
-    )
-  }
-/>
+        path="/login"
+        element={
+          getUserToken() ? (
+            <Navigate to="/" replace={true} state={{ from: null }} />
+          ) : (
+            <UserLogin />
+          )
+        }
+      />
+      <Route
+        path="/signup"
+        element={
+          getUserToken() ? (
+            <Navigate to="/" replace={true} state={{ from: null }} />
+          ) : (
+            <UserSignup />
+          )
+        }
+      />
       <Route
         path="/admin/login"
         element={getAdminToken() ? <Navigate to="/admin/dashboard" replace /> : <AdminLogin />}
