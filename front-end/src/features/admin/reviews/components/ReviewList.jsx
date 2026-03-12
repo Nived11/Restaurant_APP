@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import useReviews from '../hooks/useReviews';
 import ReviewError from './ReviewError';
+import ReviewSkelton from './ReviewSkelton';
 import { RiStarFill } from "react-icons/ri";
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, RefreshCcw, Loader2, CheckCircle2, XCircle, AlertCircle } from "lucide-react";
 
@@ -28,11 +29,7 @@ const ReviewList = () => {
     );
   };
 
-  if (loading) return (
-    <div className="min-h-[400px] flex items-center justify-center">
-       <Loader2 className="animate-spin text-slate-300" size={40} />
-    </div>
-  );
+ if (loading) return <ReviewSkelton />;
 
   if (error) return <ReviewError message={error} />;
   const totalPages = Math.ceil(totalItems / 12) || 1;
