@@ -1,7 +1,7 @@
 import { NavLink } from "react-router-dom";
 import { 
   LayoutDashboard, ShoppingBag, Utensils, 
-  Image, Users, DollarSign, LogOut, Mail, 
+  Star, Users, DollarSign, LogOut, Mail, 
   ChevronLeft, ChevronRight, X ,BookIcon,Settings
 } from "lucide-react";
 import logoWeb from "../../assets/Logo-web.png";
@@ -20,6 +20,7 @@ const AdminSidebar = ({ isExpanded, setIsExpanded, user, isMobile, closeMobileMe
     { name: "Menu", path: "/admin/menu", icon: <Utensils size={20} />, show: true },
     { name: "Bookings", path: "/admin/bookings", icon: <BookIcon size={20} />, show: true },
     { name: "Inbox", path: "/admin/inbox", icon: <Mail size={20} />, show: true }, 
+    { name: "Reviews", path: "/admin/reviews", icon: <Star size={20} />, show: isAdmin},
     { name: "Customers", path: "/admin/customers", icon: <Users size={20} />, show: isAdmin },
     { name: "Revenue", path: "/admin/revenue", icon: <DollarSign size={20} />, show: isAdmin },
     { name: "Settings", path: "/admin/settings", icon: <Settings size={20} />, show: isAdmin },
@@ -64,7 +65,7 @@ const AdminSidebar = ({ isExpanded, setIsExpanded, user, isMobile, closeMobileMe
         </button>
       )}
 
-      <nav className={`flex-1 px-4 py-4 space-y-2 sm:space-y-4 overflow-y-auto no-scrollbar ${!isFull ? "overflow-x-visible" : "overflow-x-hidden"}`}>
+      <nav className={`flex-1 px-4 py-2 space-y-1.5 sm:space-y-4 overflow-y-auto no-scrollbar ${!isFull ? "overflow-x-visible" : "overflow-x-hidden"}`}>
         {navLinks.map((link) => link.show && (
           <NavLink 
             key={link.path} 

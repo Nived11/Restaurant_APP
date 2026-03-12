@@ -78,6 +78,8 @@ export const useSignup = () => {
                 setTimer(120);
                 setCanResend(false);
             }
+            console.log(response.data);
+            
         } catch (err) {
             setError(extractErrorMessages(err));
         } finally {
@@ -105,6 +107,7 @@ export const useSignup = () => {
                 localStorage.setItem('user_access', response.data.access);
                 localStorage.setItem('user_refresh', response.data.refresh);
                 localStorage.setItem('user_role', response.data.role);
+                localStorage.setItem('user_name', response.data.first_name);
 
                 dispatch(mergeCartOnLogin());
 

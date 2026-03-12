@@ -20,7 +20,7 @@ const Header = () => {
                     <h1 className="text-2xl md:text-3xl font-black text-[#0A0A0A] tracking-tighter leading-none">
                         KITCHEN <span className="text-[#f9a602]">DASHBOARD.</span>
                     </h1>
-                    <p className="text-[8px] md:text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] md:tracking-[0.3em] mt-1 ml-0.5">
+                    <p className="text-[8px] md:text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em] md:tracking-[0.3em] mt-1 ml-0.5">
                         Live Order Management
                     </p>
                 </div>

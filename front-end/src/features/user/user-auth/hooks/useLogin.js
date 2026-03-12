@@ -102,10 +102,13 @@ export const useLogin = () => {
                 localStorage.setItem('user_access', response.data.access);
                 localStorage.setItem('user_refresh', response.data.refresh);
                 localStorage.setItem('user_role', response.data.role);
+                localStorage.setItem('user_name', response.data.first_name);
+                
 
                 dispatch(mergeCartOnLogin());
 
                 toast.success("Welcome back!");
+                console.log("Full Login Response:", response.data);
                 const origin = location.state?.from || '/';
                 setTimeout(() => {
                     window.location.href = origin;

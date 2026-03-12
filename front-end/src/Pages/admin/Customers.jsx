@@ -15,7 +15,7 @@ const Customers = () => {
   } = useCustomer(searchTerm, statusFilter);
 
   return (
-    <div className="px-0.5 pt-4 sm:px-2 pt-0 sm:pt-8 w-full min-h-screen font-sans text-[#2D3748] flex flex-col" onClick={() => setIsFilterOpen(false)}>
+    <div className="px-0.5  sm:px-2 pt-0 sm:pt-4 w-full min-h-screen font-sans text-[#2D3748] flex flex-col" onClick={() => setIsFilterOpen(false)}>
       <div id="top-of-customers"></div>
       
       {/* HEADER */}

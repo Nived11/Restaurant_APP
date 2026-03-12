@@ -31,6 +31,8 @@ const Header = () => {
   const [selectedItem, setSelectedItem] = useState(null);
   const [showLocationPicker, setShowLocationPicker] = useState(false);
   const { getCurrentLocation, isLocating } = useAddress();
+  const storedName = localStorage.getItem('user_name');
+
 
   const dispatch = useDispatch();
   const cartItems = useSelector((state) => state.cart.items);
@@ -57,7 +59,7 @@ const Header = () => {
       await dispatch(checkInitialStatus(true, false));
     };
 
-    const interval = setInterval(checkStatus, 20000); 
+    const interval = setInterval(checkStatus, 20000);
     return () => clearInterval(interval);
   }, [dispatch]);
 
@@ -82,7 +84,7 @@ const Header = () => {
           const { latitude, longitude } = pos.coords;
           dispatch(handleLocationUpdate(latitude, longitude));
         },
-        (err) => { 
+        (err) => {
           console.log("Location Denied/Error", err);
           dispatch(setChecking(false));
         },
@@ -273,9 +275,15 @@ const Header = () => {
                     </span>
                   )}
                 </Link>
-                <Link to="/profile" className="p-2 bg-primary border border-accent/30 shadow-md hover:bg-primary/90 rounded-full text-gray-700">
-                  <RiUserFill size={25} className="text-black/80" />
-                </Link>
+                <Link to="/profile" className="p-2 bg-primary border border-accent/30 shadow-md hover:bg-primary/90 rounded-full text-gray-700 flex items-center justify-center">
+  {storedName ? (
+    <div className="w-[28px] h-[28px] flex items-center justify-center text-black/80 font-black text-[18px]  uppercase leading-none">
+      {storedName.charAt(0)}
+    </div>
+  ) : (
+    <RiUserFill size={26} className="text-black/80" />
+  )}
+</Link>
               </div>
             </div>
           </div>
@@ -303,9 +311,9 @@ const Header = () => {
               <div className="relative mb-6">
                 <motion.div animate={{ scale: [1, 1.1, 1] }} transition={{ repeat: Infinity, duration: 2 }} className="absolute inset-0 bg-primary/10 rounded-full scale-150 blur-sm" />
                 <div className="relative bg-primary p-4 rounded-full shadow-lg shadow-primary/40">
-                {
-                  isStoreClosedError() ? <RiStore2Line size={32} className="text-white" /> : <MapPin size={32} className="text-white" />
-                }
+                  {
+                    isStoreClosedError() ? <RiStore2Line size={32} className="text-white" /> : <MapPin size={32} className="text-white" />
+                  }
                 </div>
               </div>
               <h3 className="text-xl font-black text-gray-900 mb-2 text-center uppercase tracking-tight">
@@ -364,7 +372,7 @@ const Header = () => {
                   onConfirm={async (data) => {
                     const result = await dispatch(handleLocationUpdate(data.lat, data.lng));
                     if (result !== "CLOSED") {
-                        setShowLocationPicker(false);
+                      setShowLocationPicker(false);
                     }
                   }}
                   getCurrentLocation={getCurrentLocation}

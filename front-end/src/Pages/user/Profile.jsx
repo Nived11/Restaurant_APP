@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ProfileTabs, OrderHistory, AddressBook, ProfileOverview } from "../../features/user/profile";
+import { ProfileTabs, OrderHistory, AddressBook, ProfileOverview, UserReviews } from "../../features/user/profile";
 
 const Profile = () => {
   const location = useLocation();
   const [activeTab, setActiveTab] = useState("profile");
+
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -18,7 +19,7 @@ const Profile = () => {
       <div className="max-w-[1440px] mx-auto">
         {/* Main Container */}
         <div className="bg-white   md:rounded-[1.5rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100/50 overflow-hidden">
-          
+
           {/* Navigation Tabs */}
           <ProfileTabs activeTab={activeTab} setActiveTab={setActiveTab} />
 
@@ -35,6 +36,9 @@ const Profile = () => {
                 {activeTab === "profile" && <ProfileOverview />}
                 {activeTab === "orders" && <OrderHistory />}
                 {activeTab === "address" && <AddressBook />}
+                {activeTab === 'review' && (
+                  <UserReviews setActiveTab={setActiveTab} />
+                )}
               </motion.div>
             </AnimatePresence>
           </div>

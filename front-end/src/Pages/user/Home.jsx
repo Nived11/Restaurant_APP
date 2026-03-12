@@ -57,7 +57,8 @@ const Home = () => {
         onItemClick={(item) => setSelectedItem(item)}
       />
       <ExploreMore />
-      <Testimonials />
+      
+     <Testimonials data={data?.feedbacks} />
       <FAQ />
       <BrandFeatures />
 

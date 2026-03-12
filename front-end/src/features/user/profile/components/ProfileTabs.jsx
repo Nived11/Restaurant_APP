@@ -1,34 +1,31 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { LogOut, User2, ShoppingBag, MapPin } from "lucide-react";
+import { LogOut, User2, ShoppingBag, MapPin, Star } from "lucide-react";
 import { useUserLogout } from "../../../../hooks/useUserLogout";
+import { useReviews } from "../hooks/useReviews"; // Import hook
 
 const ProfileTabs = ({ activeTab, setActiveTab }) => {
   const { handleLogout } = useUserLogout();
+  const { eligibility } = useReviews(); // Get eligibility data
 
+  // Start with base tabs
   const tabItems = [
-    { 
-      id: 'profile', 
-      label: 'Profile', 
-      icon: <User2 size={14} strokeWidth={2.5} /> 
-    },
-    { 
-      id: 'orders', 
-      label: 'Orders', 
-      icon: <ShoppingBag size={14} strokeWidth={2.5} /> 
-    },
-    { 
-      id: 'address', 
-      label: 'Address', 
-      icon: <MapPin size={14} strokeWidth={2.5} /> 
-    },
+    { id: 'profile', label: 'Profile', icon: <User2 size={14} strokeWidth={2.5} /> },
+    { id: 'orders', label: 'Orders', icon: <ShoppingBag size={14} strokeWidth={2.5} /> },
+    { id: 'address', label: 'Address', icon: <MapPin size={14} strokeWidth={2.5} /> },
   ];
 
+  // Logic: Only show the Reviews tab if the user is eligible AND hasn't reviewed yet
+  if (eligibility?.is_eligible && !eligibility?.has_reviewed) {
+    tabItems.push({
+      id: 'review',
+      label: 'Reviews',
+      icon: <Star size={14} strokeWidth={2.5} />
+    });
+  }
+
   return (
-    /* lg സ്ക്രീനിൽ മാത്രം റോ (Row) ആക്കി മാറ്റി, താഴെയുള്ളവയിൽ കോളം ആയി നിലനിർത്തി */
     <div className="flex flex-col lg:flex-row lg:items-center border-b border-gray-100 bg-white relative">
-      
-      {/* 1. Logout Button - lg സ്ക്രീൻ വരെ മുകളിൽ ഒരു വരിയായി നിൽക്കും */}
       <div className="flex justify-end p-3 lg:p-0 lg:absolute lg:right-8 xl:right-14">
         <button 
           onClick={handleLogout}
@@ -41,7 +38,6 @@ const ProfileTabs = ({ activeTab, setActiveTab }) => {
         </button>
       </div>
 
-      {/* 2. Tabs Section */}
       <div className="flex w-full lg:w-auto lg:mx-auto px-2 lg:px-0">
         {tabItems.map((tab) => {
           const isActive = activeTab === tab.id;
@@ -49,10 +45,8 @@ const ProfileTabs = ({ activeTab, setActiveTab }) => {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              /* md വ്യൂവിലും ഫ്ലെക്സ് സെന്റർ നിലനിർത്തി */
               className={`flex-1 lg:flex-none cursor-pointer py-4 lg:py-7 px-1 md:px-6 lg:px-10 relative flex flex-col md:flex-row items-center justify-center gap-1.5 md:gap-2.5 transition-all group`}
             >
-              {/* Icon Container */}
               <div className={`p-1.5 md:p-2 rounded-lg transition-all duration-300 ${
                 isActive 
                   ? "bg-primary text-white shadow-md shadow-primary/20 scale-105" 
@@ -60,15 +54,11 @@ const ProfileTabs = ({ activeTab, setActiveTab }) => {
               }`}>
                 {tab.icon}
               </div>
-              
-              {/* Text Visibility */}
               <span className={`text-[9px] md:text-[11px] lg:text-[12px] font-black uppercase tracking-wider transition-colors ${
                 isActive ? "text-gray-900" : "text-gray-600 group-hover:text-gray-900"
               }`}>
                 {tab.label}
               </span>
-
-              {/* Active Indicator Bar */}
               {isActive && (
                 <motion.div 
                   layoutId="activeTab" 

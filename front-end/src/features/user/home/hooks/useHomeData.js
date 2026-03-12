@@ -7,17 +7,17 @@ export const useHomeData = () => {
     queryKey: ["homeData"],
     queryFn: async () => {
       try {
-        const [bannersRes, combosRes, bestSellersRes, specialsRes, categoriesRes] = await Promise.all([
+        const [bannersRes, combosRes, bestSellersRes, specialsRes, categoriesRes, feedbacksRes] = await Promise.all([
           api.get("/inventory/public/menu-items/?section=BANNER"),
           api.get("/inventory/public/menu-items/?section=COMBO MENU"),
           api.get("/inventory/public/menu-items/?section=BEST SELLER"),
           api.get("/inventory/public/menu-items/?section=TODAY'S SPECIAL"),
-          api.get("/inventory/public/categories/")
+          api.get("/inventory/public/categories/"),
+          api.get("/feedback/list/")
         ]);
 
         const getValidatedItems = (res, sectionName) => {
           const rawData = Array.isArray(res.data) ? res.data : res.data.results || [];
-          
           return rawData.filter(item => item.section === sectionName);
         };
 
@@ -26,8 +26,8 @@ export const useHomeData = () => {
           combos: getValidatedItems(combosRes, "COMBO MENU"),
           bestSellers: getValidatedItems(bestSellersRes, "BEST SELLER"),
           specials: getValidatedItems(specialsRes, "TODAY'S SPECIAL"),
-          
-          categories: Array.isArray(categoriesRes.data) ? categoriesRes.data : categoriesRes.data.results || []
+          categories: Array.isArray(categoriesRes.data) ? categoriesRes.data : categoriesRes.data.results || [],
+          feedbacks: Array.isArray(feedbacksRes.data) ? feedbacksRes.data : feedbacksRes.data.results || []
         };
       } catch (err) {
         const errorMessage = extractErrorMessages(err);

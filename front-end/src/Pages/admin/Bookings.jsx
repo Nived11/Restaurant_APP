@@ -16,7 +16,7 @@ const Bookings = () => {
             <h1 className="text-3xl sm:text-4xl font-black uppercase tracking-tighter text-[#1A1A1A]">
               Reservation <span className="text-[#f9a602]">Lists</span>
             </h1>
-            <p className="text-[9px] sm:text-[10px] font-bold text-gray-400 uppercase tracking-[0.3em] mt-1">
+            <p className="text-[9px] sm:text-[10px] font-bold text-gray-500 uppercase tracking-[0.3em] mt-1">
               manage your restaurant reservations
             </p>
           </div>
