@@ -1,11 +1,11 @@
 import React from 'react';
 import { Mail, Phone, ShoppingBag, Calendar, Loader2, ChevronDown, ChevronUp } from 'lucide-react';
 import CustomerSkeleton from './CustomerSkeleton';
-import ErrorState from '../components/ErrorState'; 
+import ErrorState from '../components/ErrorState';
 
- const CustomerTable = ({ 
-  customers, isLoading, isError, error, onRetry, 
-  onToggleStatus, hasMore, loadMore, isMoreLoading, onShowLess 
+const CustomerTable = ({
+  customers, isLoading, isError, error, onRetry,
+  onToggleStatus, hasMore, loadMore, isMoreLoading, onShowLess
 }) => {
   return (
     <div className="bg-white border border-gray-100 rounded-[1rem] shadow-sm overflow-hidden">
@@ -41,8 +41,8 @@ import ErrorState from '../components/ErrorState';
                     <div>
                       <h3 className="font-bold text-[#1A202C]">{customer.first_name} {customer.last_name}</h3>
                       <div className="flex flex-col gap-1 mt-1">
-                        <p className="text-xs text-gray-500 flex items-center gap-1.5"><Mail size={12}/> {customer.email || 'No email'}</p>
-                        <p className="text-xs text-gray-500 flex items-center gap-1.5"><Phone size={12}/> {customer.phone_number}</p>
+                        <p className="text-xs text-gray-500 flex items-center gap-1.5"><Mail size={12} /> {customer.email || 'No email'}</p>
+                        <p className="text-xs text-gray-500 flex items-center gap-1.5"><Phone size={12} /> {customer.phone_number}</p>
                       </div>
                     </div>
                   </div>
@@ -50,16 +50,16 @@ import ErrorState from '../components/ErrorState';
                 <td className="py-6 px-8 text-center">
                   <div className="flex flex-col items-center gap-1">
                     <div className="flex items-center gap-2 px-3 py-1 bg-gray-50 rounded-full">
-                      <ShoppingBag size={12} className="text-[#f9a602]"/>
+                      <ShoppingBag size={12} className="text-[#f9a602]" />
                       <span className="text-sm font-bold text-[#1A202C]">{customer.total_orders || 0} Orders</span>
                     </div>
                     <span className="text-[10px] text-gray-500 font-medium uppercase tracking-widest flex items-center gap-1">
-                      <Calendar size={10}/> Joined {new Date(customer.date_joined).toLocaleDateString('en-GB')}
+                      <Calendar size={10} /> Joined {new Date(customer.date_joined).toLocaleDateString('en-GB')}
                     </span>
                   </div>
                 </td>
                 <td className="py-6 px-10 text-right">
-                  <button 
+                  <button
                     onClick={() => onToggleStatus(customer)}
                     className={`px-5 py-2.5 rounded-xl text-[10px] font-bold uppercase tracking-wider transition-all ${customer.is_blocked ? 'bg-red-50 text-red-500 hover:bg-red-100 border border-red-100 shadow-md cursor-pointer' : 'cursor-pointer bg-white text-gray-800 border border-gray-300 hover:bg-gray-50 shadow-md'}`}
                   >
@@ -90,11 +90,11 @@ import ErrorState from '../components/ErrorState';
               <div className="flex-1 overflow-hidden">
                 <h3 className="font-bold text-sm text-[#1A202C] truncate">{customer.first_name} {customer.last_name}</h3>
                 <div className="flex flex-col gap-0.5 mt-1">
-                  <p className="text-[11px] text-gray-500 truncate flex items-center gap-1"><Mail size={10}/> {customer.email || 'N/A'}</p>
-                  <p className="text-[11px] text-gray-500 truncate flex items-center gap-1"><Phone size={10}/> {customer.phone_number}</p>
+                  <p className="text-[11px] text-gray-500 truncate flex items-center gap-1"><Mail size={10} /> {customer.email || 'N/A'}</p>
+                  <p className="text-[11px] text-gray-500 truncate flex items-center gap-1"><Phone size={10} /> {customer.phone_number}</p>
                 </div>
               </div>
-              <button 
+              <button
                 onClick={() => onToggleStatus(customer)}
                 className={`px-4 py-2 rounded-lg text-[9px] font-bold uppercase shrink-0 ${customer.is_blocked ? 'bg-red-50 text-red-500' : 'bg-gray-50 text-gray-600'}`}
               >
@@ -105,14 +105,15 @@ import ErrorState from '../components/ErrorState';
         ))}
       </div>
 
-      {/* FOOTER ACTIONS (Load More / Show Less) */}
+      {/* FOOTER ACTIONS */}
       <div className="p-8 flex flex-col items-center gap-4">
         {hasMore && !isError && (
           <button onClick={loadMore} disabled={isMoreLoading} className="flex items-center gap-2 px-8 py-3.5 bg-black text-white rounded-full text-[11px] font-extrabold uppercase tracking-widest shadow-xl active:scale-95 disabled:opacity-70">
             {isMoreLoading ? <><Loader2 size={16} className="animate-spin text-white" /> LOADING...</> : <>SEE MORE <ChevronDown size={16} /></>}
           </button>
         )}
-        {!hasMore && customers.length > 0 && !isLoading && !isError && (
+
+        {!hasMore && customers.length > 12 && !isLoading && !isError && (
           <button onClick={onShowLess} className="flex items-center gap-2 px-8 py-3.5 bg-white border border-gray-200 text-gray-500 rounded-full text-[11px] font-extrabold uppercase tracking-widest shadow-md active:scale-95">
             SHOW LESS <ChevronUp size={16} />
           </button>

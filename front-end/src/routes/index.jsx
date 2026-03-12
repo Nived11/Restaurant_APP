@@ -21,13 +21,25 @@ const AppRoutes = () => {
            1. AUTH ROUTES 
       -------------------------------------------------------------- */}
       <Route
-        path="/login"
-        element={getUserToken() ? <Navigate to="/" replace /> : <UserLogin />}
-      />
-      <Route
-        path="/signup"
-        element={getUserToken() ? <Navigate to="/" replace /> : <UserSignup />}
-      />
+  path="/login"
+  element={
+    getUserToken() ? (
+      <Navigate to="/" replace={true} state={{ from: null }} /> 
+    ) : (
+      <UserLogin />
+    )
+  }
+/>
+     <Route
+  path="/signup"
+  element={
+    getUserToken() ? (
+      <Navigate to="/" replace={true} state={{ from: null }} />
+    ) : (
+      <UserSignup />
+    )
+  }
+/>
       <Route
         path="/admin/login"
         element={getAdminToken() ? <Navigate to="/admin/dashboard" replace /> : <AdminLogin />}

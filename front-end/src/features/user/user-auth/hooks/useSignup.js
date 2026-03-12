@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useDispatch } from 'react-redux'; 
+import { useNavigate, useLocation } from 'react-router-dom';
 import api from '../../../../api/axios';
 import { extractErrorMessages } from '../../../../utils/extractErrorMessages';
 import { mergeCartOnLogin } from '../../../../redux/cartSlice'; 
@@ -15,6 +16,8 @@ export const useSignup = () => {
     const [timer, setTimer] = useState(120);
     const [canResend, setCanResend] = useState(false);
     const inputRefs = useRef([]);
+    const navigate = useNavigate(); 
+    const location = useLocation();
 
     useEffect(() => {
         let interval;
@@ -112,8 +115,9 @@ export const useSignup = () => {
                 dispatch(mergeCartOnLogin());
 
                 toast.success("Successfully Registered! Welcome!");
+                const origin = location.state?.from || '/';
                 setTimeout(() => {
-                    window.location.href = '/';
+                   navigate(origin, { replace: true });
                 }, 1500);
             }
         } catch (err) {

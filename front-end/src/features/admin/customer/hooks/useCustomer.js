@@ -18,8 +18,12 @@ const useCustomer = (searchTerm, statusFilter) => {
     queryKey: ['customers', searchTerm, statusFilter],
     queryFn: async ({ pageParam = 1 }) => {
       const params = { search: searchTerm, page: pageParam };
-      if (statusFilter === "Blocked") params.is_blocked = true;
-      if (statusFilter === "Active") params.is_blocked = false;
+      
+      if (statusFilter === "Blocked") {
+        params.status = "blocked"; 
+      } else if (statusFilter === "Active") {
+        params.status = "active";  
+      }
 
       const response = await api.get("/customers/", { params });
       return response.data; 
@@ -47,7 +51,7 @@ const useCustomer = (searchTerm, statusFilter) => {
 
   const toggleMutation = useMutation({
     mutationFn: async (id) => {
-      const res = await api.post(`/customers/${id}/toggle-block//`);
+      const res = await api.post(`/customers/${id}/toggle-block/`);
       return res.data;
     },
     onSuccess: (data) => {
@@ -75,12 +79,14 @@ const useCustomer = (searchTerm, statusFilter) => {
     }
   };
 
-  const customers = data?.pages.flatMap(page => page.results || page) || [];
+  const customers = data?.pages.flatMap(page => page.results) || [];
+  const totalCount = data?.pages[0]?.count || 0;
 
   return {
     customers,
     isLoading,
     isError,
+    totalCount,
     isMoreLoading: isFetchingNextPage,
     hasMore: hasNextPage,
     loadMore: fetchNextPage,

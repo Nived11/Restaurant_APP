@@ -6,6 +6,7 @@ import { extractErrorMessages } from "../../../../utils/extractErrorMessages";
 export const useReviews = () => {
   const queryClient = useQueryClient(); 
   const [page, setPage] = useState(1);
+  const [searchTerm, setSearchTerm] = useState(""); 
 
   const {
     data,
@@ -14,10 +15,13 @@ export const useReviews = () => {
     error,
     refetch,
   } = useQuery({
-    queryKey: ["reviews", page],
+    queryKey: ["reviews", page, searchTerm], 
     queryFn: async () => {
       const response = await api.get(`/feedback/admin/list/`, {
-        params: { page: page }, // പേജ് പാരാമീറ്റർ കൃത്യമായി അയക്കുന്നു
+        params: { 
+          page: page,
+          search: searchTerm 
+        },
       });
       return response.data;
     },
@@ -25,7 +29,6 @@ export const useReviews = () => {
     staleTime: 5000,
   });
 
-  // Status update mutation
   const updateStatusMutation = useMutation({
     mutationFn: async ({ reviewId, isApproved }) => {
       const response = await api.patch(`/feedback/admin/${reviewId}/update/`, {
@@ -38,22 +41,27 @@ export const useReviews = () => {
     },
   });
 
-  // API റെസ്‌പോൺസ് സ്ട്രക്ചർ അനുസരിച്ചുള്ള മാറ്റങ്ങൾ
-  const reviews = data?.results || []; // API-ൽ 'results' എന്നതിലാണ് ഡാറ്റ
+  const reviews = data?.results || []; 
   const totalItems = data?.count || 0;
+  
+  // ഹാർഡ്‌കോഡഡ് 12 (ബാക്ക് എൻഡ് ലിമിറ്റ് അനുസരിച്ച്)
+  const totalPages = Math.ceil(totalItems / 12) || 1;
 
   return {
     reviews,
     page,
     setPage,
+    searchTerm,
+    setSearchTerm, 
     totalItems,
+    totalPages, 
     loading: isLoading,
     updateStatus: updateStatusMutation.mutate,
     isUpdating: updateStatusMutation.isLoading,
     error: isError ? extractErrorMessages(error) : null, 
     refresh: refetch,
-    hasNextPage: !!data?.next,     // API 'next' ഫീൽഡ് ഉപയോഗിക്കുന്നു
-    hasPrevPage: !!data?.previous, // API 'previous' ഫീൽഡ് ഉപയോഗിക്കുന്നു
+    hasNextPage: !!data?.next,    
+    hasPrevPage: !!data?.previous,
   };
 };
 

@@ -1,7 +1,17 @@
 import React from 'react';
 import { Search, Filter } from 'lucide-react';
 
- const CustomerFilters = ({ searchTerm, setSearchTerm, statusFilter, setStatusFilter, isFilterOpen, setIsFilterOpen, customerCount, isLoading }) => {
+ const CustomerFilters = ({ 
+  searchTerm, 
+  setSearchTerm, 
+  statusFilter, 
+  setStatusFilter, 
+  isFilterOpen, 
+  setIsFilterOpen, 
+  loadedCount, 
+  totalCount,  
+  isLoading 
+}) => {
   return (
     <div className="flex flex-col md:flex-row items-stretch md:items-center gap-3 md:gap-4 mb-8">
       <div className="relative flex-1 group">
@@ -39,7 +49,9 @@ import { Search, Filter } from 'lucide-react';
           )}
         </div>
         <div className="bg-white px-4 py-3 md:px-5 md:py-4 flex items-center gap-2 rounded-xl md:rounded-2xl font-bold text-[10px] md:text-xs text-gray-500 border border-primary/60 md:border-none shadow-xl md:shadow-none">
-           <span className="text-[#1A202C]">{isLoading ? ".." : customerCount}</span> RECORDS
+          <span className="text-[#1A202C]">
+          {isLoading ? ".." : `${loadedCount} / ${totalCount}`}
+        </span> RECORDS
         </div>
       </div>
     </div>

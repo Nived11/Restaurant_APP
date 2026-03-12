@@ -64,17 +64,17 @@ export const OrderSection = ({ selectedAddress, cartItems, subTotal, totalAmount
                 <div key={item.id} className="flex justify-between items-center group">
                   <div className="flex items-center gap-4">
                     <div className="h-10 w-10 bg-gray-50 rounded-xl flex items-center justify-center font-black text-[10px] border border-gray-100">
-                      {item.quantity}x
+                      <img src={item.image} alt=" product" className="w-full h-full object-contain rounded-xl" />
                     </div>
                     <div>
                       <p className="text-[11px] md:text-xs font-black uppercase text-black">
                         {item.name}
                       </p>
-                      <p className="text-[9px] text-gray-500 font-bold">₹{item.offer_price} per unit</p>
+                      <p className="text-[9px] text-gray-500 font-bold"> {item.quantity} x ₹{item.offer_price}</p>
                     </div>
                   </div>
                   <p className="text-xs md:text-sm font-black text-black tracking-tight">
-                    ₹{item.offer_price * item.quantity}
+                  ₹{item.offer_price * item.quantity}
                   </p>
                 </div>
               ))}

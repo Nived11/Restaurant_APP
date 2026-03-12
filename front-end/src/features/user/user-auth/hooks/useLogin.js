@@ -1,13 +1,14 @@
 import { useState, useEffect, useRef } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux'; 
 import api from '../../../../api/axios';
 import { extractErrorMessages } from '../../../../utils/extractErrorMessages';
 import { mergeCartOnLogin } from '../../../../redux/cartSlice'; 
 import { toast } from 'sonner';
 
+
 export const useLogin = () => {
-    const dispatch = useDispatch(); // Initialize dispatch
+    const dispatch = useDispatch(); 
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null); 
     const [step, setStep] = useState(1);
@@ -17,7 +18,10 @@ export const useLogin = () => {
     const [canResend, setCanResend] = useState(false);
 
     const inputRefs = useRef([]);
+
+    const navigate = useNavigate();
     const location = useLocation();
+
 
     const formatTime = (seconds) => {
         const mins = Math.floor(seconds / 60);
@@ -111,7 +115,7 @@ export const useLogin = () => {
                 console.log("Full Login Response:", response.data);
                 const origin = location.state?.from || '/';
                 setTimeout(() => {
-                    window.location.href = origin;
+                   navigate(origin, { replace: true });
                 }, 1500);
             }
         } catch (err) {

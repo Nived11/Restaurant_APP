@@ -59,7 +59,9 @@ const Home = () => {
       <ExploreMore />
       
      <Testimonials data={data?.feedbacks} />
-      <FAQ />
+
+     <FAQ data={data?.faqs} />
+     
       <BrandFeatures />
 
       <AnimatePresence>

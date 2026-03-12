@@ -116,7 +116,11 @@ const HistoryOrders = () => {
   
   const topRef = useRef(null);
 
-  const { orders, isLoading, isError, error, hasNext, hasPrev } = useOrderHistory(page, debouncedSearch);
+  const { orders, totalCount, isLoading, isError, error, hasNext, hasPrev } = useOrderHistory(page, debouncedSearch);
+
+  // Pagination Logic
+  const itemsPerPage = 12;
+  const totalPages = Math.ceil(totalCount / itemsPerPage) || 1;
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -192,7 +196,7 @@ const HistoryOrders = () => {
             {orders.map(order => <HistoryRow key={order.id} order={order} />)}
           </div>
 
-          {/* Pagination */}
+          {/* Updated Pagination with Page X of Y */}
           <div className="flex justify-center items-center gap-6 mt-12 pb-16">
             <button
               disabled={!hasPrev}
@@ -207,11 +211,16 @@ const HistoryOrders = () => {
               Prev
             </button>
             
-            <div className="flex flex-col items-center">
-               <span className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-0.5">Page</span>
-               <span className="text-sm font-black text-primary bg-primary/5 px-3 py-1 rounded-lg">
-                {page}
-              </span>
+            <div className="flex flex-col items-center min-w-[120px]">
+               <span className="text-[10px] font-black text-gray-600   uppercase tracking-[0.2em] mb-1">
+                Page {page} of {totalPages}
+               </span>
+               <div className="w-24 h-1 bg-gray-100 rounded-full overflow-hidden">
+                  <div 
+                    className="h-full bg-primary transition-all duration-300" 
+                    style={{ width: `${(page / totalPages) * 100}%` }}
+                  />
+               </div>
             </div>
 
             <button
@@ -229,7 +238,7 @@ const HistoryOrders = () => {
           </div>
         </>
       ) : (
-        /* Only show Empty State if NOT loading and NO orders */
+        /* Empty State */
         <div className="flex flex-col items-center justify-center py-32 bg-gray-50/50 rounded-3xl border border-dashed border-gray-200">
           <div className="p-4 bg-white rounded-full shadow-sm mb-4">
             <Search size={32} className="text-gray-200" />

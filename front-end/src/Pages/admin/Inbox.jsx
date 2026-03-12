@@ -73,7 +73,7 @@ const Inbox = () => {
             <p className="text-xs text-gray-500">Showing <span className="font-bold text-[#f9a602]">{totalItems}</span> messages</p>
           </div>
           <div className="relative mb-5">
-            <Search className="absolute left-3 top-2.5 text-gray-500" size={16}/><input type="text" placeholder="Search..." value={localSearch}
+            <Search className="absolute left-3 top-2.5 text-gray-500" size={16}/><input type="text" placeholder="Search by name or email..." value={localSearch}
               onChange={(e) => setLocalSearch(e.target.value)} className="w-full pl-10 py-2 bg-white border border-primary/60 rounded-xl text-sm font-medium outline-none shadow-xl" />
           </div>
           {isLoading && page === 1 ? <MobileSkeleton /> : error ? <ErrorState message={error} /> : 
@@ -91,8 +91,8 @@ const Inbox = () => {
             </div>
             <div className="relative group">
                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-[#f9a602]" size={18}/>
-               <input type="text" placeholder="Search..." value={localSearch} onChange={(e) => setLocalSearch(e.target.value)}
-                 className="pl-12 pr-4 py-3 w-80 bg-white border border-primary/60 rounded-xl text-sm outline-none shadow-xl" />
+               <input type="text" placeholder="Search by name or email..." value={localSearch} onChange={(e) => setLocalSearch(e.target.value)}
+                 className="pl-12 pr-4 py-3  w-80  bg-white border border-primary/60 rounded-xl text-sm font-medium outline-none focus:border-[#f9a602] focus:ring-1 focus:ring-[#f9a602] transition-all shadow-xl placeholder:text-gray-500" />
             </div>
          </div>
 
