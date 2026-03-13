@@ -9,7 +9,7 @@ import { useReactToPrint } from 'react-to-print';
 import { OrderReceipt } from './OrderReceipt'; 
 
 const OrderRow = ({ order, onAccept, onCancelClick, isUpdating, updatingOrderId }) => {
- const { elapsedTime, formattedDate } = useOrderTime(order.created_at);
+  const { elapsedTime, formattedDate } = useOrderTime(order.created_at);
   const componentRef = useRef(null); 
   const isThisOrderUpdating = isUpdating && updatingOrderId === order.id;
 
@@ -39,7 +39,6 @@ const OrderRow = ({ order, onAccept, onCancelClick, isUpdating, updatingOrderId 
             </div>
           </div>
           
-          {/* Print Button - onClick കണക്ട് ചെയ്തു */}
           <button 
             onClick={() => handlePrint()}
             className="cursor-pointer flex items-center gap-1.5 text-gray-700 bg-white border border-gray-200 px-4 py-1.5 rounded-lg shadow-md hover:bg-gray-50 transition-colors"
@@ -76,12 +75,19 @@ const OrderRow = ({ order, onAccept, onCancelClick, isUpdating, updatingOrderId 
             <div className="flex-1">
               <p className="text-[8px] font-black text-gray-500 uppercase tracking-widest mb-1">Items</p>
               <p className="text-[13px] font-bold text-gray-700 leading-relaxed">
-                {order.items.map((item, idx) => (
-                  <span key={idx}>
-                    <span className="text-[#f9a602] font-black">{item.quantity}x</span> {item.item_name}
-                    {idx < order.items.length - 1 ? ', ' : ''}
-                  </span>
-                ))}
+                {order.items.map((item, idx) => {
+                  // MODIFIED: Adding variant name (size_name) with the item name if it exists
+                  const displayName = item.size_name 
+                    ? `${item.item_name} (${item.size_name})` 
+                    : item.item_name;
+
+                  return (
+                    <span key={idx}>
+                      <span className="text-[#f9a602] font-black">{item.quantity}x</span> {displayName}
+                      {idx < order.items.length - 1 ? ', ' : ''}
+                    </span>
+                  );
+                })}
               </p>
             </div>
             <div className="md:text-right shrink-0">

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Edit3, Trash2, ImageIcon, AlertTriangle } from "lucide-react";
+import { Edit3, Trash2, ImageIcon, AlertTriangle, Layers } from "lucide-react";
 
 const ProductCard = ({ item, onEdit, onDelete }) => {
   const [showConfirm, setShowConfirm] = useState(false);
@@ -7,7 +7,12 @@ const ProductCard = ({ item, onEdit, onDelete }) => {
   if (!item) return null;
 
   const isVeg = item?.dietary_preference === "VEG";
+  const hasVariants = item?.has_variants && item?.variants?.length > 0;
 
+  // Determine Price and Stock based on variants
+  const displayOfferPrice = hasVariants ? item.variants[0].offer_price || item.variants[0].actual_price : item?.offer_price || item?.actual_price;
+  const displayActualPrice = hasVariants ? item.variants[0].actual_price : item?.actual_price;
+  
   return (
     <>
       <div className="group bg-white rounded-xl border border-slate-200 overflow-hidden hover:shadow-md transition-all duration-300 flex flex-col h-full relative">
@@ -30,10 +35,15 @@ const ProductCard = ({ item, onEdit, onDelete }) => {
               <ImageIcon size={20} />
             </div>
           )}
-          <div className="absolute bottom-2 left-2">
+          <div className="absolute bottom-2 left-2 flex gap-1.5">
             <span className="bg-white/90 backdrop-blur-sm text-slate-900 text-[7px] sm:text-[8px] font-black px-1.5 py-0.5 rounded shadow-sm uppercase">
               {item?.category_name || "General"}
             </span>
+            {hasVariants && (
+              <span className="bg-blue-500/90 backdrop-blur-sm text-white text-[7px] sm:text-[8px] font-black px-1.5 py-0.5 rounded shadow-sm uppercase flex items-center gap-0.5">
+                <Layers size={8} /> Variants
+              </span>
+            )}
           </div>
         </div>
 
@@ -50,21 +60,28 @@ const ProductCard = ({ item, onEdit, onDelete }) => {
           <p className="text-[9px] text-slate-500 line-clamp-1 mb-2">{item?.description || "No description"}</p>
 
           <div className="mt-auto pt-2 border-t border-slate-50">
-            <div className="flex flex-col sm:flex-row sm:items-center gap-0.5 sm:gap-2 mb-2">
-              <span className="text-xs sm:text-base font-black text-slate-900 leading-none">
-                ₹{item?.offer_price}
-              </span>
-              <span className="text-[8px] sm:text-[10px] font-medium text-slate-400 line-through leading-none">
-                ₹{item?.actual_price}
-              </span>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-1 gap-1">
+               <div className="flex items-end gap-1.5">
+                  {hasVariants && <span className="text-[8px] font-bold text-slate-400 uppercase mb-0.5">Starts from</span>}
+                  <span className="text-xs sm:text-base font-black text-slate-900 leading-none">
+                    ₹{displayOfferPrice}
+                  </span>
+                  {displayOfferPrice !== displayActualPrice && (
+                    <span className="text-[8px] sm:text-[10px] font-medium text-slate-400 line-through leading-none mb-0.5">
+                      ₹{displayActualPrice}
+                    </span>
+                  )}
+               </div>
             </div>
             
-            <div className="flex items-center justify-between">
-              <span className="text-[7px] sm:text-[8px] font-bold text-slate-400 uppercase">Stock</span>
-              <span className={`text-[8px] sm:text-[9px] font-black ${parseInt(item?.quantity) < 10 ? 'text-amber-500' : 'text-slate-700'}`}>
-                {item?.quantity} Qty
-              </span>
-            </div>
+            {!hasVariants && (
+              <div className="flex items-center justify-between mt-2 pt-1 border-t border-slate-50 border-dashed">
+                <span className="text-[7px] sm:text-[8px] font-bold text-slate-400 uppercase">Stock</span>
+                <span className={`text-[8px] sm:text-[9px] font-black ${parseInt(item?.quantity) < 10 ? 'text-amber-500' : 'text-slate-700'}`}>
+                  {item?.quantity} Qty
+                </span>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -72,7 +89,7 @@ const ProductCard = ({ item, onEdit, onDelete }) => {
       {/* Confirmation Modal */}
       {showConfirm && (
   <div className="fixed inset-0 z-[3000] flex items-center justify-center p-4 backdrop-blur-sm bg-slate-900/40">
-    <div className="bg-white w-full  max-w-[450px] rounded-[2rem] shadow-2xl p-8 text-center animate-in fade-in zoom-in duration-200">
+    <div className="bg-white w-full max-w-[450px] rounded-[2rem] shadow-2xl p-8 text-center animate-in fade-in zoom-in duration-200">
       
       <div className="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-5">
         <AlertTriangle size={32} />

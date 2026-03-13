@@ -19,8 +19,20 @@ const DailySpecials = ({ data: specials = [], onItemClick }) => {
         {specials.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
             {specials.map((item) => {
-              const actual = parseFloat(item.actual_price);
-              const offer = parseFloat(item.offer_price);
+              // Check if variants exist
+              const hasVariants = item?.has_variants && item?.variants?.length > 0;
+
+              // Extract actual and offer prices
+              const rawOfferPrice = hasVariants 
+                ? (item.variants[0].offer_price || item.variants[0].actual_price) 
+                : (item.offer_price || item.actual_price || 0);
+                
+              const rawActualPrice = hasVariants 
+                ? item.variants[0].actual_price 
+                : (item.actual_price || rawOfferPrice);
+
+              const actual = parseFloat(rawActualPrice);
+              const offer = parseFloat(rawOfferPrice);
               let discountPercent = 0;
               
               if (actual > offer) {
@@ -44,7 +56,7 @@ const DailySpecials = ({ data: specials = [], onItemClick }) => {
                   
                   {/* Floating Discount Tag */}
                   {discountPercent > 0 && (
-                    <div className="absolute top-3 right-3 z-10 bg-orange-600 text-white text-[8px] md:text-[10px] font-black px-2 py-1  rounded-2xl shadow-lg">
+                    <div className="absolute top-3 right-3 z-10 bg-orange-600 text-white text-[8px] md:text-[10px] font-black px-2 py-1 rounded-2xl shadow-lg">
                       {discountPercent}% OFF
                     </div>
                   )}
@@ -63,6 +75,11 @@ const DailySpecials = ({ data: specials = [], onItemClick }) => {
 
                     <div className="flex justify-between items-end border-t border-white/10 pt-3">
                       <div className="flex flex-col">
+                        {hasVariants && (
+                          <span className="text-gray-400 text-[8px] md:text-[9px] font-bold uppercase mb-0.5">
+                            Starts from
+                          </span>
+                        )}
                         {actual > offer && (
                           <span className="text-gray-400 text-[9px] md:text-[11px] line-through font-bold">
                             ₹{Math.round(actual)}

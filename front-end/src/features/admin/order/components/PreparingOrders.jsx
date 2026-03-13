@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'; // useRef ചേർത്തു
+import React, { useState, useRef } from 'react'; 
 import { Clock, User, Printer, X, Truck, MapPin, Loader2 } from 'lucide-react';
 import { usePreparingOrders } from '../hooks/usePreparingOrders';
 import { OrderSkeleton } from './OrderSkeleton';
@@ -9,7 +9,7 @@ import { useReactToPrint } from 'react-to-print';
 import { OrderReceipt } from './OrderReceipt'; 
 
 const PreparingOrderRow = ({ order, onDispatch, onCancelClick, isUpdating, updatingOrderId }) => {
-const { elapsedTime, formattedDate } = useOrderTime(order.created_at);
+  const { elapsedTime, formattedDate } = useOrderTime(order.created_at);
   const componentRef = useRef(null); 
   const isThisOrderUpdating = isUpdating && updatingOrderId === order.id;
 
@@ -77,12 +77,19 @@ const { elapsedTime, formattedDate } = useOrderTime(order.created_at);
             <div className="flex-1">
               <p className="text-[8px] font-black text-gray-500 uppercase tracking-widest mb-1">Items being Prepared</p>
               <p className="text-[13px] font-bold text-gray-700 leading-relaxed">
-                {order.items.map((item, idx) => (
-                  <span key={idx}>
-                    <span className="text-blue-500 font-black">{item.quantity}x</span> {item.item_name}
-                    {idx < order.items.length - 1 ? ', ' : ''}
-                  </span>
-                ))}
+                {order.items.map((item, idx) => {
+                  // MODIFIED: Adding variant name (size_name) with the item name if it exists
+                  const displayName = item.size_name 
+                    ? `${item.item_name} (${item.size_name})` 
+                    : item.item_name;
+
+                  return (
+                    <span key={idx}>
+                      <span className="text-blue-500 font-black">{item.quantity}x</span> {displayName}
+                      {idx < order.items.length - 1 ? ', ' : ''}
+                    </span>
+                  );
+                })}
               </p>
             </div>
             <div className="md:text-right shrink-0">

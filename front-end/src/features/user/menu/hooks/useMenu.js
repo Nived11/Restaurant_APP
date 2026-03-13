@@ -27,7 +27,7 @@ export const useMenu = () => {
         throw new Error(extractErrorMessages(err));
       }
     },
-    staleTime: 600000,
+    staleTime: 0,
   });
 
   // 2. Fetch ALL Menu Items 
@@ -41,7 +41,7 @@ export const useMenu = () => {
         return [];
       }
     },
-    staleTime: 300000,
+    staleTime: 0,
   });
 
   // 3. Fetch Filtered Menu Items 

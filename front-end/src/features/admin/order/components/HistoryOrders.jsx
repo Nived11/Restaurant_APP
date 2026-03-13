@@ -81,12 +81,19 @@ const HistoryRow = ({ order }) => {
             <div className="flex-1">
               <p className="text-[8px] font-black text-gray-500 uppercase mb-1">Items Ordered</p>
               <p className="text-[13px] font-bold text-gray-700">
-                {order.items.map((item, idx) => (
-                  <span key={idx}>
-                    <span className="text-[#f9a602] font-black">{item.quantity}x</span> {item.item_name}
-                    {idx < order.items.length - 1 ? ', ' : ''}
-                  </span>
-                ))}
+                {order.items.map((item, idx) => {
+                  // MODIFIED: Adding variant name (size_name) with the item name if it exists
+                  const displayName = item.size_name 
+                    ? `${item.item_name} (${item.size_name})` 
+                    : item.item_name;
+
+                  return (
+                    <span key={idx}>
+                      <span className="text-[#f9a602] font-black">{item.quantity}x</span> {displayName}
+                      {idx < order.items.length - 1 ? ', ' : ''}
+                    </span>
+                  );
+                })}
               </p>
             </div>
             <div className="text-right">

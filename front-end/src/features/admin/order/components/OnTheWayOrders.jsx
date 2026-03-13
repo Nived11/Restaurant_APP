@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import { Clock, User, Printer, X, CheckCircle, MapPin, Share2, Loader2 } from 'lucide-react';
 import { useOnTheWayOrders } from '../hooks/useOnTheWayOrders';
 import { OrderSkeleton } from './OrderSkeleton';
@@ -11,7 +11,7 @@ import { useReactToPrint } from 'react-to-print';
 import { OrderReceipt } from './OrderReceipt';
 
 const OnTheWayOrderRow = ({ order, onComplete, onCancelClick, isUpdating, updatingOrderId }) => {
-const { elapsedTime, formattedDate } = useOrderTime(order.created_at);
+  const { elapsedTime, formattedDate } = useOrderTime(order.created_at);
   const componentRef = useRef(null);
   const isThisOrderUpdating = isUpdating && updatingOrderId === order.id;
 
@@ -25,6 +25,12 @@ const { elapsedTime, formattedDate } = useOrderTime(order.created_at);
     const lng = order.delivery_address?.longitude;
     const address = order.delivery_address?.complete_address;
     
+    // MODIFIED: WhatsApp മെസ്സേജിൽ ഐറ്റങ്ങളും വേരിയന്റുകളും കാണിക്കാൻ
+    const itemsListStr = order.items.map(item => {
+      const variantText = item.size_name ? `(${item.size_name})` : '';
+      return `${item.quantity}x ${item.item_name} ${variantText}`.trim();
+    }).join('\n');
+    
     if (lat && lng) {
       const mapLink = `https://www.google.com/maps?q=${lat},${lng}`;
       const messageText = 
@@ -32,6 +38,7 @@ const { elapsedTime, formattedDate } = useOrderTime(order.created_at);
         `ORDER ID: #${order.id}\n` + 
         `CUSTOMER: ${order.customer_name}\n` +
         `PHONE: ${order.customer_phone}\n\n` +
+        `ITEMS TO DELIVER:\n${itemsListStr}\n\n` + // ഐറ്റംസ് ഇവിടെ ചേർത്തു
         `LOCATION: ${address}\n\n` +
         `TOTAL AMOUNT: Rs. ${order.total_amount} (${order.payment_method})\n` + 
         `GOOGLE MAP ROUTE: ${mapLink}\n\n` +
@@ -115,12 +122,19 @@ const { elapsedTime, formattedDate } = useOrderTime(order.created_at);
             <div className="flex-1">
               <p className="text-[8px] font-black text-gray-500 uppercase tracking-widest mb-1">Items in Transit</p>
               <p className="text-[13px] font-bold text-gray-700 leading-relaxed">
-                {order.items.map((item, idx) => (
-                  <span key={idx}>
-                    <span className="text-green-600 font-black">{item.quantity}x</span> {item.item_name}
-                    {idx < order.items.length - 1 ? ', ' : ''}
-                  </span>
-                ))}
+                {order.items.map((item, idx) => {
+                  // MODIFIED: Adding variant name to the UI
+                  const displayName = item.size_name 
+                    ? `${item.item_name} (${item.size_name})` 
+                    : item.item_name;
+
+                  return (
+                    <span key={idx}>
+                      <span className="text-green-600 font-black">{item.quantity}x</span> {displayName}
+                      {idx < order.items.length - 1 ? ', ' : ''}
+                    </span>
+                  );
+                })}
               </p>
             </div>
             <div className="md:text-right shrink-0">

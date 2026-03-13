@@ -22,8 +22,20 @@ const BestSellers = ({ data: bestSellers = [], onItemClick }) => {
         {bestSellers.length > 0 ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-5">
             {bestSellers.map((item) => {
-              const actual = parseFloat(item.actual_price);
-              const offer = parseFloat(item.offer_price);
+              // Check if variants exist
+              const hasVariants = item?.has_variants && item?.variants?.length > 0;
+
+              // Extract actual and offer prices based on variants
+              const rawOfferPrice = hasVariants 
+                ? (item.variants[0].offer_price || item.variants[0].actual_price) 
+                : (item.offer_price || item.actual_price || 0);
+                
+              const rawActualPrice = hasVariants 
+                ? item.variants[0].actual_price 
+                : (item.actual_price || rawOfferPrice);
+
+              const actual = parseFloat(rawActualPrice);
+              const offer = parseFloat(rawOfferPrice);
               const isVeg = item?.dietary_preference === "VEG";
               
               let discountPercent = 0;
@@ -34,7 +46,7 @@ const BestSellers = ({ data: bestSellers = [], onItemClick }) => {
               return (
                 <div 
                   key={item.id} 
-                   onClick={() => onItemClick?.(item)}
+                  onClick={() => onItemClick?.(item)}
                   className="cursor-pointer group bg-white rounded-xl border border-slate-200 overflow-hidden hover:shadow-md transition-all duration-300 flex flex-col h-full relative"
                 >
                   {/* Discount Badge */}
@@ -80,6 +92,11 @@ const BestSellers = ({ data: bestSellers = [], onItemClick }) => {
                     {/* Price & Add Button */}
                     <div className="mt-auto pt-2 border-t border-slate-50 flex items-center justify-between">
                       <div className="flex flex-col">
+                        {hasVariants && (
+                          <span className="text-gray-400 text-[7px] md:text-[8px] font-bold uppercase mb-0.5">
+                            Starts from
+                          </span>
+                        )}
                         <span className="text-[11px] md:text-[15px] font-black text-slate-900 leading-none">
                           ₹{Math.round(offer)}
                         </span>
@@ -91,7 +108,6 @@ const BestSellers = ({ data: bestSellers = [], onItemClick }) => {
                       </div>
 
                       <button 
-                       
                         className="cursor-pointer bg-slate-900 text-white p-1.5 md:p-2 rounded-lg hover:bg-primary hover:text-black transition-all active:scale-90"
                       >
                         <RiAddLine size={16} className="md:size-5" />

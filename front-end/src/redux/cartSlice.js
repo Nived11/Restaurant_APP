@@ -17,9 +17,11 @@ const saveToLocal = (items) => {
 const formatCartItems = (items) => {
   return (items || []).map(item => ({
     ...item,
-    id: item.id,
+    id: item.id, // Backend provides a unique id for each cart row
     item_id: item.item_id || item.id,
-    name: item.name || item.item_name, 
+    variant_id: item.variant_id || null,
+    // Add size to name if variant exists (eg: Mandi (full))
+    name: item.size_name ? `${item.name} (${item.size_name})` : (item.name || item.item_name), 
     image: item.image || item.item_image,
     offer_price: item.offer_price?.toString() || "0",
   }));
@@ -48,6 +50,7 @@ export const mergeCartOnLogin = createAsyncThunk(
       }
       const itemsToMerge = localCart.map(item => ({
         item_id: item.item_id || item.id,
+        variant_id: item.variant_id || null,
         quantity: item.quantity
       }));
       const response = await api.post('/orders/cart/merge/', { items: itemsToMerge });
@@ -61,13 +64,19 @@ export const mergeCartOnLogin = createAsyncThunk(
 
 export const syncCartUpdate = createAsyncThunk(
   'cart/syncUpdate',
-  async ({ itemId, actionType, quantity = 1 }, { rejectWithValue }) => {
+  async ({ itemId, variantId = null, actionType, quantity = 1 }, { rejectWithValue }) => {
     try {
-      const response = await api.post('/orders/cart/update/', {
+      const payload = {
         item_id: itemId,
         action: actionType,
         quantity: quantity
-      });
+      };
+      
+      if (variantId) {
+        payload.variant_id = variantId;
+      }
+
+      const response = await api.post('/orders/cart/update/', payload);
       return response.data; 
     } catch (err) {
       return rejectWithValue(extractErrorMessages(err));
@@ -85,18 +94,21 @@ const cartSlice = createSlice({
   reducers: {
     addToCart: (state, action) => {
       const { item, quantity } = action.payload;
-      const itemId = item.item_id || item.id;
-      const existingItem = state.items.find((i) => (i.item_id || i.id) === itemId);
+      const cartItemId = item.id; 
+      
+      const existingItem = state.items.find((i) => i.id === cartItemId || (i.item_id === item.item_id && i.variant_id === item.variant_id));
 
       if (existingItem) {
         existingItem.quantity += quantity;
       } else {
         state.items.push({ 
           ...item, 
-          item_id: itemId,
+          id: cartItemId,
+          item_id: item.item_id,
+          variant_id: item.variant_id || null,
           quantity,
-          name: item.name || item.item_name,
-          image: item.image || item.item_image,
+          name: item.name,
+          image: item.image,
           offer_price: item.offer_price?.toString() || "0"
         });
       }
@@ -127,7 +139,10 @@ const cartSlice = createSlice({
         state.error = null;
       })
       .addCase(fetchCart.fulfilled, (state, action) => {
-        state.items = formatCartItems(action.payload.items);
+        // FIX: Handle both response structures (with or without 'cart_data')
+        const fetchedItems = action.payload?.cart_data?.items || action.payload?.items || [];
+        state.items = formatCartItems(fetchedItems);
+        saveToLocal(state.items); // Keep local storage in sync
         state.loading = false;
       })
       .addCase(fetchCart.rejected, (state, action) => {
@@ -136,13 +151,18 @@ const cartSlice = createSlice({
       })
       // Sync Update
       .addCase(syncCartUpdate.fulfilled, (state, action) => {
-        if (action.payload?.items) {
-          state.items = formatCartItems(action.payload.items);
-          saveToLocal(state.items);
-        }
+        const syncedItems = action.payload?.cart_data?.items || action.payload?.items || [];
+        state.items = formatCartItems(syncedItems);
+        saveToLocal(state.items);
       })
       .addCase(syncCartUpdate.rejected, (state, action) => {
         state.error = action.payload;
+      })
+      // Merge logic
+      .addCase(mergeCartOnLogin.fulfilled, (state, action) => {
+        const mergedItems = action.payload?.cart_data?.items || action.payload?.items || [];
+        state.items = formatCartItems(mergedItems);
+        saveToLocal(state.items);
       });
   }
 });

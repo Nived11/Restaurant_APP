@@ -47,9 +47,19 @@ const useCart = () => {
   const cartWithStockStatus = cartItems.map(item => {
     const targetId = item.item_id || item.id;
     const serverProduct = latestProducts.find(p => p.id === targetId);
-    const currentAvailableStock = serverProduct 
-      ? serverProduct.quantity 
-      : (isStockLoading && !isStockFetched ? item.quantity : 0); 
+    
+    let currentAvailableStock = 0;
+
+    if (serverProduct) {
+      if (item.variant_id && serverProduct.has_variants) {
+        const variant = serverProduct.variants?.find(v => v.id === item.variant_id);
+        currentAvailableStock = variant ? variant.quantity : 0;
+      } else {
+        currentAvailableStock = serverProduct.quantity;
+      }
+    } else {
+      currentAvailableStock = isStockLoading && !isStockFetched ? item.quantity : 0;
+    }
     
     return {
       ...item,
@@ -64,11 +74,11 @@ const useCart = () => {
   }, 0);
 
   const incrementQty = (item) => {
-  const itemId = item.item_id || item.id;
-  if (item.quantity < item.currentStock) {
-    dispatch(updateQuantity({ id: item.id, quantity: item.quantity + 1 }));
-    if (token) dispatch(syncCartUpdate({ itemId, actionType: 'add' })); 
-  } else {
+    const itemId = item.item_id || item.id;
+    if (item.quantity < item.currentStock) {
+      dispatch(updateQuantity({ id: item.id, quantity: item.quantity + 1 }));
+      if (token) dispatch(syncCartUpdate({ itemId, variantId: item.variant_id, actionType: 'add' })); 
+    } else {
       toast.error(`Stock limit reached! Only ${item.currentStock} available.`);
     }
   };
@@ -77,13 +87,13 @@ const useCart = () => {
     const itemId = item.item_id || item.id;
     if (item.quantity > 1) {
       dispatch(updateQuantity({ id: item.id, quantity: item.quantity - 1 }));
-      if (token) dispatch(syncCartUpdate({ itemId, actionType: 'decrease' }));
+      if (token) dispatch(syncCartUpdate({ itemId, variantId: item.variant_id, actionType: 'decrease' }));
     }
   };
 
-  const removeItem = (id, itemId) => {
+  const removeItem = (id, itemId, variantId = null) => {
     dispatch(removeFromCart(id));
-    if (token) dispatch(syncCartUpdate({ itemId, actionType: 'remove' }));
+    if (token) dispatch(syncCartUpdate({ itemId, variantId, actionType: 'remove' }));
     toast.success("Item removed from cart");
   };
 

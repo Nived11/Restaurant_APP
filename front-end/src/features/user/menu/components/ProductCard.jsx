@@ -3,8 +3,21 @@ import { Plus, Leaf, Flame } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const ProductCard = ({ item, onProductClick }) => {
-  const offerPrice = Math.round(parseFloat(item.offer_price || 0));
-  const actualPrice = Math.round(parseFloat(item.actual_price || item.offer_price || 0));
+  // Check if item has valid variants
+  const hasVariants = item?.has_variants && item?.variants?.length > 0;
+
+  // Get pricing based on variants or regular item
+  const rawOfferPrice = hasVariants 
+    ? (item.variants[0].offer_price || item.variants[0].actual_price) 
+    : (item.offer_price || item.actual_price || 0);
+    
+  const rawActualPrice = hasVariants 
+    ? item.variants[0].actual_price 
+    : (item.actual_price || rawOfferPrice);
+
+  const offerPrice = Math.round(parseFloat(rawOfferPrice));
+  const actualPrice = Math.round(parseFloat(rawActualPrice));
+  
   const hasDiscount = actualPrice > offerPrice;
   
   const discountPercent = hasDiscount 
@@ -21,8 +34,7 @@ const ProductCard = ({ item, onProductClick }) => {
       whileHover={{ y: -6 }}
       whileTap={{ scale: 0.98 }}
       onClick={() => onProductClick?.(item)}
-      className="cursor-pointer  group relative flex flex-col bg-white rounded-[1.2rem] md:rounded-[2rem] p-2.5 md:p-3 shadow-sm hover:shadow-xl transition-all duration-500 border border-gray-100"
-      
+      className="cursor-pointer group relative flex flex-col bg-white rounded-[1.2rem] md:rounded-[2rem] p-2.5 md:p-3 shadow-sm hover:shadow-xl transition-all duration-500 border border-gray-100"
     >
       {/* --- IMAGE CONTAINER --- */}
       <div className="relative aspect-square w-full overflow-hidden rounded-[1.2rem] md:rounded-[1.6rem] bg-gray-50">
@@ -41,7 +53,7 @@ const ProductCard = ({ item, onProductClick }) => {
             </span>
           )}
           
-          <div className={`p-1.5 rounded-lg backdrop-blur-md shadow-sm border border-white/20 ${isVeg ? 'bg-green-50/90' : 'bg-red-50/90'}`}>
+          <div className={`p-1.5 rounded-lg backdrop-blur-md shadow-sm border border-white/20 ${isVeg ? 'bg-green-50/90' : 'bg-red-50/90'} ml-auto`}>
             {isVeg ? (
               <Leaf size={12} className="text-green-600 fill-current" />
             ) : (
@@ -69,15 +81,21 @@ const ProductCard = ({ item, onProductClick }) => {
                 ₹{actualPrice}
               </span>
             )}
-            <span className="text-base md:text-xl font-black text-black tracking-tighter">
-              ₹{offerPrice}
-            </span>
+            <div className="flex items-baseline gap-1">
+              <span className="text-base md:text-xl font-black text-black tracking-tighter">
+                ₹{offerPrice}
+              </span>
+              {hasVariants && (
+                <span className="text-[8px] md:text-[9px] text-gray-400 font-bold uppercase pb-1">
+                  Onwards
+                </span>
+              )}
+            </div>
           </div>
           
           <motion.button 
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            
             className="cursor-pointer h-9 w-9 md:h-11 md:w-11 bg-black text-white rounded-xl md:rounded-[1.2rem] flex items-center justify-center shadow-lg hover:bg-[#f9a602] hover:text-black transition-colors duration-300 group/btn"
           >
             <Plus size={18} md:size={22} strokeWidth={3} className="transition-transform group-hover/btn:rotate-90" />

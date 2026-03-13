@@ -1,7 +1,6 @@
 import React, { useRef, useState } from "react";
 import { RiFlashlightFill, RiArrowLeftSLine, RiArrowRightSLine, RiInboxLine } from "react-icons/ri";
 
-
 const ComboSection = ({ data: combos = [], onItemClick }) => {
   const scrollRef = useRef(null);
   const [showLeftArrow, setShowLeftArrow] = useState(false);
@@ -61,8 +60,20 @@ const ComboSection = ({ data: combos = [], onItemClick }) => {
 
             {combos.length > 0 ? (
               combos.map((combo) => {
-                const actual = parseFloat(combo.actual_price);
-                const offer = parseFloat(combo.offer_price);
+                // Check if variants exist
+                const hasVariants = combo?.has_variants && combo?.variants?.length > 0;
+
+                // Extract actual and offer prices
+                const rawOfferPrice = hasVariants 
+                  ? (combo.variants[0].offer_price || combo.variants[0].actual_price) 
+                  : (combo.offer_price || combo.actual_price || 0);
+                  
+                const rawActualPrice = hasVariants 
+                  ? combo.variants[0].actual_price 
+                  : (combo.actual_price || rawOfferPrice);
+
+                const actual = parseFloat(rawActualPrice);
+                const offer = parseFloat(rawOfferPrice);
                 const savings = Math.round(actual - offer);
 
                 return (
@@ -97,11 +108,18 @@ const ComboSection = ({ data: combos = [], onItemClick }) => {
                       </div>
 
                       <div className="mt-3">
-                        <div className="flex items-baseline gap-2 mb-2">
-                          <span className="text-xl md:text-2xl font-black text-black">₹{Math.round(offer)}</span>
-                          {actual > offer && (
-                            <span className="text-[10px] md:text-sm text-gray-400 line-through font-bold">₹{Math.round(actual)}</span>
+                        <div className="flex flex-col mb-2">
+                           {hasVariants && (
+                            <span className="text-gray-400 text-[8px] md:text-[9px] font-bold uppercase mb-0.5">
+                              Starts from
+                            </span>
                           )}
+                          <div className="flex items-baseline gap-2">
+                            <span className="text-xl md:text-2xl font-black text-black">₹{Math.round(offer)}</span>
+                            {actual > offer && (
+                              <span className="text-[10px] md:text-sm text-gray-400 line-through font-bold">₹{Math.round(actual)}</span>
+                            )}
+                          </div>
                         </div>
                         
                         <button  className="w-full bg-black text-white py-2.5 md:py-3 rounded-xl text-[9px] md:text-xs font-black uppercase flex items-center justify-center gap-2 hover:bg-primary hover:text-black transition-all active:scale-95 shadow-lg shadow-black/5">

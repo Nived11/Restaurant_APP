@@ -40,14 +40,12 @@ export const CartSection = ({
   onNext,
   loading,
   error,
-  // Cart.js-ൽ നിന്ന് വരുന്നത് isStoreClosed ആയതുകൊണ്ട് അത് തന്നെ ഇവിടെയും ഉപയോഗിക്കുന്നു
   isStoreClosed 
 }) => {
   const isCartEmpty = cartItems.length === 0;
 
   if (error) return <ErrorState message={error} />;
 
-  // isStoreClosed പ്രോപ്പർട്ടി ആയി കിട്ടുന്നതിനാൽ പ്രത്യേകം വേരിയബിൾ ആവശ്യമില്ല
   const isDisableConfirm = cartItems.some(item => item.isOutOfStock) || isStoreClosed;
 
   return (
@@ -81,7 +79,10 @@ export const CartSection = ({
                     <img src={item.image} className="w-16 h-16 md:w-20 md:h-20 rounded-2xl object-cover bg-gray-50 shadow-inner" alt={item.name} />
                     
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-black text-black text-[11px] md:text-sm uppercase truncate tracking-tight">{item.name}</h3>
+                      {/* USE display_name OR name based on variant */}
+                      <h3 className="font-black text-black text-[11px] md:text-sm uppercase truncate tracking-tight">
+                        {item.display_name || item.name}
+                      </h3>
                       <p className="text-[#f9a602] font-black text-[12px] md:text-sm mt-0.5">₹{item.offer_price}</p>
                       
                       <div className="flex items-center bg-gray-50 border border-gray-300 w-fit rounded-lg mt-2 overflow-hidden">
@@ -99,7 +100,8 @@ export const CartSection = ({
 
                     <div className="text-right">
                       <p className="font-black text-sm md:text-base text-black tracking-tight">₹{(parseFloat(item.offer_price) * item.quantity).toFixed(0)}</p>
-                      <button onClick={() => removeItem(item.id, item.item_id)} className="cursor-pointer text-red-500 hover:text-red-600 transition-colors mt-1 p-1">
+                      {/* Pass variant_id also when removing an item */}
+                      <button onClick={() => removeItem(item.id, item.item_id, item.variant_id)} className="cursor-pointer text-red-500 hover:text-red-600 transition-colors mt-1 p-1">
                         <Trash2 size={16}/>
                       </button>
                     </div>

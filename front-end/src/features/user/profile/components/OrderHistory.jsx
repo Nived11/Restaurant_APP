@@ -139,30 +139,39 @@ const OrderHistory = () => {
                     className="border-t border-gray-50 bg-gray-50/40"
                   >
                     <div className="p-6 space-y-4">
-                      {order.items.map((item, idx) => (
-                        <div key={idx} className="flex justify-between items-center bg-white p-3 rounded-2xl border border-gray-100 shadow-sm">
-                          <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 bg-gray-50 rounded-xl flex-shrink-0 overflow-hidden border border-gray-100">
-                              {item.image ? (
-                                <img
-                                  src={item.image}
-                                  alt={item.item_name}
-                                  className="w-full h-full object-cover"
-                                />
-                              ) : (
-                                <div className="w-full h-full flex items-center justify-center">
-                                  <ShoppingBag size={18} className="text-gray-300" />
-                                </div>
-                              )}
+                      {order.items.map((item, idx) => {
+                        // FIX: Display name with variant size if available
+                        const displayName = item.size_name 
+                          ? `${item.item_name} (${item.size_name})` 
+                          : item.item_name;
+
+                        return (
+                          <div key={idx} className="flex justify-between items-center bg-white p-3 rounded-2xl border border-gray-100 shadow-sm">
+                            <div className="flex items-center gap-4">
+                              <div className="w-12 h-12 bg-gray-50 rounded-xl flex-shrink-0 overflow-hidden border border-gray-100">
+                                {item.image ? (
+                                  <img
+                                    src={item.image}
+                                    alt={item.item_name}
+                                    className="w-full h-full object-cover"
+                                  />
+                                ) : (
+                                  <div className="w-full h-full flex items-center justify-center">
+                                    <ShoppingBag size={18} className="text-gray-300" />
+                                  </div>
+                                )}
+                              </div>
+                              <div>
+                                <p className="text-xs font-black uppercase text-gray-800 leading-tight mb-1">
+                                  {displayName}
+                                </p>
+                                <p className="text-[10px] font-bold text-gray-500 uppercase">Qty: {item.quantity} <span className="text-[8px]">x</span> ₹{Math.round(item.price)}</p>
+                              </div>
                             </div>
-                            <div>
-                              <p className="text-xs font-black uppercase text-gray-800 leading-tight mb-1">{item.item_name}</p>
-                              <p className="text-[10px] font-bold text-gray-500 uppercase">Qty: {item.quantity} <span className="text-[8px]">x</span> ₹{Math.round(item.price)}</p>
-                            </div>
+                            <p className="text-sm font-black text-black">₹{Math.round(item.price * item.quantity)}</p>
                           </div>
-                          <p className="text-sm font-black text-black">₹{Math.round(item.price * item.quantity)}</p>
-                        </div>
-                      ))}
+                        )
+                      })}
                     </div>
                   </motion.div>
                 )}

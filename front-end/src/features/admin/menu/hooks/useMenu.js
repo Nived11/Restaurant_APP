@@ -25,9 +25,19 @@ export const useMenu = (filters) => {
     bannerPreviewUrl: null,
     dietary_preference: "VEG",
     is_available: true,
+    has_variants: false,
+    variants: [],
   });
 
-  const queryKey = ["menuItems", filters.searchQuery, filters.activeCategory, filters.activeSection, filters.isLowStock,filters.showUnavailable, page];
+  const queryKey = [
+    "menuItems",
+    filters.searchQuery,
+    filters.activeCategory,
+    filters.activeSection,
+    filters.isLowStock,
+    filters.showUnavailable,
+    page,
+  ];
 
   // 1. Fetching Menu Items
   const { data, isLoading, isFetching, error } = useQuery({
@@ -62,7 +72,7 @@ export const useMenu = (filters) => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["menuItems"] });
-      queryClient.invalidateQueries({ queryKey: ["homeData"] }); 
+      queryClient.invalidateQueries({ queryKey: ["homeData"] });
       toast.success(editingId ? "Item updated successfully!" : "Item added successfully!");
       resetForm();
     },
@@ -107,40 +117,70 @@ export const useMenu = (filters) => {
       bannerPreviewUrl: null,
       dietary_preference: "VEG",
       is_available: true,
+      has_variants: false,
+      variants: [],
     });
     setEditingId(null);
   };
 
   const handleSubmit = async (e) => {
     if (e) e.preventDefault();
-    const mrp = parseFloat(formData.actual_price);
-    const offer = parseFloat(formData.offer_price);
 
-    if (offer > mrp) {
-      toast.error("Invalid Pricing: Offer price must be less than or equal to MRP");
-      return false;
+    // Price Validation
+    if (formData.has_variants) {
+      if (formData.variants.length === 0) {
+        toast.error("Please add at least one variant.");
+        return false;
+      }
+      const invalidVariant = formData.variants.find(
+        (v) => v.offer_price && parseFloat(v.offer_price) > parseFloat(v.actual_price)
+      );
+      if (invalidVariant) {
+        toast.error("Invalid Pricing: Variant offer price must be less than or equal to MRP");
+        return false;
+      }
+    } else {
+      const mrp = parseFloat(formData.actual_price);
+      const offer = parseFloat(formData.offer_price);
+      if (offer > mrp) {
+        toast.error("Invalid Pricing: Offer price must be less than or equal to MRP");
+        return false;
+      }
     }
 
     const data = new FormData();
-    
+
+    // Append regular fields
     Object.keys(formData).forEach((key) => {
-      if (!["previewUrl", "bannerPreviewUrl", "image", "banner_image"].includes(key)) {
-        if (key === "is_available") {
+      if (!["previewUrl", "bannerPreviewUrl", "image", "banner_image", "variants"].includes(key)) {
+        if (key === "is_available" || key === "has_variants") {
           data.append(key, formData[key] ? "true" : "false");
-        } else {
+        } else if (formData[key] !== null && formData[key] !== undefined) {
           data.append(key, formData[key]);
         }
       }
     });
+
+    // Append variants in Array format using indexes
+    if (formData.has_variants) {
+      formData.variants.forEach((variant, index) => {
+        // Creates keys like variants[0]size_name, variants[0]actual_price etc.
+        data.append(`variants[${index}]size_name`, variant.size_name || "");
+        data.append(`variants[${index}]actual_price`, variant.actual_price || "");
+        data.append(`variants[${index}]offer_price`, variant.offer_price || "");
+        data.append(`variants[${index}]quantity`, variant.quantity || "");
+        data.append(`variants[${index}]is_available`, variant.is_available ? "true" : "false");
+      });
+    }
 
     if (formData.image instanceof File) data.append("image", formData.image);
     if (formData.banner_image instanceof File) data.append("banner_image", formData.banner_image);
 
     try {
       await mutation.mutateAsync(data);
-      return true; 
+      return true;
     } catch (err) {
-      return false; 
+      return false;
     }
   };
 
@@ -152,6 +192,11 @@ export const useMenu = (filters) => {
       bannerPreviewUrl: item.banner_image,
       image: null,
       banner_image: null,
+      has_variants: item.has_variants || false,
+      variants: item.variants || [],
+      actual_price: item.actual_price || "",
+      offer_price: item.offer_price || "",
+      quantity: item.quantity || "",
     });
   };
 

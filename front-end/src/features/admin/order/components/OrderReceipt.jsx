@@ -1,9 +1,9 @@
 import React from 'react';
 
 export const OrderReceipt = React.forwardRef(({ order }, ref) => {
-    if (!order) return null;
+  if (!order) return null;
   return (
-    <div ref={ref} className="p-8 bg-white text-black"style={{ 
+    <div ref={ref} className="p-8 bg-white text-black" style={{ 
        width: '80mm', 
        margin: '0 auto',
        minHeight: '100px' 
@@ -29,13 +29,20 @@ export const OrderReceipt = React.forwardRef(({ order }, ref) => {
           </tr>
         </thead>
         <tbody>
-          {order.items.map((item, i) => (
-            <tr key={i}>
-              <td className="py-1">{item.item_name}</td>
-              <td className="text-right">{item.quantity}</td>
-              <td className="text-right">₹{item.price}</td>
-            </tr>
-          ))}
+          {order.items.map((item, i) => {
+            // പേരിനൊപ്പം വേരിയന്റ് കൂടി ചേർക്കുന്നു
+            const displayName = item.size_name 
+              ? `${item.item_name} (${item.size_name})` 
+              : item.item_name;
+
+            return (
+              <tr key={i}>
+                <td className="py-1">{displayName}</td>
+                <td className="text-right">{item.quantity}</td>
+                <td className="text-right">₹{item.price}</td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
 
