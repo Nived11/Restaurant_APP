@@ -28,7 +28,7 @@ const SignupForm = () => {
   return (
     <div className="h-screen w-full flex flex-col lg:flex-row bg-[#0a0a0a] overflow-hidden font-sans">
 
-      {/* 1. LEFT CONTENT SECTION (No changes here, kept exactly as yours) */}
+      {/* 1. LEFT CONTENT SECTION */}
       <div className="relative w-full lg:w-[60%] h-[24vh] lg:h-full bg-black flex-shrink-0 overflow-hidden">
         <img src={loginbg} className="absolute inset-0 w-full h-full object-cover opacity-25 lg:opacity-30" alt="Premium Culinary" />
         <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-transparent to-transparent lg:hidden"></div>
@@ -58,13 +58,11 @@ const SignupForm = () => {
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, ease: "easeOut" }}
-        // MODIFIED: Added pt-4 lg:pt-0 to push the form slightly down without causing scroll
-        className="w-full lg:w-[40%] flex flex-col items-center px-8 lg:px-20 bg-[#0a0a0a] flex-grow pt-8 lg:pt-0 lg:justify-center overflow-hidden"
+        className="w-full lg:w-[40%] flex flex-col items-center justify-start px-8 lg:px-20 bg-[#0a0a0a] flex-grow pt-8 lg:pt-0 lg:justify-center overflow-hidden"
       >
-        {/* MODIFIED: Adjusted space-y to make the form tighter and fit on screen */}
-        <div className="max-w-sm w-full space-y-4 lg:space-y-10">
+        <div className="max-w-sm w-full space-y-4 lg:space-y-6">
           
-          <header className="text-center lg:text-left space-y-1 lg:space-y-4">
+          <header className="text-center lg:text-left space-y-1 lg:space-y-3">
             <h2 className="text-3xl lg:text-7xl font-black uppercase tracking-tighter text-white leading-tight italic">
               Sign <span className="text-[#f9a602]">Up.</span>
             </h2>
@@ -73,11 +71,12 @@ const SignupForm = () => {
             </p>
           </header>
 
-          {/* MODIFIED: Using flex-col-reverse so Error Message appears ABOVE the input fields but pushes upwards */}
           <div className="flex flex-col-reverse w-full">
             
             {step === 1 ? (
-              <form onSubmit={handleRegisterSubmit} className="space-y-3 lg:space-y-5 w-full">
+              <form onSubmit={handleRegisterSubmit} className="space-y-4 lg:space-y-6 w-full">
+                
+                {/* Full Name Input - Matched with Login style */}
                 <div className="relative group">
                   <div className="absolute inset-y-0 left-0 pl-6 flex items-center pointer-events-none">
                     <User size={18} className="text-[#f9a602] opacity-70" />
@@ -87,11 +86,12 @@ const SignupForm = () => {
                     placeholder="Full Name"
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="w-full pl-14 pr-6 py-2.5 lg:py-2 text-sm sm:text-base bg-white/[0.03] border border-white/10 rounded-xl focus:border-[#f9a602] transition-all font-bold text-white outline-none placeholder:text-sm placeholder:text-gray-700"
+                    className="w-full pl-14 pr-6 py-3 text-sm sm:text-base bg-white/[0.03] border border-white/10 rounded-2xl focus:border-[#f9a602] transition-all font-bold text-white outline-none placeholder:text-sm placeholder:text-gray-700"
                     required
                   />
                 </div>
 
+                {/* Mobile Number Input - Matched with Login style */}
                 <div className="relative group">
                   <div className="absolute inset-y-0 left-0 pl-6 flex items-center pointer-events-none">
                     <span className="text-[#f9a602] font-black text-sm sm:text-base pr-3 border-r border-white/10">+91</span>
@@ -102,11 +102,12 @@ const SignupForm = () => {
                     placeholder="Mobile Number"
                     value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    className="w-full pl-18 pr-6 py-2.5 lg:py-2 text-sm sm:text-base bg-white/[0.03] border border-white/10 rounded-xl focus:border-[#f9a602] transition-all font-bold text-white outline-none placeholder:text-sm placeholder:text-gray-700"
+                    className="w-full pl-20 pr-6 py-3 text-sm sm:text-base bg-white/[0.03] border border-white/10 rounded-2xl focus:border-[#f9a602] transition-all font-bold text-white outline-none placeholder:text-sm placeholder:text-gray-700"
                     required
                   />
                 </div>
 
+                {/* Email Input - Matched with Login style */}
                 <div className="relative group">
                   <div className="absolute inset-y-0 left-0 pl-6 flex items-center pointer-events-none">
                     <Mail size={18} className="text-[#f9a602] opacity-70" />
@@ -116,26 +117,29 @@ const SignupForm = () => {
                     placeholder="Email Address (Optional)"
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="w-full pl-14 pr-6 py-2.5 lg:py-2 text-sm sm:text-base bg-white/[0.03] border border-white/10 rounded-xl focus:border-[#f9a602] transition-all font-bold text-white outline-none placeholder:text-sm placeholder:text-gray-700"
+                    className="w-full pl-14 pr-6 py-3 text-sm sm:text-base bg-white/[0.03] border border-white/10 rounded-2xl focus:border-[#f9a602] transition-all font-bold text-white outline-none placeholder:text-sm placeholder:text-gray-700"
                   />
                 </div>
 
+                {/* Submit Button - Matched with Login style */}
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full mt-2 lg:mt-10 bg-[#f9a602] text-black py-3 lg:py-4 rounded-xl font-black uppercase tracking-[0.2em] text-[10px] lg:text-[11px] hover:bg-primary/80 cursor-pointer transition-all flex items-center justify-center gap-2 active:scale-95 shadow-2xl shadow-[#f9a602]/10 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full bg-[#f9a602] text-black py-4 rounded-2xl font-black uppercase tracking-[0.2em] text-[11px] flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50"
                 >
                   {loading ? (
-                    <><Loader2 className="animate-spin" size={16} /> Sending OTP...</>
+                    <><Loader2 className="animate-spin" size={16} /> <span>Sending OTP...</span></>
                   ) : (
-                    <>Create Account <ArrowRight size={16} strokeWidth={3} /></>
+                    <><span>Create Account</span> <ArrowRight size={16} strokeWidth={3} /></>
                   )}
                 </button>
               </form>
             ) : (
-              <form onSubmit={handleVerifySubmit} className="space-y-8 lg:space-y-12 w-full">
+              <form onSubmit={handleVerifySubmit} className="space-y-8 w-full">
                 <div>
                   <p className="text-center text-[#f9a602] text-[10px] font-black uppercase tracking-widest mb-4">Enter 6 Digit OTP</p>
+                  
+                  {/* OTP Inputs - Matched with Login style */}
                   <div className="flex justify-between gap-2">
                     {otp.map((data, index) => (
                       <input
@@ -146,19 +150,24 @@ const SignupForm = () => {
                         value={data}
                         onKeyDown={(e) => handleKeyDown(e, index)}
                         onChange={(e) => handleOtpChange(e.target.value, index)}
-                        className="w-full h-12 mt-2 sm:mt-0 lg:h-14 bg-white/5 border border-white/10 rounded-xl text-center font-black text-xl text-[#f9a602] focus:border-[#f9a602] outline-none"
+                        className="w-full h-12 lg:h-14 bg-white/5 border border-white/10 rounded-xl text-center font-black text-xl text-[#f9a602] focus:border-[#f9a602] outline-none"
                       />
                     ))}
                   </div>
                 </div>
 
                 <div className="space-y-4">
+                  {/* Verify Button - Matched with Login style */}
                   <button
                     type="submit"
                     disabled={loading}
-                    className="cursor-pointer w-full bg-[#f9a602] text-black py-3 lg:py-5 rounded-2xl font-black uppercase tracking-[0.2em] text-[10px] lg:text-[11px] hover:bg-primary/80 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                    className="w-full bg-[#f9a602] text-black py-4 rounded-2xl font-black uppercase tracking-[0.2em] text-[11px] flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50"
                   >
-                    {loading ? "Verifying..." : "Verify & Register"} <ShieldCheck size={16} />
+                    {loading ? (
+                      <><Loader2 className="animate-spin" size={16} /> <span>Verifying...</span></>
+                    ) : (
+                      <><span>Verify & Register</span> <ShieldCheck size={16} /></>
+                    )}
                   </button>
 
                   <div className="flex flex-col items-center gap-6">
@@ -179,7 +188,7 @@ const SignupForm = () => {
                     <button
                       type="button"
                       onClick={() => setStep(1)}
-                      className="flex items-center justify-center gap-2 mt-2 sm:mt-0 cursor-pointer text-[9px] font-black uppercase tracking-widest text-gray-500 hover:text-white underline underline-offset-4 decoration-[#f9a602]"
+                      className="flex items-center justify-center gap-2 cursor-pointer text-[9px] font-black uppercase tracking-widest text-gray-500 hover:text-white underline underline-offset-4 decoration-[#f9a602]"
                     >
                       <ChevronLeft size={14} /> Back to details
                     </button>
@@ -188,7 +197,7 @@ const SignupForm = () => {
               </form>
             )}
 
-            {/* Error Message Section - Appears exactly above the form fields */}
+            {/* Error Message Section */}
             <div className="w-full min-h-[44px] mb-2 flex items-end">
               <AnimatePresence>
                 {error && (
@@ -208,7 +217,7 @@ const SignupForm = () => {
             </div>
           </div>
 
-          {/* MODIFIED: Show 'Already have an account' ONLY in Step 1 (Hidden in OTP view) */}
+          {/* Show 'Already have an account' ONLY in Step 1 */}
           {step === 1 && (
             <div className="pt-4 lg:pt-8 border-t border-white/5">
               <div className="flex flex-col items-center lg:items-start gap-3 lg:gap-4">
@@ -221,7 +230,6 @@ const SignupForm = () => {
                     <ChevronLeft size={14} />
                   </div>
                   <span className="font-black uppercase tracking-widest text-[11px] group-hover:text-[#f9a602]">Sign In Now</span>
-                  {/* Invisible spacer to balance the text perfectly in the center */}
                   <div className="w-7 h-7 lg:hidden" />
                 </button>
               </div>
