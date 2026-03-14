@@ -23,7 +23,7 @@ const ComboSection = ({ data: combos = [], onItemClick }) => {
   if (combos.length === 0) return null;
 
   return (
-    <section className="py-12 bg-white overflow-hidden">
+    <section className="py-4 pt-4 sm:pt-0 md:py-14 bg-white overflow-hidden">
       <div className="max-w-[1440px] mx-auto px-4 md:px-10">
         
         {/* Header Section */}

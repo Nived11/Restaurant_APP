@@ -36,12 +36,12 @@ const Header = () => {
   const [isReserveOpen, setIsReserveOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
   const [showLocationPicker, setShowLocationPicker] = useState(false);
-  
+
   const { getCurrentLocation, isLocating } = useAddress();
   const storedName = localStorage.getItem('user_name');
   const dispatch = useDispatch();
   const location = useLocation();
-  
+
   const cartItems = useSelector((state) => state.cart.items);
   const { currentLocation, errorPopup, isOpen } = useSelector((state) => state.location);
   const cartCount = cartItems.length;
@@ -59,7 +59,6 @@ const Header = () => {
   }, [categories]);
 
   const { scrollY } = useScroll();
-  const lastScrollY = useRef(0);
 
   // Prevent body scroll when location picker is open
   useEffect(() => {
@@ -67,12 +66,24 @@ const Header = () => {
     return () => { document.body.style.overflow = "unset"; };
   }, [showLocationPicker]);
 
-  // Scroll Behavior for hiding extras
+  // Scroll Behavior — checkpoint based (no flicker)
+  const checkpointY = useRef(0);
   useMotionValueEvent(scrollY, "change", (latest) => {
-    const diff = latest - lastScrollY.current;
-    if (diff > 10 && latest > 50) setShowExtras(false);
-    else if (diff < -10 || latest < 20) setShowExtras(true);
-    lastScrollY.current = latest;
+    const distanceFromCheckpoint = latest - checkpointY.current;
+
+    if (latest < 20) {
+      // Always show when near top of page
+      setShowExtras(true);
+      checkpointY.current = latest;
+    } else if (distanceFromCheckpoint > 60) {
+      // Scrolled 60px DOWN from last checkpoint → hide
+      setShowExtras(false);
+      checkpointY.current = latest;
+    } else if (distanceFromCheckpoint < -40) {
+      // Scrolled 40px UP from last checkpoint → show
+      setShowExtras(true);
+      checkpointY.current = latest;
+    }
   });
 
   const handleCloseSearch = () => {
@@ -123,7 +134,7 @@ const Header = () => {
               </Link>
               {!searchOpen && <Location variant="desktop" address={currentLocation.address} onClick={() => setShowLocationPicker(true)} />}
             </div>
-            
+
             {/* Extracted Desktop Nav */}
             <DesktopNav location={location} searchOpen={searchOpen} />
 
@@ -253,7 +264,7 @@ const MobileNav = ({ location, cartCount, setIsReserveOpen }) => (
         </Link>
       );
     })}
-    
+
     <div className="relative -mt-12 mx-2">
       <motion.button onClick={() => setIsReserveOpen(true)} whileTap={{ scale: 0.9 }} className="w-14 h-14 bg-black rounded-full border-4 border-white shadow-lg flex items-center justify-center text-primary">
         <RiRestaurantLine size={24} />

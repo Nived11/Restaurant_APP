@@ -3,7 +3,7 @@ import api from '../../../../api/axios';
 import { extractErrorMessages } from '../../../../utils/extractErrorMessages';
 
  const useDashboard = () => {
-  const { data, isLoading, isError, error } = useQuery({
+  const { data, isLoading, isError, error ,refetch } = useQuery({
     queryKey: ['admin-stats'],
     queryFn: async () => {
       const response = await api.get('/dashboard/admin-stats/');
@@ -20,6 +20,7 @@ import { extractErrorMessages } from '../../../../utils/extractErrorMessages';
     activeDispatch: data?.active_dispatch || [],
     isLoading,
     isError,
+    refetch,
     error: extractErrorMessages(error),
   };
 };

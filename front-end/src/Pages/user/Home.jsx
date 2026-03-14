@@ -3,14 +3,14 @@ import { AnimatePresence } from "framer-motion";
 import ProductModal from "../../components/common/ProductModal";
 import {
   BannerSection,
+  CategorySection,
   DailySpecials,
   BestSellers,
-  ComboSection,
   FirstOrderBanner,
-  CategorySection,
+  ComboSection,
   ExploreMore,
-  FAQ,
   Testimonials,
+  FAQ,
   BrandFeatures,
   HomeError,
   HomeSkeleton,

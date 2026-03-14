@@ -2,7 +2,7 @@ import {  DashboardHeader, StatsGrid, RevenueChart,  Leaderboard,  StatusSection
 
 const Dashboard = ({ user }) => {
 
-  const { stats, weeklyVolume, leaderboard, attentionNeeded, activeDispatch, isLoading, isError, error } = useDashboard();
+  const { stats, weeklyVolume, leaderboard, attentionNeeded, activeDispatch, isLoading, isError, error,refetch  } = useDashboard();
 
   if (isLoading) return <DashboardSkeleton />;
   
