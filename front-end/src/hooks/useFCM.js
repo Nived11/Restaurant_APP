@@ -35,7 +35,7 @@ export const useFCM = (isAdminPath, user) => {
 
     const unsubscribe = onMessage(messaging, (payload) => {
       toast.success(`${payload.notification.title}: ${payload.notification.body}`, {
-        duration: 8000,
+        duration: 4000,
       });
       new Audio("/OrderNotify.mp3").play().catch(() => {});
     });

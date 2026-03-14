@@ -63,17 +63,24 @@ export const HistoryReceipt = React.forwardRef(({ order }, ref) => {
           </tr>
         </thead>
         <tbody className="divide-y-2 divide-gray-100">
-          {order.items.map((item, i) => (
-            <tr key={i} className="hover:bg-gray-50">
-              <td className="p-4">
-                <p className="font-black text-gray-900 uppercase">{item.item_name}</p>
-                <p className="text-[10px] text-gray-500 font-bold">Item ID: {item.item_id}</p>
-              </td>
-              <td className="p-4 text-center font-bold">₹{item.price}</td>
-              <td className="p-4 text-center font-black" style={{ color: primaryColor }}>{item.quantity}</td>
-              <td className="p-4 text-right font-black text-lg">₹{(item.price * item.quantity).toFixed(2)}</td>
-            </tr>
-          ))}
+          {order.items.map((item, i) => {
+            // MODIFIED: Adding variant name (size_name) with the item name if it exists
+            const displayName = item.size_name 
+              ? `${item.item_name} (${item.size_name})` 
+              : item.item_name;
+
+            return (
+              <tr key={i} className="hover:bg-gray-50">
+                <td className="p-4">
+                  <p className="font-black text-gray-900 uppercase">{displayName}</p>
+                  <p className="text-[10px] text-gray-500 font-bold">Item ID: {item.item_id}</p>
+                </td>
+                <td className="p-4 text-center font-bold">₹{item.price}</td>
+                <td className="p-4 text-center font-black" style={{ color: primaryColor }}>{item.quantity}</td>
+                <td className="p-4 text-right font-black text-lg">₹{(item.price * item.quantity).toFixed(2)}</td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
 
@@ -106,29 +113,28 @@ export const HistoryReceipt = React.forwardRef(({ order }, ref) => {
       </div>
 
       {/* Footer */}
-      {/* Footer */}
-<div className="mt-24 text-center">
-  {isCancelled ? (
-    <div className="space-y-2">
-      <p className="text-[10px] font-black uppercase tracking-[0.3em] text-red-500">
-        Order Cancelled
-      </p>
-      <p className="text-[10px] font-bold text-gray-400 italic">
-        We hope to serve you better next time.
-      </p>
-    </div>
-  ) : (
-    <p className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-400">
-      Thank you for ordering with The Crunch
-    </p>
-  )}
-  
-  <div className="mt-4 flex justify-center gap-4">
-      <div className={`h-1 w-12 ${isCancelled ? 'bg-red-500' : 'bg-black'}`}></div>
-      <div className="h-1 w-12" style={{ backgroundColor: primaryColor }}></div>
-      <div className={`h-1 w-12 ${isCancelled ? 'bg-red-500' : 'bg-black'}`}></div>
-  </div>
-</div>
+      <div className="mt-24 text-center">
+        {isCancelled ? (
+          <div className="space-y-2">
+            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-red-500">
+              Order Cancelled
+            </p>
+            <p className="text-[10px] font-bold text-gray-400 italic">
+              We hope to serve you better next time.
+            </p>
+          </div>
+        ) : (
+          <p className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-400">
+            Thank you for ordering with The Crunch
+          </p>
+        )}
+        
+        <div className="mt-4 flex justify-center gap-4">
+            <div className={`h-1 w-12 ${isCancelled ? 'bg-red-500' : 'bg-black'}`}></div>
+            <div className="h-1 w-12" style={{ backgroundColor: primaryColor }}></div>
+            <div className={`h-1 w-12 ${isCancelled ? 'bg-red-500' : 'bg-black'}`}></div>
+        </div>
+      </div>
     </div>
   );
 });

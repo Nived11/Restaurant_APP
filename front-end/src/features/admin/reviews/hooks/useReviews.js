@@ -44,7 +44,6 @@ export const useReviews = () => {
   const reviews = data?.results || []; 
   const totalItems = data?.count || 0;
   
-  // ഹാർഡ്‌കോഡഡ് 12 (ബാക്ക് എൻഡ് ലിമിറ്റ് അനുസരിച്ച്)
   const totalPages = Math.ceil(totalItems / 12) || 1;
 
   return {

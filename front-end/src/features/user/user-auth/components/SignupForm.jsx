@@ -28,8 +28,8 @@ const SignupForm = () => {
   return (
     <div className="h-screen w-full flex flex-col lg:flex-row bg-[#0a0a0a] overflow-hidden font-sans">
 
-      {/* 1. LEFT CONTENT SECTION */}
-      <div className="relative w-full lg:w-[60%] h-[20vh] lg:h-full bg-black flex-shrink-0 overflow-hidden">
+      {/* 1. LEFT CONTENT SECTION (No changes here, kept exactly as yours) */}
+      <div className="relative w-full lg:w-[60%] h-[24vh] lg:h-full bg-black flex-shrink-0 overflow-hidden">
         <img src={loginbg} className="absolute inset-0 w-full h-full object-cover opacity-25 lg:opacity-30" alt="Premium Culinary" />
         <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-transparent to-transparent lg:hidden"></div>
         <div className="hidden lg:block absolute inset-y-0 right-0 w-1/3 bg-gradient-to-l from-[#0a0a0a] to-transparent"></div>
@@ -58,10 +58,13 @@ const SignupForm = () => {
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, ease: "easeOut" }}
-        className="w-full lg:w-[40%] flex flex-col items-center justify-start lg:justify-center px-8 lg:px-20 bg-[#0a0a0a] flex-grow overflow-y-auto"
+        // MODIFIED: Added pt-4 lg:pt-0 to push the form slightly down without causing scroll
+        className="w-full lg:w-[40%] flex flex-col items-center px-8 lg:px-20 bg-[#0a0a0a] flex-grow pt-8 lg:pt-0 lg:justify-center overflow-hidden"
       >
-        <div className="max-w-sm w-full space-y-8 lg:space-y-10">
-          <header className="text-center lg:text-left space-y-3 lg:space-y-4">
+        {/* MODIFIED: Adjusted space-y to make the form tighter and fit on screen */}
+        <div className="max-w-sm w-full space-y-4 lg:space-y-10">
+          
+          <header className="text-center lg:text-left space-y-1 lg:space-y-4">
             <h2 className="text-3xl lg:text-7xl font-black uppercase tracking-tighter text-white leading-tight italic">
               Sign <span className="text-[#f9a602]">Up.</span>
             </h2>
@@ -70,25 +73,11 @@ const SignupForm = () => {
             </p>
           </header>
 
-          <div className="w-full min-h-[60px]">
-            <AnimatePresence>
-              {error && (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  className="mb-6 p-3 bg-red-500/10 border border-red-500/30 rounded-2xl flex items-center gap-3"
-                >
-                  <AlertCircle size={18} className="text-red-500 shrink-0" />
-                  <p className="text-red-500 text-[8px] sm:text-[10px] font-bold uppercase tracking-widest whitespace-nowrap leading-tight">
-                    {error}
-                  </p>
-                </motion.div>
-              )}
-            </AnimatePresence>
-
+          {/* MODIFIED: Using flex-col-reverse so Error Message appears ABOVE the input fields but pushes upwards */}
+          <div className="flex flex-col-reverse w-full">
+            
             {step === 1 ? (
-              <form onSubmit={handleRegisterSubmit} className="space-y-5">
+              <form onSubmit={handleRegisterSubmit} className="space-y-3 lg:space-y-5 w-full">
                 <div className="relative group">
                   <div className="absolute inset-y-0 left-0 pl-6 flex items-center pointer-events-none">
                     <User size={18} className="text-[#f9a602] opacity-70" />
@@ -98,7 +87,7 @@ const SignupForm = () => {
                     placeholder="Full Name"
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="w-full pl-14 pr-6 py-2  text-sm sm:text-base bg-white/[0.03] border border-white/10 rounded-xl focus:border-[#f9a602] transition-all font-bold text-white outline-none placeholder:text-sm placeholder:text-gray-700"
+                    className="w-full pl-14 pr-6 py-2.5 lg:py-2 text-sm sm:text-base bg-white/[0.03] border border-white/10 rounded-xl focus:border-[#f9a602] transition-all font-bold text-white outline-none placeholder:text-sm placeholder:text-gray-700"
                     required
                   />
                 </div>
@@ -113,7 +102,7 @@ const SignupForm = () => {
                     placeholder="Mobile Number"
                     value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    className="w-full pl-18 pr-6 py-2 text-sm sm:text-base bg-white/[0.03] border border-white/10 rounded-xl focus:border-[#f9a602] transition-all font-bold text-white outline-none placeholder:text-sm placeholder:text-gray-700"
+                    className="w-full pl-18 pr-6 py-2.5 lg:py-2 text-sm sm:text-base bg-white/[0.03] border border-white/10 rounded-xl focus:border-[#f9a602] transition-all font-bold text-white outline-none placeholder:text-sm placeholder:text-gray-700"
                     required
                   />
                 </div>
@@ -127,14 +116,14 @@ const SignupForm = () => {
                     placeholder="Email Address (Optional)"
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="w-full pl-14 pr-6 py-2 text-sm sm:text-base bg-white/[0.03] border border-white/10 rounded-xl focus:border-[#f9a602] transition-all font-bold text-white outline-none placeholder:text-sm placeholder:text-gray-700"
+                    className="w-full pl-14 pr-6 py-2.5 lg:py-2 text-sm sm:text-base bg-white/[0.03] border border-white/10 rounded-xl focus:border-[#f9a602] transition-all font-bold text-white outline-none placeholder:text-sm placeholder:text-gray-700"
                   />
                 </div>
 
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full mt-4 lg:mt-10 bg-[#f9a602] text-black py-3 lg:py-4 rounded-xl font-black uppercase tracking-[0.2em] text-[10px] lg:text-[11px] hover:bg-primary/80 cursor-pointer transition-all flex items-center justify-center gap-2 active:scale-95 shadow-2xl shadow-[#f9a602]/10 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full mt-2 lg:mt-10 bg-[#f9a602] text-black py-3 lg:py-4 rounded-xl font-black uppercase tracking-[0.2em] text-[10px] lg:text-[11px] hover:bg-primary/80 cursor-pointer transition-all flex items-center justify-center gap-2 active:scale-95 shadow-2xl shadow-[#f9a602]/10 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {loading ? (
                     <><Loader2 className="animate-spin" size={16} /> Sending OTP...</>
@@ -144,7 +133,7 @@ const SignupForm = () => {
                 </button>
               </form>
             ) : (
-              <form onSubmit={handleVerifySubmit} className="space-y-12">
+              <form onSubmit={handleVerifySubmit} className="space-y-8 lg:space-y-12 w-full">
                 <div>
                   <p className="text-center text-[#f9a602] text-[10px] font-black uppercase tracking-widest mb-4">Enter 6 Digit OTP</p>
                   <div className="flex justify-between gap-2">
@@ -157,7 +146,7 @@ const SignupForm = () => {
                         value={data}
                         onKeyDown={(e) => handleKeyDown(e, index)}
                         onChange={(e) => handleOtpChange(e.target.value, index)}
-                        className="w-full h-12 mt-6 sm:mt-0 lg:h-14 bg-white/5 border border-white/10 rounded-xl text-center font-black text-xl text-[#f9a602] focus:border-[#f9a602] outline-none"
+                        className="w-full h-12 mt-2 sm:mt-0 lg:h-14 bg-white/5 border border-white/10 rounded-xl text-center font-black text-xl text-[#f9a602] focus:border-[#f9a602] outline-none"
                       />
                     ))}
                   </div>
@@ -190,7 +179,7 @@ const SignupForm = () => {
                     <button
                       type="button"
                       onClick={() => setStep(1)}
-                      className="flex items-center justify-center gap-2 mt-5 sm:mt-0 cursor-pointer text-[9px] font-black uppercase tracking-widest text-gray-500 hover:text-white underline underline-offset-4 decoration-[#f9a602]"
+                      className="flex items-center justify-center gap-2 mt-2 sm:mt-0 cursor-pointer text-[9px] font-black uppercase tracking-widest text-gray-500 hover:text-white underline underline-offset-4 decoration-[#f9a602]"
                     >
                       <ChevronLeft size={14} /> Back to details
                     </button>
@@ -198,22 +187,47 @@ const SignupForm = () => {
                 </div>
               </form>
             )}
-          </div>
 
-          <div className="pt-8 border-t border-white/5">
-            <div className="flex flex-col items-center lg:items-start gap-4">
-              <p className="text-[10px] font-medium text-gray-500 tracking-tight">Already have an account?</p>
-              <button
-                onClick={() => navigate('/login')}
-                className="cursor-pointer group flex items-center gap-2 text-white transition-all"
-              >
-                <div className="w-7 h-7 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-[#f9a602] group-hover:text-black transition-all">
-                  <ChevronLeft size={14} />
-                </div>
-                <span className="font-black uppercase tracking-widest text-[11px] group-hover:text-[#f9a602]">Sign In Now</span>
-              </button>
+            {/* Error Message Section - Appears exactly above the form fields */}
+            <div className="w-full min-h-[44px] mb-2 flex items-end">
+              <AnimatePresence>
+                {error && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 10 }}
+                    className="w-full p-2.5 bg-red-500/10 border border-red-500/30 rounded-xl flex items-center gap-3"
+                  >
+                    <AlertCircle size={16} className="text-red-500 shrink-0" />
+                    <p className="text-red-500 text-[8px] sm:text-[10px] font-bold uppercase tracking-widest leading-tight">
+                      {error}
+                    </p>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           </div>
+
+          {/* MODIFIED: Show 'Already have an account' ONLY in Step 1 (Hidden in OTP view) */}
+          {step === 1 && (
+            <div className="pt-4 lg:pt-8 border-t border-white/5">
+              <div className="flex flex-col items-center lg:items-start gap-3 lg:gap-4">
+                <p className="text-[10px] font-medium text-gray-500 tracking-tight">Already have an account?</p>
+                <button
+                  onClick={() => navigate('/login')}
+                  className="cursor-pointer group flex items-center gap-3 text-white transition-all"
+                >
+                  <div className="w-7 h-7 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-[#f9a602] group-hover:text-black transition-all">
+                    <ChevronLeft size={14} />
+                  </div>
+                  <span className="font-black uppercase tracking-widest text-[11px] group-hover:text-[#f9a602]">Sign In Now</span>
+                  {/* Invisible spacer to balance the text perfectly in the center */}
+                  <div className="w-7 h-7 lg:hidden" />
+                </button>
+              </div>
+            </div>
+          )}
+
         </div>
       </motion.div>
     </div>

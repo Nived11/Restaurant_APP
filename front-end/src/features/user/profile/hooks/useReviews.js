@@ -6,6 +6,9 @@ import { toast } from 'sonner';
 export const useReviews = () => {
   const queryClient = useQueryClient();
 
+  const token = localStorage.getItem('user_access');
+  const isLoggedIn = !!token;
+
   // 1. Eligibility Check
   const { data: eligibility } = useQuery({
     queryKey: ['review-eligibility'],
@@ -13,6 +16,7 @@ export const useReviews = () => {
       const response = await api.get('/feedback/eligibility/');
       return response.data;
     },
+    enabled: isLoggedIn,
   });
 
   // 2. Fetch Reviews List
@@ -22,6 +26,7 @@ export const useReviews = () => {
       const response = await api.get('/feedback/list/');
       return Array.isArray(response.data) ? response.data : [];
     },
+    enabled: isLoggedIn,
   });
 
   // 3. Create Review Mutation

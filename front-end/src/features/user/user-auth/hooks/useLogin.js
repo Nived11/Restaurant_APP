@@ -112,7 +112,6 @@ export const useLogin = () => {
                 dispatch(mergeCartOnLogin());
 
                 toast.success("Welcome back!");
-                console.log("Full Login Response:", response.data);
                 const origin = location.state?.from || '/';
                 setTimeout(() => {
                    navigate(origin, { replace: true });
