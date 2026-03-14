@@ -13,7 +13,7 @@ export default defineConfig({
         name: 'THE CRUNCH INDIA',
         short_name: 'Crunch', 
         theme_color: '#ffffff', 
-        background_color: '#ffffff', 
+        background_color: '#323232', 
         display: 'standalone',
         scope: '/',
         start_url: '/',
