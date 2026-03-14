@@ -12,8 +12,8 @@ export default defineConfig({
       manifest: {
         name: 'THE CRUNCH INDIA',
         short_name: 'Crunch', 
-        theme_color: '#ffffff', 
-        background_color: '#323232', 
+        theme_color: '#323232', 
+        background_color: '#ffffff', 
         display: 'standalone',
         scope: '/',
         start_url: '/',
