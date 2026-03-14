@@ -18,25 +18,23 @@ const ReserveTable = ({ isOpen, onClose }) => {
     return () => { document.body.style.overflow = "unset"; };
   }, [isOpen]);
 
-  const inputClass = "w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-2 md:py-3.5 text-[11px] md:text-[12px] font-bold text-slate-900 outline-none focus:border-primary focus:bg-white transition-all appearance-none placeholder:text-slate-400";
+  const inputClass = "w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-2 md:py-3 text-[11px] md:text-[12px] font-bold text-slate-900 outline-none focus:border-primary focus:bg-white transition-all appearance-none placeholder:text-slate-400";
   const labelClass = "text-[8px] md:text-[10px] font-black text-slate-700 uppercase tracking-widest ml-1 mb-1 block";
 
-  // സ്മൂത്ത് ആനിമേഷനുള്ള വേരിയന്റുകൾ
+  // MODIFIED: Changed animation type to "tween" with lower duration for smoother performance on mobile GPUs
   const modalVariants = {
-    initial: isMobile ? { y: "100%" } : { y: 30, opacity: 0, scale: 0.95 },
+    initial: isMobile ? { y: "100%" } : { y: 20, opacity: 0, scale: 0.98 },
     animate: { 
       y: 0, 
       opacity: 1, 
       scale: 1,
-      transition: isMobile 
-        ? { type: "spring", damping: 30, stiffness: 300, mass: 0.8 } // മൊബൈലിൽ സ്പ്രിംഗ് ആനിമേഷൻ കൂടുതൽ സ്മൂത്താണ്
-        : { duration: 0.3, ease: "easeOut" }
+      transition: { type: "tween", ease: "easeOut", duration: 0.25 }
     },
     exit: { 
-      y: "100%", 
-      opacity: isMobile ? 1 : 0, 
-      scale: isMobile ? 1 : 0.95, 
-      transition: { duration: 0.3, ease: [0.32, 0.72, 0, 1] }
+      y: isMobile ? "100%" : 20, 
+      opacity: 0, 
+      scale: isMobile ? 1 : 0.98, 
+      transition: { type: "tween", ease: "easeIn", duration: 0.2 }
     },
   };
 
@@ -44,14 +42,13 @@ const ReserveTable = ({ isOpen, onClose }) => {
     <AnimatePresence>
       {isOpen && (
         <div className="fixed inset-0 z-[2000] flex items-end md:items-center justify-center p-0 md:p-6 overflow-hidden">
-          {/* Backdrop - opacity 0.4s സ്ലോ ആയി വരുന്നത് സ്മൂത്ത്നെസ്സ് കൂട്ടും */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
+            transition={{ duration: 0.2 }}
             onClick={onClose}
-            className="absolute inset-0 bg-black/70 backdrop-blur-md"
+            className="absolute inset-0 bg-black/70 backdrop-blur-sm"
           />
 
           {/* Modal Container */}
@@ -61,46 +58,48 @@ const ReserveTable = ({ isOpen, onClose }) => {
             animate="animate"
             exit="exit"
             drag={isMobile ? "y" : false}
-            dragConstraints={{ top: 0 }}
-            dragElastic={0.05} // ഡ്രാഗ് ചെയ്യുമ്പോൾ കൂടുതൽ കൺട്രോൾ കിട്ടാൻ
+            dragConstraints={{ top: 0, bottom: 0 }}
+            dragElastic={0.1} 
             onDragEnd={(e, { offset, velocity }) => {
-              if (offset.y > 100 || velocity.y > 500) onClose();
+              if (offset.y > 100 || velocity.y > 400) onClose();
             }}
-            // performance മെച്ചപ്പെടുത്താൻ താഴെ പറയുന്നവ ചേർത്തു
-            className="relative bg-white w-full md:max-w-4xl rounded-t-[2.5rem] md:rounded-[3rem] shadow-2xl flex flex-col max-h-[95vh] md:max-h-[90vh] overflow-hidden touch-none md:touch-auto"
+            // MODIFIED: h-auto ensuring it fits without scrolling in desktop
+            className="relative bg-white w-full md:max-w-4xl rounded-t-[2.5rem] md:rounded-[3rem] shadow-2xl flex flex-col h-auto max-h-[95vh] overflow-hidden touch-none md:touch-auto"
             style={{ willChange: "transform" }} 
             onClick={(e) => e.stopPropagation()}
           >
             {/* Mobile Handle Bar */}
-            <div className="md:hidden absolute top-3 left-1/2 -translate-x-1/2 w-10 h-1 bg-gray-200 rounded-full z-50" />
+            <div className="md:hidden absolute top-3 left-1/2 -translate-x-1/2 w-12 h-1.5 bg-gray-200 rounded-full z-50" />
 
             {/* Close Button */}
             <button 
               onClick={onClose} 
-              className="absolute right-5 top-5 p-2 bg-slate-100 hover:bg-primary/10 transition-colors rounded-full z-50 text-slate-900"
+              className="absolute right-4 top-4 md:right-5 md:top-5 p-2 bg-slate-100 hover:bg-primary/10 transition-colors rounded-full z-50 text-slate-900"
             >
               <X size={isMobile ? 18 : 22} />
             </button>
 
             {/* Header Section */}
-            <div className="relative pt-8 md:pt-12 pb-2 md:pb-6 px-6 text-center shrink-0">
-              <div className="flex justify-center mb-2 md:mb-4">
-                <img src={Logo} alt="Logo" className="h-10 md:h-16 w-auto object-contain" />
+            {/* MODIFIED: Reduced padding for desktop (pt-8 md:pt-10) to save space */}
+            <div className="relative pt-8 md:pt-10 pb-2 md:pb-4 px-6 text-center shrink-0">
+              <div className="flex justify-center mb-2 md:mb-3">
+                <img src={Logo} alt="Logo" className="h-10 md:h-14 w-auto object-contain" />
               </div>
-              <h2 className="text-xl md:text-4xl font-black uppercase tracking-tight text-slate-900 leading-none">
+              <h2 className="text-xl md:text-3xl font-black uppercase tracking-tight text-slate-900 leading-none">
                 Table <span className="text-primary italic">Reservation</span>
               </h2>
 
               {error && (
-                <motion.p initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="text-red-500 text-[9px] md:text-xs font-bold mt-2 bg-red-50 py-1 px-4 rounded-full inline-block">
+                <motion.p initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} className="text-red-500 text-[9px] md:text-xs font-bold mt-2 bg-red-50 py-1 px-4 rounded-full inline-block">
                   {error}
                 </motion.p>
               )}
             </div>
 
             {/* Form Content */}
-            <form onSubmit={handleSubmit} className="px-6 md:px-16 pb-8 md:pb-12 overflow-y-auto space-y-3 md:space-y-5 no-scrollbar flex-1">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-6">
+            {/* MODIFIED: Changed space-y-5 to space-y-4 on desktop and removed internal scrolling for desktop */}
+            <form onSubmit={handleSubmit} className="px-6 md:px-16 pb-8 md:pb-10 overflow-y-auto md:overflow-visible space-y-3 md:space-y-4 flex-1">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-5">
                 <div className="space-y-1">
                   <label className={labelClass}>Full Name</label>
                   <div className="relative">
@@ -136,7 +135,7 @@ const ReserveTable = ({ isOpen, onClose }) => {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-6">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-5">
                 <div className="space-y-1">
                   <label className={labelClass}>Date</label>
                   <div className="relative">
@@ -161,16 +160,17 @@ const ReserveTable = ({ isOpen, onClose }) => {
 
               <div className="space-y-1">
                 <label className={labelClass}>Notes (Optional)</label>
-                <textarea name="notes" value={formData.notes} onChange={handleChange} rows={isMobile ? "2" : "3"} placeholder="Special requests..." className={`${inputClass} resize-none py-3`} />
+                <textarea name="notes" value={formData.notes} onChange={handleChange} rows={isMobile ? "2" : "2"} placeholder="Special requests..." className={`${inputClass} resize-none py-2 md:py-3`} />
               </div>
 
-              <div className="pt-2">
+              {/* MODIFIED: Reduced pt-2 to pt-1 on desktop */}
+              <div className="pt-1 md:pt-2">
                 <motion.button
                   whileHover={!loading ? { scale: 1.01 } : undefined}
                   whileTap={!loading ? { scale: 0.98 } : undefined}
                   disabled={loading}
                   type="submit"
-                  className={`w-full md:max-w-xs mx-auto flex items-center justify-center gap-3 bg-slate-900 text-white py-4 md:py-5 rounded-2xl font-black uppercase tracking-[0.15em] text-[10px] md:text-xs shadow-xl transition-all ${loading ? 'opacity-90 cursor-not-allowed' : 'hover:bg-primary cursor-pointer'}`}
+                  className={`w-full md:max-w-xs mx-auto flex items-center justify-center gap-2 md:gap-3 bg-slate-900 text-white py-4 md:py-4 rounded-2xl font-black uppercase tracking-[0.15em] text-[10px] md:text-[11px] shadow-xl transition-all ${loading ? 'opacity-90 cursor-not-allowed' : 'hover:bg-primary hover:text-black cursor-pointer'}`}
                 >
                   {loading ? (
                     <Loader2 size={16} className="animate-spin" />

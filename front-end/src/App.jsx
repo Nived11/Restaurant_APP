@@ -7,20 +7,26 @@ import { Provider, useSelector } from "react-redux";
 import { store } from "./redux/store";
 import { AnimatePresence } from "framer-motion";
 import SiteLaunchLoader from "./components/ui/SiteLaunchLoader";
-import { useFCM } from "./hooks/useFCM"; 
+import ServerErrorPage from "./components/ui/ServerErrorPage";
+import ErrorBoundary from "./components/common/ErrorBoundary";
+import { useFCM } from "./hooks/useFCM";
 
 const queryClient = new QueryClient();
 
 const AppContent = () => {
-  const { isChecking } = useSelector((state) => state.location);
+  const { isChecking, globalError } = useSelector((state) => state.location);
   const user = useSelector((state) => state.auth?.user);
   const currentPath = window.location.pathname;
   const isAdminPath = currentPath.startsWith("/admin");
   const isAuthPath = currentPath === "/login" || currentPath === "/signup";
 
-  const showLoader = isChecking && !isAdminPath && !isAuthPath;
+  const showLoader = isChecking && !isAdminPath && !isAuthPath && !globalError;
 
   useFCM(isAdminPath, user);
+
+  if (globalError && !isAdminPath) {
+    return <ServerErrorPage />;
+  }
 
   return (
     <BrowserRouter>
@@ -30,7 +36,9 @@ const AppContent = () => {
       <ScrollToTop />
       <Toaster position="top-center" />
       <div style={{ visibility: showLoader ? "hidden" : "visible" }}>
-        <AppRoutes />
+        <ErrorBoundary>
+          <AppRoutes />
+        </ErrorBoundary>
       </div>
     </BrowserRouter>
   );

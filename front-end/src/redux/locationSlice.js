@@ -15,27 +15,20 @@ const locationSlice = createSlice({
     isOpen: true, 
     isChecking: true, 
     errorPopup: null, 
+    globalError: false, 
   },
   reducers: {
     setLocation: (state, action) => {
       const data = action.payload;
       const { workingHours, isOpen, ...locationData } = data;
       
-      state.currentLocation = {
-        ...state.currentLocation,
-        ...locationData
-      };
-      
-      if (workingHours) {
-        state.workingHours = workingHours;
-      }
-
-      if (isOpen !== undefined) {
-        state.isOpen = isOpen;
-      }
+      state.currentLocation = { ...state.currentLocation, ...locationData };
+      if (workingHours) state.workingHours = workingHours;
+      if (isOpen !== undefined) state.isOpen = isOpen;
       
       state.isChecking = false;
       state.errorPopup = null;
+      state.globalError = false;
       
       localStorage.setItem("user_location", JSON.stringify(state.currentLocation));
     },
@@ -54,9 +47,13 @@ const locationSlice = createSlice({
     },
     clearError: (state) => {
       state.errorPopup = null;
+    },
+    setGlobalError: (state, action) => {
+      state.globalError = action.payload;
+      state.isChecking = false; 
     }
   }
 });
 
-export const { setLocation, setChecking, setErrorPopup, clearError } = locationSlice.actions;
+export const { setLocation, setChecking, setErrorPopup, clearError, setGlobalError } = locationSlice.actions;
 export default locationSlice.reducer;

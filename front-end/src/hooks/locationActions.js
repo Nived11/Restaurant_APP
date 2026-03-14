@@ -1,5 +1,5 @@
 // locationActions.js
-import { setLocation, setChecking, setErrorPopup } from '../redux/locationSlice';
+import { setLocation, setChecking, setErrorPopup, setGlobalError } from '../redux/locationSlice'; 
 import { fetchLocationDetails } from '../utils/addressHelper';
 import api from '../api/axios'; 
 
@@ -43,16 +43,22 @@ export const checkInitialStatus = (isSilent = false, showPopup = true) => async 
         }
         return "OPEN";
     } catch (error) {
-        dispatch(setChecking(false));
+        console.error("Server API Failed:", error);
+        
+        if (!isSilent) {
+            dispatch(setGlobalError(true)); 
+        } else {
+            dispatch(setChecking(false));
+        }
         return "ERROR";
     }
 };
+
 export const handleLocationUpdate = (lat, lng, isBackground = false) => async (dispatch) => {
     try {
         const response = await api.get(`/site-settings/info/?t=${new Date().getTime()}`);
         const settings = response.data;
         
-        // ബാക്കെൻഡ് തരുന്ന എല്ലാ പ്രധാന ഡാറ്റയും എടുക്കുന്നു
         const { 
             latitude: SHOP_LAT, 
             longitude: SHOP_LNG, 
@@ -74,7 +80,6 @@ export const handleLocationUpdate = (lat, lng, isBackground = false) => async (d
 
         dispatch(setLocation(locationData));
 
-        // 1. ആദ്യം ഷോപ്പ് തുറന്നിട്ടുണ്ടോ എന്ന് നോക്കുന്നു
         if (isOpen === false) {
             if (!isBackground) {
                 dispatch(setErrorPopup({
@@ -85,7 +90,6 @@ export const handleLocationUpdate = (lat, lng, isBackground = false) => async (d
             return "CLOSED";
         }
 
-        // 2. രണ്ടാമത് ഡെലിവറി റേഞ്ച് നോക്കുന്നു
         if (!isDeliverable) {
             if (!isBackground) {
                 dispatch(setErrorPopup(`Delivery is not available in your area.`));

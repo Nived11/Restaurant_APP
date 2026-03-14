@@ -23,6 +23,11 @@ const MenuFormModal = ({
     };
   }, []);
 
+  // സ്ക്രോൾ ചെയ്യുമ്പോൾ നമ്പർ മാറുന്നത് തടയാനുള്ള ഫങ്ക്ഷൻ
+  const stopScrollChange = (e) => {
+    e.target.blur();
+  };
+
   // Validation Check
   let isPriceInvalid = false;
   if (formData.has_variants) {
@@ -81,7 +86,6 @@ const MenuFormModal = ({
         initial={isMobile ? { y: "100%" } : { opacity: 0, y: 20 }}
         animate={{ y: 0, opacity: 1 }}
         exit={isMobile ? { y: "100%" } : { opacity: 0, y: 20 }}
-        // Changed md:max-h-none to md:max-h-[90vh] to enable scrolling inside the modal
         className="relative bg-white w-full md:max-w-5xl rounded-t-[2rem] md:rounded-[1.5rem] shadow-2xl flex flex-col max-h-[92vh] md:max-h-[90vh] overflow-hidden border border-slate-200"
       >
         {/* Header */}
@@ -103,7 +107,7 @@ const MenuFormModal = ({
           <form id="product-form" onSubmit={onSubmit}>
             <div className="grid grid-cols-1 md:grid-cols-12 gap-8 relative items-start">
               
-              {/* Left Side: Images - Added sticky class here */}
+              {/* Left Side: Images */}
               <div className="md:col-span-4 space-y-4 md:sticky md:top-0 h-fit">
                 <div className="flex flex-col gap-4">
                   <AnimatePresence>
@@ -184,9 +188,8 @@ const MenuFormModal = ({
               {/* Right Side: Details */}
               <div className="md:col-span-8 space-y-4">
                 
-                {/* Top Toggles Row: Variants & Availability */}
+                {/* Top Toggles Row */}
                 <div className="flex justify-between items-center mb-3 mt-0 sm:-mt-4 gap-3">
-                  {/* Variants Toggle */}
                   <div
                     onClick={() => {
                       if (!loading) {
@@ -212,7 +215,6 @@ const MenuFormModal = ({
                     </span>
                   </div>
 
-                  {/* Availability Toggle */}
                   <div
                     onClick={() => !loading && setFormData({ ...formData, is_available: !formData.is_available })}
                     className={`flex items-center gap-2 px-3 py-1.5 rounded-xl border-2 transition-all cursor-pointer ${
@@ -270,7 +272,7 @@ const MenuFormModal = ({
                 </div>
 
                 {/* Pricing / Variants Section */}
-                <div className="">
+                <div>
                   {formData.has_variants ? (
                     <div className="space-y-2 bg-slate-50 p-4 rounded-xl border border-slate-200">
                       {formData.variants.map((variant, index) => {
@@ -282,7 +284,6 @@ const MenuFormModal = ({
                               <button
                                 type="button"
                                 onClick={() => handleRemoveVariant(index)}
-                                // Changed here: opacity-100 for mobile, opacity-0 md:group-hover:opacity-100 for desktop
                                 className="absolute -top-2 -right-2 bg-red-100 text-red-600 p-1.5 rounded-full hover:bg-red-200 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity shadow-sm z-10"
                               >
                                 <Trash2 size={12} />
@@ -295,23 +296,51 @@ const MenuFormModal = ({
                               </div>
                               <div className="space-y-1">
                                 <label className="text-[8px] font-bold text-slate-500 uppercase">MRP (₹)</label>
-                                <input disabled={loading} type="number" required placeholder="0" className={`${inputClass} !py-1.5`} value={variant.actual_price} onChange={(e) => handleVariantChange(index, "actual_price", e.target.value)} />
+                                <input 
+                                  disabled={loading} 
+                                  type="number" 
+                                  min="0" // മൈനസ് വാല്യൂ ഒഴിവാക്കാൻ
+                                  onWheel={stopScrollChange} // സ്ക്രോൾ ചെയ്യുമ്പോൾ നമ്പർ മാറുന്നത് തടയാൻ
+                                  required 
+                                  placeholder="0" 
+                                  className={`${inputClass} !py-1.5`} 
+                                  value={variant.actual_price} 
+                                  onChange={(e) => handleVariantChange(index, "actual_price", e.target.value)} 
+                                />
                               </div>
                               <div className="space-y-1">
                                 <label className="text-[8px] font-bold text-slate-500 uppercase">Offer Price (₹)</label>
-                                <input disabled={loading} type="number" placeholder="0" className={`${inputClass} !py-1.5 ${isVariantPriceInvalid ? "border-red-500 bg-red-50" : ""}`} value={variant.offer_price || ""} onChange={(e) => handleVariantChange(index, "offer_price", e.target.value)} />
+                                <input 
+                                  disabled={loading} 
+                                  type="number" 
+                                  min="0" // മൈനസ് വാല്യൂ ഒഴിവാക്കാൻ
+                                  onWheel={stopScrollChange} // സ്ക്രോൾ ചെയ്യുമ്പോൾ നമ്പർ മാറുന്നത് തടയാൻ
+                                  placeholder="0" 
+                                  className={`${inputClass} !py-1.5 ${isVariantPriceInvalid ? "border-red-500 bg-red-50" : ""}`} 
+                                  value={variant.offer_price || ""} 
+                                  onChange={(e) => handleVariantChange(index, "offer_price", e.target.value)} 
+                                />
                                 {isVariantPriceInvalid && <span className="text-[7px] text-red-600 font-bold">Invalid</span>}
                               </div>
                               <div className="space-y-1">
                                 <label className="text-[8px] font-bold text-slate-500 uppercase">Stock</label>
-                                <input disabled={loading} type="number" required placeholder="0" className={`${inputClass} !py-1.5`} value={variant.quantity} onChange={(e) => handleVariantChange(index, "quantity", e.target.value)} />
+                                <input 
+                                  disabled={loading} 
+                                  type="number" 
+                                  min="0" // മൈനസ് വാല്യൂ ഒഴിവാക്കാൻ
+                                  onWheel={stopScrollChange} // സ്ക്രോൾ ചെയ്യുമ്പോൾ നമ്പർ മാറുന്നത് തടയാൻ
+                                  required 
+                                  placeholder="0" 
+                                  className={`${inputClass} !py-1.5`} 
+                                  value={variant.quantity} 
+                                  onChange={(e) => handleVariantChange(index, "quantity", e.target.value)} 
+                                />
                               </div>
                             </div>
                           </div>
                         );
                       })}
 
-                      {/* Add more button moved to the bottom */}
                       <button
                         type="button"
                         onClick={handleAddVariant}
@@ -325,16 +354,45 @@ const MenuFormModal = ({
                     <div className="grid grid-cols-3 gap-4">
                       <div className="space-y-1.5">
                         <label className={labelClass}>MRP (₹)</label>
-                        <input disabled={loading} type="number" required={!formData.has_variants} placeholder="0" className={inputClass} value={formData.actual_price} onChange={(e) => setFormData({ ...formData, actual_price: e.target.value })} />
+                        <input 
+                          disabled={loading} 
+                          type="number" 
+                          min="0" // മൈനസ് വാല്യൂ ഒഴിവാക്കാൻ
+                          onWheel={stopScrollChange} // സ്ക്രോൾ ചെയ്യുമ്പോൾ നമ്പർ മാറുന്നത് തടയാൻ
+                          required={!formData.has_variants} 
+                          placeholder="0" 
+                          className={inputClass} 
+                          value={formData.actual_price} 
+                          onChange={(e) => setFormData({ ...formData, actual_price: e.target.value })} 
+                        />
                       </div>
                       <div className="space-y-1.5">
                         <label className={labelClass}>Offer Price (₹)</label>
-                        <input disabled={loading} type="number" placeholder="0" className={`${inputClass} ${isPriceInvalid ? "border-red-500 bg-red-50 focus:border-red-600" : ""}`} value={formData.offer_price} onChange={(e) => setFormData({ ...formData, offer_price: e.target.value })} />
+                        <input 
+                          disabled={loading} 
+                          type="number" 
+                          min="0" // മൈനസ് വാല്യൂ ഒഴിവാക്കാൻ
+                          onWheel={stopScrollChange} // സ്ക്രോൾ ചെയ്യുമ്പോൾ നമ്പർ മാറുന്നത് തടയാൻ
+                          placeholder="0" 
+                          className={`${inputClass} ${isPriceInvalid ? "border-red-500 bg-red-50 focus:border-red-600" : ""}`} 
+                          value={formData.offer_price} 
+                          onChange={(e) => setFormData({ ...formData, offer_price: e.target.value })} 
+                        />
                         {isPriceInvalid && <p className="text-[8px] text-red-600 font-black uppercase ml-1">Must be less than MRP</p>}
                       </div>
                       <div className="space-y-1.5">
                         <label className={labelClass}>Stock</label>
-                        <input disabled={loading} type="number" required={!formData.has_variants} placeholder="0" className={inputClass} value={formData.quantity} onChange={(e) => setFormData({ ...formData, quantity: e.target.value })} />
+                        <input 
+                          disabled={loading} 
+                          type="number" 
+                          min="0" // മൈനസ് വാല്യൂ ഒഴിവാക്കാൻ
+                          onWheel={stopScrollChange} // സ്ക്രോൾ ചെയ്യുമ്പോൾ നമ്പർ മാറുന്നത് തടയാൻ
+                          required={!formData.has_variants} 
+                          placeholder="0" 
+                          className={inputClass} 
+                          value={formData.quantity} 
+                          onChange={(e) => setFormData({ ...formData, quantity: e.target.value })} 
+                        />
                       </div>
                     </div>
                   )}

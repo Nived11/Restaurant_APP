@@ -54,7 +54,11 @@ const ComboSection = ({ data: combos = [], onItemClick }) => {
           <div 
             ref={scrollRef}
             onScroll={handleScrollState}
-            className="flex gap-4 md:gap-6 overflow-x-auto no-scrollbar pb-6 snap-x snap-mandatory px-2 scroll-smooth"
+            className="flex gap-4 md:gap-6 overflow-x-auto no-scrollbar pb-6 snap-x snap-mandatory scroll-pl-4 md:scroll-pl-0 px-2 scroll-smooth"
+            style={{
+              WebkitOverflowScrolling: 'touch',
+              scrollSnapStop: 'always'
+            }}
           >
             <style dangerouslySetInnerHTML={{__html: `.no-scrollbar::-webkit-scrollbar { display: none; }`}} />
 
@@ -80,7 +84,7 @@ const ComboSection = ({ data: combos = [], onItemClick }) => {
                   <div 
                     key={combo.id} 
                     onClick={() => onItemClick?.(combo)}
-                    className="cursor-pointer snap-start min-w-[310px] md:min-w-[440px] bg-white rounded-[2rem] p-3 md:p-4 flex gap-4 md:gap-6 shadow-sm border border-gray-100 group/item items-center"
+                    className="cursor-pointer snap-center shrink-0 w-[85vw] sm:w-[60vw] md:w-auto md:min-w-[440px] bg-white rounded-[2rem] p-3 md:p-4 flex gap-4 md:gap-6 shadow-sm border border-gray-100 group/item items-center"
                   >
                     <div className="relative shrink-0 w-28 h-28 md:w-36 md:h-40 overflow-hidden rounded-[1.5rem] md:rounded-[2rem] shadow-inner bg-gray-100">
                       <img 
@@ -99,30 +103,42 @@ const ComboSection = ({ data: combos = [], onItemClick }) => {
 
                     <div className="flex flex-col justify-center flex-1 min-w-0 py-1">
                       <div>
-                        <h4 className="font-black text-sm md:text-xl uppercase text-gray-900 truncate tracking-tight">
+                        {/* MODIFIED: Dynamically adjusting font size using tailwind logic or CSS clamp. 
+                            Here we use line-clamp-1 so it never breaks layout, but text-size is responsive. */}
+                        <h4 
+                          className="font-black uppercase text-gray-900 tracking-tight line-clamp-1"
+                          style={{
+                            // This ensures the font size scales between 12px and 18px based on the screen width
+                            // preventing it from getting too large or too small.
+                            fontSize: 'clamp(0.75rem, 1.5vw + 0.5rem, 1.125rem)' 
+                          }}
+                          title={combo.name} // Shows full name on hover if truncated
+                        >
                           {combo.name}
                         </h4>
-                        <p className="text-[9px] md:text-xs text-gray-500 font-bold mt-1 md:mt-2 uppercase line-clamp-2 leading-tight">
+                        
+                        {/* MODIFIED: Ensured strictly 2 lines for description */}
+                        <p className="text-[9px] md:text-xs text-gray-500 font-bold mt-1 md:mt-1.5 uppercase line-clamp-2 leading-tight min-h-[1.5rem] md:min-h-[2rem]">
                           {combo.description}
                         </p>
                       </div>
 
-                      <div className="mt-3">
+                      <div className="mt-2 md:mt-3">
                         <div className="flex flex-col mb-2">
                            {hasVariants && (
-                            <span className="text-gray-400 text-[8px] md:text-[9px] font-bold uppercase mb-0.5">
+                            <span className="text-gray-500 text-[8px] md:text-[9px] font-bold uppercase mb-0.5">
                               Starts from
                             </span>
                           )}
                           <div className="flex items-baseline gap-2">
                             <span className="text-xl md:text-2xl font-black text-black">₹{Math.round(offer)}</span>
                             {actual > offer && (
-                              <span className="text-[10px] md:text-sm text-gray-400 line-through font-bold">₹{Math.round(actual)}</span>
+                              <span className="text-[10px] md:text-sm text-gray-500 line-through font-bold">₹{Math.round(actual)}</span>
                             )}
                           </div>
                         </div>
                         
-                        <button  className="w-full bg-black text-white py-2.5 md:py-3 rounded-xl text-[9px] md:text-xs font-black uppercase flex items-center justify-center gap-2 hover:bg-primary hover:text-black transition-all active:scale-95 shadow-lg shadow-black/5">
+                        <button className="w-full bg-black text-white py-2.5 md:py-3 rounded-xl text-[9px] md:text-xs font-black uppercase flex items-center justify-center gap-2 hover:bg-primary hover:text-black transition-all active:scale-95 shadow-lg shadow-black/5">
                           <RiFlashlightFill size={16} className="text-primary group-hover/item:text-black" />
                           Grab Now
                         </button>
@@ -137,7 +153,7 @@ const ComboSection = ({ data: combos = [], onItemClick }) => {
                  <p className="text-gray-400 text-[10px] font-bold uppercase tracking-widest">No Combo Deals Available</p>
               </div>
             )}
-            <div className="shrink-0 w-8 md:w-20" />
+            <div className="shrink-0 w-4 md:w-20 snap-end" />
           </div>
         </div>
       </div>

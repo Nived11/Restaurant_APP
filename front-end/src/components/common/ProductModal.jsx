@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Plus, Minus, ShoppingBag, Leaf, Flame, Clock, Tag, ArrowRight, PlusCircle, AlertCircle, CheckCircle2 } from "lucide-react";
+import { X, Plus, Minus, ShoppingBag, Leaf, Flame, Clock, Tag, ArrowRight, PlusCircle, AlertCircle, ChevronDown } from "lucide-react";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { useDispatch, useSelector } from "react-redux";
@@ -133,7 +133,7 @@ const ProductModal = ({ item, onClose }) => {
     exit: {
       y: "100%",
       opacity: isMobile ? 1 : 0,
-      transition: { duration: 0.2, ease: "easeIn" }
+      transition: { duration: 0.25, ease: "easeIn" }
     },
   };
 
@@ -154,15 +154,16 @@ const ProductModal = ({ item, onClose }) => {
         animate="animate"
         exit="exit"
         drag={isMobile ? "y" : false}
-        dragConstraints={{ top: 0 }}
-        dragElastic={0.05}
+        dragConstraints={{ top: 0, bottom: 0 }}
+        dragElastic={0.2}
         onDragEnd={(e, { offset, velocity }) => {
-          if (offset.y > 80 || velocity.y > 500) onClose();
+          if (offset.y > 100 || velocity.y > 400) onClose();
         }}
-        className="relative bg-white w-full md:max-w-5xl rounded-t-[2rem] md:rounded-[2.5rem] shadow-2xl flex flex-col md:flex-row overflow-hidden h-[96vh] md:h-[85vh] max-h-[900px] z-10 mt-auto md:my-auto"
+        /* MODIFIED: Changed md:h-[85vh] to md:max-h-[85vh] h-auto to auto-adjust size on desktop */
+        className="relative bg-white w-full md:max-w-5xl rounded-t-[2.5rem] md:rounded-[2.5rem] shadow-2xl flex flex-col md:flex-row overflow-hidden h-auto max-h-[95vh] md:max-h-[85vh] z-10 mt-auto md:my-auto"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="md:hidden absolute top-2.5 left-1/2 -translate-x-1/2 w-10 h-1.5 bg-slate-300 rounded-full z-50" />
+        <div className="md:hidden absolute top-3 left-1/2 -translate-x-1/2 w-12 h-1.5 bg-slate-200 rounded-full z-50" />
 
         <button
           onClick={onClose}
@@ -172,11 +173,12 @@ const ProductModal = ({ item, onClose }) => {
         </button>
 
         {/* Image Section */}
-        <div className="w-full md:w-[45%] relative shrink-0 h-[25vh] min-h-[180px] md:h-full bg-slate-50">
+        {/* MODIFIED: Changed md:h-full to md:h-auto with a md:min-h-[350px] so it shrinks properly with the content */}
+        <div className={`w-full md:w-[45%] relative shrink-0 transition-all duration-300 bg-slate-50 ${hasVariants ? 'h-[28vh]' : 'h-[40vh]'} md:h-auto md:min-h-[350px]`}>
           <img
             src={item.image}
             alt={item.name}
-            className="w-full h-full object-cover object-center rounded-t-[2rem] md:rounded-l-[2.5rem] md:rounded-tr-none"
+            className="w-full h-full object-cover object-center rounded-t-[2.5rem] md:rounded-l-[2.5rem] md:rounded-tr-none"
           />
           <div className="absolute top-4 left-4 z-20">
             <span className={`flex items-center gap-1 px-2.5 py-1 rounded-full backdrop-blur-md border border-white/30 text-[9px] md:text-[10px] font-black uppercase tracking-wider text-white shadow-lg ${isVeg ? 'bg-green-500/90' : 'bg-red-500/90'}`}>
@@ -188,90 +190,97 @@ const ProductModal = ({ item, onClose }) => {
         </div>
 
         {/* Content Section */}
-        <div className="w-full md:w-[55%] flex flex-col bg-white h-[calc(100%-25vh)] md:h-full">
+        <div className="w-full md:w-[55%] flex flex-col bg-white overflow-hidden shrink min-h-0">
           
-          {/* Scrollable Area */}
-          <div className="flex-1 overflow-y-auto p-4 md:p-8 lg:p-10 no-scrollbar">
+          <div className="flex-1 flex flex-col overflow-y-auto p-4 md:p-8 lg:p-10 no-scrollbar">
             
-            {/* Title & Price */}
-            <div className="space-y-1.5 md:space-y-3 mt-1 md:mt-0">
-              <div className="space-y-0.5 md:space-y-1.5">
-                <span className="text-primary font-black text-[9px] md:text-[10px] uppercase tracking-widest block">
-                  {item.category_name}
-                </span>
-                <h2 className="text-xl md:text-3xl font-black text-slate-900 leading-tight uppercase tracking-tighter">
-                  {item.name}
-                </h2>
-              </div>
-
-              <div className="flex flex-col gap-1.5 items-start">
+            <div className="space-y-1 shrink-0 mt-1 md:mt-0">
+              <span className="text-primary font-black text-[9px] md:text-[10px] uppercase tracking-widest">
+                {item.category_name}
+              </span>
+              <h2 className="text-md md:text-2xl font-black text-slate-900 leading-tight uppercase tracking-tighter">
+                {item.name}
+              </h2>
+              
+              <div className="flex flex-col gap-1 items-start mt-1">
                 {discountPercent > 0 && (
-                  <div className="inline-flex items-center gap-1 bg-primary/10 text-primary text-[9px] md:text-[11px] font-black px-2 py-1 rounded-md border border-primary/20">
+                  <div className="inline-flex items-center gap-1 bg-primary/10 text-primary text-[9px] md:text-[11px] font-black px-2 py-0.5 rounded-md border border-primary/20">
                     <Tag size={10} strokeWidth={3} /> {discountPercent}% OFF
                   </div>
                 )}
                 <div className="flex items-baseline gap-2">
-                  <span className="text-2xl md:text-3xl font-black text-slate-900 tracking-tighter">₹{Math.round(offerPrice)}</span>
+                  <span className="text-xl md:text-2xl font-black text-slate-900 tracking-tighter">₹{Math.round(offerPrice)}</span>
                   {actualPrice > offerPrice && (
-                    <span className="text-sm md:text-base text-slate-400 line-through font-bold">₹{Math.round(actualPrice)}</span>
+                    <span className="text-xs md:text-sm text-slate-600 line-through font-bold">₹{Math.round(actualPrice)}</span>
                   )}
                 </div>
               </div>
             </div>
 
-            {/* Description */}
-            <div className="border-l-2 border-slate-200 pl-3 py-1 mt-3 md:mt-4">
-              <p className="text-slate-500 text-[11px] md:text-[13px] leading-relaxed font-medium">
-                {item.description || "Authentic blend of traditional spices and fresh ingredients."}
-              </p>
+            {/* Scrollable Description */}
+            <div className="mt-3 pb-3 border-b border-slate-50 shrink-0">
+              <div className="max-h-20 md:max-h-32 pr-2 ">
+                <p className="text-slate-700 text-[11px] md:text-[13px] leading-relaxed font-medium text-justify ">
+                  {item.description || "Description not available."}
+                </p>
+              </div>
             </div>
 
-            {/* Variants Selection - LIST VIEW */}
+            {/* Variants Selection */}
             {hasVariants && (
-              <div className="mt-5 md:mt-6 space-y-3">
+              <div className="mt-6 sm:mt-0 space-y-2 pb-2 shrink-0">
                 <div className="flex items-center justify-between">
-                   <h3 className="text-[10px] md:text-xs font-black text-slate-800 uppercase tracking-widest">
-                     Choose Size / Variant
-                   </h3>
-                   <span className="text-[9px] font-bold text-slate-400 bg-slate-100 px-2 py-0.5 rounded-md uppercase">Required</span>
+                   <div className="flex items-center gap-1.5">
+                     <h3 className="text-[10px] md:text-[8px] font-black text-slate-800 uppercase tracking-widest">
+                       Choose
+                     </h3>
+                     {item.variants.length > 1 && (
+                       <motion.div
+                         animate={{ y: [0, 3, 0] }}
+                         transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
+                       >
+                         <ChevronDown size={14} className="text-slate-600" />
+                       </motion.div>
+                     )}
+                   </div>
+                   <span className="text-[7px] font-bold text-slate-600 bg-slate-50 px-1.5 py-0.5 rounded uppercase border border-slate-100">Required</span>
                 </div>
                 
-                <div className="flex flex-col gap-2">
+                <div className="flex flex-col gap-1.5 ">
                   {item.variants.map((variant) => {
                     const isSelected = selectedVariant?.id === variant.id;
-                    const variantOfferPrice = parseFloat(variant.offer_price || variant.actual_price);
+                    const vOffer = parseFloat(variant.offer_price || variant.actual_price);
                     const variantActualPrice = parseFloat(variant.actual_price);
                     
                     return (
                       <div 
-                        key={variant.id}
-                        onClick={() => setSelectedVariant(variant)}
-                        className={`group relative cursor-pointer border-2 rounded-xl p-2.5 md:p-3.5 flex flex-row items-center justify-between transition-all ${
+                        key={variant.id} 
+                        onClick={() => setSelectedVariant(variant)} 
+                        className={`cursor-pointer border rounded-xl px-3 py-2 md:py-2.5 flex flex-row items-center justify-between transition-all ${
                           isSelected 
                             ? 'border-slate-900 bg-slate-50/50 shadow-sm' 
                             : 'border-slate-100 bg-white hover:border-slate-200'
                         }`}
                       >
-                        <div className="flex items-center gap-3">
-                          {/* Custom Radio Button */}
-                          <div className={`w-4 h-4 md:w-5 md:h-5 rounded-full border-2 flex items-center justify-center transition-colors ${
+                        <div className="flex items-center gap-2.5">
+                          <div className={`w-3.5 h-3.5 md:w-4 md:h-4 rounded-full border flex items-center justify-center transition-colors ${
                             isSelected ? 'border-slate-900' : 'border-slate-300 group-hover:border-slate-400'
                           }`}>
-                            {isSelected && <div className="w-2 h-2 md:w-2.5 md:h-2.5 bg-slate-900 rounded-full" />}
+                            {isSelected && <div className="w-1.5 h-1.5 md:w-2 md:h-2 bg-slate-900 rounded-full" />}
                           </div>
-                          <span className={`text-[11px] md:text-[13px] font-black uppercase tracking-tight ${isSelected ? 'text-slate-900' : 'text-slate-600'}`}>
+                          <span className={`text-[10px] md:text-[11px] font-black uppercase tracking-wide ${isSelected ? 'text-slate-900' : 'text-slate-600'}`}>
                             {variant.size_name}
                           </span>
                         </div>
 
                         <div className="flex items-center gap-2">
-                           {variantActualPrice > variantOfferPrice && (
-                             <span className="text-[9px] md:text-[10px] line-through text-slate-400 font-bold">
+                           {variantActualPrice > vOffer && (
+                             <span className="text-[9px] md:text-[10px] line-through text-slate-500 font-bold">
                                ₹{Math.round(variantActualPrice)}
                              </span>
                            )}
-                           <span className={`text-[12px] md:text-sm font-black ${isSelected ? 'text-slate-900' : 'text-slate-700'}`}>
-                             ₹{Math.round(variantOfferPrice)}
+                           <span className={`text-[11px] md:text-[12px] font-black ${isSelected ? 'text-slate-900' : 'text-slate-700'}`}>
+                             ₹{Math.round(vOffer)}
                            </span>
                         </div>
                       </div>
@@ -280,16 +289,16 @@ const ProductModal = ({ item, onClose }) => {
                 </div>
               </div>
             )}
-            
-            <div className="h-4 md:h-6"></div>
           </div>
 
           {/* Sticky Action Area (Footer) */}
-          <div className="shrink-0 bg-white border-t border-slate-100 p-3 md:p-6 lg:p-8 z-20 pb-6 md:pb-6 lg:pb-8 shadow-[0_-8px_30px_-15px_rgba(0,0,0,0.1)] md:shadow-none">
+          <div className="shrink-0 bg-white border-t border-slate-100 p-3 md:p-6 lg:p-8 z-20 pb-2 md:pb-4 lg:pb-4 shadow-[0_-8px_30px_-15px_rgba(0,0,0,0.1)] md:shadow-none">
+            
+            {/* Store Closed Warning */}
             {isStoreClosed && !isAdded && (
               <div className="flex items-center justify-center gap-2 text-red-600 mb-2 md:mb-3 bg-red-50 py-1.5 md:py-2 rounded-xl border border-red-100">
                 <Clock size={14} />
-                <span className="text-[10px] md:text-[11px] font-black uppercase tracking-tight">Store is currently Closed</span>
+                <span className="text-[10px] md:text-[11px] font-bold  uppercase tracking-wide">Store is currently Closed</span>
               </div>
             )}
 
@@ -297,7 +306,7 @@ const ProductModal = ({ item, onClose }) => {
               <>
                 <div className="flex items-center justify-between mb-2 md:mb-4">
                   <div className="flex flex-col">
-                    <span className="text-slate-400 text-[8px] md:text-[10px] font-black uppercase tracking-widest">Total Amount</span>
+                    <span className="text-slate-600 text-[8px] md:text-[10px] font-black uppercase tracking-widest">Total Amount</span>
                     <span className="text-[17px] md:text-2xl font-black text-slate-900 tracking-tighter">
                       ₹{Math.round(offerPrice * (isAdded ? (existingInCart?.quantity || quantity) : quantity))}
                     </span>
@@ -363,12 +372,15 @@ const ProductModal = ({ item, onClose }) => {
                 )}
               </>
             ) : (
+              // Out of Stock Warning Logic with Variant Check
               <div className="space-y-2.5 md:space-y-4">
                 <div className="flex items-start md:items-center gap-2 md:gap-3 bg-red-50 border border-red-100 p-2 md:p-4 rounded-xl">
                   <AlertCircle className="text-red-500 shrink-0 mt-0.5 md:mt-0" size={14} md:size={20} />
                   <p className="text-red-600 font-bold text-[9px] md:text-xs leading-tight">
                     {availableStock === 0 ? (
-                      "Sold Out! This size/variant is currently out of stock."
+                      hasVariants 
+                        ? `The selected variant is out of stock Please select another one.`
+                        : "Sold Out! This item is currently out of stock."
                     ) : (
                       `Hurry! Only ${maxAvailableToAdd} left in your limit.`
                     )}

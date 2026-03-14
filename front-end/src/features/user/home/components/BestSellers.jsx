@@ -85,7 +85,7 @@ const BestSellers = ({ data: bestSellers = [], onItemClick }) => {
                     <h3 className="text-[11px] md:text-sm font-bold text-slate-900 truncate mb-0.5 leading-tight group-hover:text-primary transition-colors">
                       {item?.name}
                     </h3>
-                    <p className="text-[9px] md:text-[10px] text-slate-500 line-clamp-1 mb-3">
+                    <p className="text-[9px] md:text-[10px] text-gray-500 font-medium  line-clamp-2 mb-3">
                       {item?.description || "No description"}
                     </p>
 
