@@ -43,6 +43,12 @@ export const checkInitialStatus = (isSilent = false, showPopup = true) => async 
         }
         return "OPEN";
     } catch (error) {
+        if (error.response?.status === 401) {
+            console.warn("Unauthorized! Clearing session to recover...");
+            localStorage.clear();
+            dispatch(setChecking(false));
+            return "ERROR";
+        }
         console.error("Server API Failed:", error);
         
         if (!isSilent) {
