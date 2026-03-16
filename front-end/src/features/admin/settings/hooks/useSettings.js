@@ -71,8 +71,8 @@ export const useSettings = () => {
     setSettings(prev => ({ ...prev, isManuallyOpen: newStatus }));
 
     try {
-      const response = await api.put('/site-settings/info/', {
-        ...settings,
+      // MODIFIED: Changed to PATCH and only sending the required field
+      const response = await api.patch('/site-settings/info/', {
         isManuallyOpen: newStatus 
       });
       if (response.data) {
@@ -90,7 +90,7 @@ export const useSettings = () => {
     const toastId = toast.loading("Updating settings...");
     try {
       const ensureSeconds = (timeStr) => {
-        if (!timeStr) return null;
+        if (!timeStr) return undefined; // MODIFIED: Changed to undefined
         const parts = timeStr.split(':');
         if (parts.length === 2) return `${timeStr}:00`;
         return timeStr;
@@ -99,13 +99,22 @@ export const useSettings = () => {
       const payload = {
         ...settings,
         deliveryRadius: parseFloat(settings.deliveryRadius) || 0,
-        latitude: settings.latitude ? parseFloat(settings.latitude) : null,
-        longitude: settings.longitude ? parseFloat(settings.longitude) : null,
+        latitude: settings.latitude ? parseFloat(settings.latitude) : undefined,
+        longitude: settings.longitude ? parseFloat(settings.longitude) : undefined,
         openingTime: ensureSeconds(settings.openingTime),
         closingTime: ensureSeconds(settings.closingTime),
       };
 
-      const response = await api.put('/site-settings/info/', payload);
+      // MODIFIED: Remove empty/null fields before sending the PATCH request
+      Object.keys(payload).forEach(key => {
+        if (payload[key] === "" || payload[key] === null || payload[key] === undefined) {
+          delete payload[key];
+        }
+      });
+
+      // MODIFIED: Changed from api.put to api.patch
+      const response = await api.patch('/site-settings/info/', payload);
+      
       if (response.data) {
         setSettings(prev => ({ ...prev, ...response.data }));
       }
@@ -145,8 +154,8 @@ export const useSettings = () => {
   useEffect(() => {
     const delayDebounceFn = setTimeout(async () => {
       if (searchQuery.trim().length < 3) {
-        setSearchResults([]);
-        setShowDropdown(false);
+        searchResults.length && setSearchResults([]);
+        showDropdown && setShowDropdown(false);
         return;
       }
       setIsSearching(true);
@@ -160,10 +169,11 @@ export const useSettings = () => {
       } catch (e) { console.error(e); } finally { setIsSearching(false); }
     }, 600);
     return () => clearTimeout(delayDebounceFn);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchQuery]);
 
   return {
-    settings, isLoading,error, fetchSettings, isSaving, isLocating, getCurrentLocation,
+    settings, isLoading, error, fetchSettings, isSaving, isLocating, getCurrentLocation,
     handleChange, handleNestedChange, handleMapClick, saveSettings,
     toggleShopStatus, searchQuery, setSearchQuery, searchResults, 
     isSearching, showDropdown, setShowDropdown
