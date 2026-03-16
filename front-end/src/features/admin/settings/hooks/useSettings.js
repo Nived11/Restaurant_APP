@@ -71,6 +71,7 @@ export const useSettings = () => {
     setSettings(prev => ({ ...prev, isManuallyOpen: newStatus }));
 
     try {
+      // MODIFIED: Changed to PATCH and only sending the required field
       const response = await api.patch('/site-settings/info/', {
         isManuallyOpen: newStatus 
       });
@@ -89,7 +90,7 @@ export const useSettings = () => {
     const toastId = toast.loading("Updating settings...");
     try {
       const ensureSeconds = (timeStr) => {
-        if (!timeStr) return undefined;
+        if (!timeStr) return undefined; // MODIFIED: Changed to undefined
         const parts = timeStr.split(':');
         if (parts.length === 2) return `${timeStr}:00`;
         return timeStr;
@@ -104,12 +105,14 @@ export const useSettings = () => {
         closingTime: ensureSeconds(settings.closingTime),
       };
 
+      // MODIFIED: Remove empty/null fields before sending the PATCH request
       Object.keys(payload).forEach(key => {
         if (payload[key] === "" || payload[key] === null || payload[key] === undefined) {
           delete payload[key];
         }
       });
 
+      // MODIFIED: Changed from api.put to api.patch
       const response = await api.patch('/site-settings/info/', payload);
       
       if (response.data) {
