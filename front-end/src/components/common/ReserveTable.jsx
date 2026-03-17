@@ -21,19 +21,17 @@ const ReserveTable = ({ isOpen, onClose }) => {
   const inputClass = "w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-2 md:py-3 text-[11px] md:text-[12px] font-bold text-slate-900 outline-none focus:border-primary focus:bg-white transition-all appearance-none placeholder:text-slate-400";
   const labelClass = "text-[8px] md:text-[10px] font-black text-slate-700 uppercase tracking-widest ml-1 mb-1 block";
 
-  // MODIFIED: Changed animation type to "tween" with lower duration for smoother performance on mobile GPUs
+  // MODIFIED: Simplified animation for perfectly smooth mobile GPU rendering. Removed scale to avoid jitter.
   const modalVariants = {
-    initial: isMobile ? { y: "100%" } : { y: 20, opacity: 0, scale: 0.98 },
+    initial: isMobile ? { y: "100%" } : { y: 20, opacity: 0 },
     animate: { 
       y: 0, 
       opacity: 1, 
-      scale: 1,
       transition: { type: "tween", ease: "easeOut", duration: 0.25 }
     },
     exit: { 
       y: isMobile ? "100%" : 20, 
       opacity: 0, 
-      scale: isMobile ? 1 : 0.98, 
       transition: { type: "tween", ease: "easeIn", duration: 0.2 }
     },
   };
@@ -63,9 +61,8 @@ const ReserveTable = ({ isOpen, onClose }) => {
             onDragEnd={(e, { offset, velocity }) => {
               if (offset.y > 100 || velocity.y > 400) onClose();
             }}
-            // MODIFIED: h-auto ensuring it fits without scrolling in desktop
-            className="relative bg-white w-full md:max-w-4xl rounded-t-[2.5rem] md:rounded-[3rem] shadow-2xl flex flex-col h-auto max-h-[95vh] overflow-hidden touch-none md:touch-auto"
-            style={{ willChange: "transform" }} 
+            // MODIFIED: h-auto ensuring it fits without scrolling in desktop, added will-change-transform for smooth 60fps
+            className="relative bg-white w-full md:max-w-4xl rounded-t-[2.5rem] md:rounded-[3rem] shadow-2xl flex flex-col h-auto max-h-[95vh] overflow-hidden touch-none md:touch-auto will-change-transform"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Mobile Handle Bar */}
@@ -80,7 +77,6 @@ const ReserveTable = ({ isOpen, onClose }) => {
             </button>
 
             {/* Header Section */}
-            {/* MODIFIED: Reduced padding for desktop (pt-8 md:pt-10) to save space */}
             <div className="relative pt-8 md:pt-10 pb-2 md:pb-4 px-6 text-center shrink-0">
               <div className="flex justify-center mb-2 md:mb-3">
                 <img src={Logo} alt="Logo" className="h-10 md:h-14 w-auto object-contain" />
@@ -97,7 +93,6 @@ const ReserveTable = ({ isOpen, onClose }) => {
             </div>
 
             {/* Form Content */}
-            {/* MODIFIED: Changed space-y-5 to space-y-4 on desktop and removed internal scrolling for desktop */}
             <form onSubmit={handleSubmit} className="px-6 md:px-16 pb-8 md:pb-10 overflow-y-auto md:overflow-visible space-y-3 md:space-y-4 flex-1">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-5">
                 <div className="space-y-1">
@@ -163,7 +158,6 @@ const ReserveTable = ({ isOpen, onClose }) => {
                 <textarea name="notes" value={formData.notes} onChange={handleChange} rows={isMobile ? "2" : "2"} placeholder="Special requests..." className={`${inputClass} resize-none py-2 md:py-3`} />
               </div>
 
-              {/* MODIFIED: Reduced pt-2 to pt-1 on desktop */}
               <div className="pt-1 md:pt-2">
                 <motion.button
                   whileHover={!loading ? { scale: 1.01 } : undefined}

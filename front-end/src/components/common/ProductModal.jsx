@@ -123,17 +123,26 @@ const ProductModal = ({ item, onClose }) => {
     discountPercent = Math.round(((actualPrice - offerPrice) / actualPrice) * 100);
   }
 
+  // MODIFIED: Simplified and optimized animation for mobile GPUs
   const modalVariants = {
     initial: isMobile ? { y: "100%" } : { y: 20, opacity: 0 },
     animate: {
       y: 0,
       opacity: 1,
-      transition: { type: "spring", damping: 25, stiffness: 300, duration: isMobile ? 0.3 : 0.4 }
+      transition: { 
+        type: "tween", // Changed from 'spring' to 'tween' for better mobile performance
+        ease: "easeOut", 
+        duration: 0.25 // Faster animation
+      }
     },
     exit: {
-      y: "100%",
-      opacity: isMobile ? 1 : 0,
-      transition: { duration: 0.25, ease: "easeIn" }
+      y: isMobile ? "100%" : 20,
+      opacity: 0,
+      transition: { 
+        type: "tween", 
+        ease: "easeIn", 
+        duration: 0.2 
+      }
     },
   };
 
@@ -159,8 +168,8 @@ const ProductModal = ({ item, onClose }) => {
         onDragEnd={(e, { offset, velocity }) => {
           if (offset.y > 100 || velocity.y > 400) onClose();
         }}
-        // MODIFIED: 'h-auto' combined with 'min-h-0' makes it perfectly fit the content
-        className="relative bg-white w-full md:max-w-5xl rounded-t-[2.5rem] md:rounded-[2.5rem] shadow-2xl flex flex-col md:flex-row overflow-hidden h-auto max-h-[95vh] md:max-h-[85vh] z-10 mt-auto md:my-auto"
+        // MODIFIED: Added `will-change-transform` for better GPU rendering
+        className="relative bg-white w-full md:max-w-5xl rounded-t-[2.5rem] md:rounded-[2.5rem] shadow-2xl flex flex-col md:flex-row overflow-hidden h-auto max-h-[95vh] md:max-h-[85vh] z-10 mt-auto md:my-auto will-change-transform"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="md:hidden absolute top-3 left-1/2 -translate-x-1/2 w-12 h-1.5 bg-slate-200 rounded-full z-50" />
@@ -173,7 +182,6 @@ const ProductModal = ({ item, onClose }) => {
         </button>
 
         {/* Image Section */}
-        {/* MODIFIED: Completely removed static min-heights on desktop so it stretches perfectly with the content */}
         <div className={`w-full md:w-[45%] relative shrink-0 transition-all duration-300 bg-slate-50 ${hasVariants ? 'h-[28vh]' : 'h-[40vh]'} md:h-auto`}>
           <img
             src={item.image}
@@ -352,7 +360,7 @@ const ProductModal = ({ item, onClose }) => {
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       whileTap={{ scale: 0.98 }}
-                      onClick={() => onClose()} // MODIFIED
+                      onClick={() => onClose()} 
                       className="cursor-pointer flex-[1] bg-white text-slate-900 font-black py-3.5 md:py-4 rounded-xl flex items-center justify-center gap-1.5 shadow-sm text-[10px] md:text-xs uppercase tracking-widest border-2 border-slate-200 hover:bg-slate-50"
                     >
                       <PlusCircle size={14} md:size={16} strokeWidth={2.5} />
@@ -365,7 +373,7 @@ const ProductModal = ({ item, onClose }) => {
                       animate={{ opacity: 1, y: 0 }}
                       whileTap={{ scale: 0.98 }}
                       onClick={() => { 
-                        onClose(true); // MODIFIED
+                        onClose(true); 
                         navigate("/cart"); 
                       }}
                       className="cursor-pointer flex-[1.5] bg-primary text-black font-black py-3.5 md:py-4 rounded-xl flex items-center justify-center gap-2 shadow-lg text-[10px] md:text-xs uppercase tracking-widest hover:bg-[#e59802]"
@@ -394,7 +402,7 @@ const ProductModal = ({ item, onClose }) => {
                 <motion.button
                   whileTap={{ scale: 0.98 }}
                   onClick={() => { 
-                    onClose(true); // MODIFIED
+                    onClose(true); 
                     navigate("/cart"); 
                   }}
                   className="cursor-pointer w-full bg-slate-900 text-white font-black py-3.5 md:py-4 rounded-xl flex items-center justify-center gap-2 shadow-lg text-[11px] md:text-sm uppercase tracking-widest hover:bg-black"
