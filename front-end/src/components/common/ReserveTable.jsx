@@ -21,7 +21,7 @@ const ReserveTable = ({ isOpen, onClose }) => {
   const inputClass = "w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-2 md:py-3 text-[11px] md:text-[12px] font-bold text-slate-900 outline-none focus:border-primary focus:bg-white transition-all appearance-none placeholder:text-slate-400";
   const labelClass = "text-[8px] md:text-[10px] font-black text-slate-700 uppercase tracking-widest ml-1 mb-1 block";
 
-  // MODIFIED: Simplified animation for perfectly smooth mobile GPU rendering. Removed scale to avoid jitter.
+  // MODIFIED: Exact same smooth tween animation used in Privacy and Terms Modals
   const modalVariants = {
     initial: isMobile ? { y: "100%" } : { y: 20, opacity: 0 },
     animate: { 
@@ -39,7 +39,8 @@ const ReserveTable = ({ isOpen, onClose }) => {
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-[2000] flex items-end md:items-center justify-center p-0 md:p-6 overflow-hidden">
+        <div className="fixed inset-0 z-[2000] flex items-end md:items-center justify-center p-0 md:p-6 overflow-hidden outline-none">
+          {/* Backdrop Animation Synced */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -61,7 +62,7 @@ const ReserveTable = ({ isOpen, onClose }) => {
             onDragEnd={(e, { offset, velocity }) => {
               if (offset.y > 100 || velocity.y > 400) onClose();
             }}
-            // MODIFIED: h-auto ensuring it fits without scrolling in desktop, added will-change-transform for smooth 60fps
+            // will-change-transform added for 60fps mobile rendering
             className="relative bg-white w-full md:max-w-4xl rounded-t-[2.5rem] md:rounded-[3rem] shadow-2xl flex flex-col h-auto max-h-[95vh] overflow-hidden touch-none md:touch-auto will-change-transform"
             onClick={(e) => e.stopPropagation()}
           >
@@ -71,7 +72,7 @@ const ReserveTable = ({ isOpen, onClose }) => {
             {/* Close Button */}
             <button 
               onClick={onClose} 
-              className="absolute right-4 top-4 md:right-5 md:top-5 p-2 bg-slate-100 hover:bg-primary/10 transition-colors rounded-full z-50 text-slate-900"
+              className="absolute right-4 top-4 md:right-5 md:top-5 p-2 bg-slate-100 hover:bg-primary/10 transition-colors rounded-full z-50 text-slate-900 cursor-pointer"
             >
               <X size={isMobile ? 18 : 22} />
             </button>
