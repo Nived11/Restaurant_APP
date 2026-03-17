@@ -84,9 +84,11 @@ const ComboSection = ({ data: combos = [], onItemClick }) => {
                   <div 
                     key={combo.id} 
                     onClick={() => onItemClick?.(combo)}
-                    className="cursor-pointer snap-center shrink-0 w-[85vw] sm:w-[60vw] md:w-auto md:min-w-[440px] bg-white rounded-[2rem] p-3 md:p-4 flex gap-4 md:gap-6 shadow-sm border border-gray-100 group/item items-center"
+                    // MODIFIED: Changed mobile width to w-[320px] max-w-[85vw] for a better constrained look
+                    className="cursor-pointer snap-center shrink-0 w-[320px] max-w-[85vw] sm:w-[60vw] md:w-[480px] md:max-w-[500px] bg-white rounded-[2rem] p-3 md:p-4 flex gap-3 md:gap-6 shadow-sm border border-gray-100 group/item items-center"
                   >
-                    <div className="relative shrink-0 w-28 h-28 md:w-36 md:h-40 overflow-hidden rounded-[1.5rem] md:rounded-[2rem] shadow-inner bg-gray-100">
+                    {/* MODIFIED: Adjusted image size on mobile from w-28 h-28 to w-24 h-24 */}
+                    <div className="relative shrink-0 w-24 h-24 sm:w-28 sm:h-28 md:w-36 md:h-40 overflow-hidden rounded-[1.5rem] md:rounded-[2rem] shadow-inner bg-gray-100">
                       <img 
                         src={combo.image} 
                         loading="lazy"
@@ -95,7 +97,7 @@ const ComboSection = ({ data: combos = [], onItemClick }) => {
                         alt={combo.name}
                       />
                       {savings > 0 && (
-                        <div className="absolute top-1.5 left-1.5 z-10 bg-primary text-black text-[7px] md:text-[10px] font-black px-2 py-1 rounded-lg uppercase shadow-sm">
+                        <div className="absolute top-1.5 left-1.5 z-10 bg-primary text-black text-[7px] md:text-[10px] font-black px-2 py-1 rounded-[1rem] uppercase shadow-sm">
                           Save ₹{savings}
                         </div>
                       )}
@@ -103,21 +105,16 @@ const ComboSection = ({ data: combos = [], onItemClick }) => {
 
                     <div className="flex flex-col justify-center flex-1 min-w-0 py-1">
                       <div>
-                        {/* MODIFIED: Dynamically adjusting font size using tailwind logic or CSS clamp. 
-                            Here we use line-clamp-1 so it never breaks layout, but text-size is responsive. */}
                         <h4 
                           className="font-black uppercase text-gray-900 tracking-tight line-clamp-1"
                           style={{
-                            // This ensures the font size scales between 12px and 18px based on the screen width
-                            // preventing it from getting too large or too small.
                             fontSize: 'clamp(0.75rem, 1.5vw + 0.5rem, 1.125rem)' 
                           }}
-                          title={combo.name} // Shows full name on hover if truncated
+                          title={combo.name} 
                         >
                           {combo.name}
                         </h4>
                         
-                        {/* MODIFIED: Ensured strictly 2 lines for description */}
                         <p className="text-[9px] md:text-xs text-gray-500 font-bold mt-1 md:mt-1.5 uppercase line-clamp-2 leading-tight min-h-[1.5rem] md:min-h-[2rem]">
                           {combo.description}
                         </p>
@@ -131,15 +128,15 @@ const ComboSection = ({ data: combos = [], onItemClick }) => {
                             </span>
                           )}
                           <div className="flex items-baseline gap-2">
-                            <span className="text-xl md:text-2xl font-black text-black">₹{Math.round(offer)}</span>
+                            <span className="text-lg md:text-2xl font-black text-black">₹{Math.round(offer)}</span>
                             {actual > offer && (
-                              <span className="text-[10px] md:text-sm text-gray-500 line-through font-bold">₹{Math.round(actual)}</span>
+                              <span className="text-[9px] md:text-sm text-gray-500 line-through font-bold">₹{Math.round(actual)}</span>
                             )}
                           </div>
                         </div>
                         
-                        <button className="w-full bg-black text-white py-2.5 md:py-3 rounded-xl text-[9px] md:text-xs font-black uppercase flex items-center justify-center gap-2 hover:bg-primary hover:text-black transition-all active:scale-95 shadow-lg shadow-black/5">
-                          <RiFlashlightFill size={16} className="text-primary group-hover/item:text-black" />
+                        <button className="w-full bg-black text-white py-2 md:py-3 rounded-xl text-[9px] md:text-xs font-black uppercase flex items-center justify-center gap-1.5 hover:bg-primary hover:text-black transition-all active:scale-95 shadow-lg shadow-black/5">
+                          <RiFlashlightFill size={14} className="text-primary group-hover/item:text-black md:w-4 md:h-4" />
                           Grab Now
                         </button>
                       </div>

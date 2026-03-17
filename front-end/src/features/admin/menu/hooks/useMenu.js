@@ -126,6 +126,13 @@ export const useMenu = (filters) => {
   const handleSubmit = async (e) => {
     if (e) e.preventDefault();
 
+    // MODIFIED: Only Character Limit Validation (150 chars max)
+    const description = formData.description || "";
+    if (description.length > 150) {
+      toast.error("Description must not exceed 150 characters.");
+      return false;
+    }
+
     // Price Validation
     if (formData.has_variants) {
       if (formData.variants.length === 0) {

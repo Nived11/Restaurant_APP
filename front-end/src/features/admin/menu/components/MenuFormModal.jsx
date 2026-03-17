@@ -16,6 +16,10 @@ const MenuFormModal = ({
   const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
   const bannerInputRef = useRef(null);
 
+  // MODIFIED: Only Character Limit for description (Professional approach)
+  const MAX_CHARS = 150;
+  const currentChars = formData.description ? formData.description.length : 0;
+
   useEffect(() => {
     document.body.style.overflow = "hidden";
     return () => {
@@ -266,9 +270,23 @@ const MenuFormModal = ({
                   <input disabled={loading} required placeholder="Enter item name..." className={inputClass} value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} />
                 </div>
 
+                {/* MODIFIED: Changed to Character Count & Limit only */}
                 <div className="space-y-1.5">
-                  <label className={labelClass}>Description</label>
-                  <textarea disabled={loading} required placeholder="Short description..." className={`${inputClass} h-20 md:h-24 resize-none py-3`} value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} />
+                  <div className="flex justify-between items-end">
+                    <label className={labelClass}>Description</label>
+                    <span className={`text-[8px] font-black uppercase ${currentChars >= MAX_CHARS ? "text-red-500" : "text-slate-400"}`}>
+                      {currentChars} / {MAX_CHARS} Characters
+                    </span>
+                  </div>
+                  <textarea 
+                    disabled={loading} 
+                    required 
+                    maxLength={MAX_CHARS} // HTML Native Character Limit
+                    placeholder="Short description..." 
+                    className={`${inputClass} h-20 md:h-24 resize-none py-3 ${currentChars >= MAX_CHARS ? 'border-red-300 focus:border-red-500' : ''}`} 
+                    value={formData.description} 
+                    onChange={(e) => setFormData({ ...formData, description: e.target.value })} 
+                  />
                 </div>
 
                 {/* Pricing / Variants Section */}
@@ -296,45 +314,16 @@ const MenuFormModal = ({
                               </div>
                               <div className="space-y-1">
                                 <label className="text-[8px] font-bold text-slate-500 uppercase">MRP (₹)</label>
-                                <input 
-                                  disabled={loading} 
-                                  type="number" 
-                                  min="0" // മൈനസ് വാല്യൂ ഒഴിവാക്കാൻ
-                                  onWheel={stopScrollChange} // സ്ക്രോൾ ചെയ്യുമ്പോൾ നമ്പർ മാറുന്നത് തടയാൻ
-                                  required 
-                                  placeholder="0" 
-                                  className={`${inputClass} !py-1.5`} 
-                                  value={variant.actual_price} 
-                                  onChange={(e) => handleVariantChange(index, "actual_price", e.target.value)} 
-                                />
+                                <input disabled={loading} type="number" min="0" onWheel={stopScrollChange} required placeholder="0" className={`${inputClass} !py-1.5`} value={variant.actual_price} onChange={(e) => handleVariantChange(index, "actual_price", e.target.value)} />
                               </div>
                               <div className="space-y-1">
                                 <label className="text-[8px] font-bold text-slate-500 uppercase">Offer Price (₹)</label>
-                                <input 
-                                  disabled={loading} 
-                                  type="number" 
-                                  min="0" // മൈനസ് വാല്യൂ ഒഴിവാക്കാൻ
-                                  onWheel={stopScrollChange} // സ്ക്രോൾ ചെയ്യുമ്പോൾ നമ്പർ മാറുന്നത് തടയാൻ
-                                  placeholder="0" 
-                                  className={`${inputClass} !py-1.5 ${isVariantPriceInvalid ? "border-red-500 bg-red-50" : ""}`} 
-                                  value={variant.offer_price || ""} 
-                                  onChange={(e) => handleVariantChange(index, "offer_price", e.target.value)} 
-                                />
+                                <input disabled={loading} type="number" min="0" onWheel={stopScrollChange} placeholder="0" className={`${inputClass} !py-1.5 ${isVariantPriceInvalid ? "border-red-500 bg-red-50" : ""}`} value={variant.offer_price || ""} onChange={(e) => handleVariantChange(index, "offer_price", e.target.value)} />
                                 {isVariantPriceInvalid && <span className="text-[7px] text-red-600 font-bold">Invalid</span>}
                               </div>
                               <div className="space-y-1">
                                 <label className="text-[8px] font-bold text-slate-500 uppercase">Stock</label>
-                                <input 
-                                  disabled={loading} 
-                                  type="number" 
-                                  min="0" // മൈനസ് വാല്യൂ ഒഴിവാക്കാൻ
-                                  onWheel={stopScrollChange} // സ്ക്രോൾ ചെയ്യുമ്പോൾ നമ്പർ മാറുന്നത് തടയാൻ
-                                  required 
-                                  placeholder="0" 
-                                  className={`${inputClass} !py-1.5`} 
-                                  value={variant.quantity} 
-                                  onChange={(e) => handleVariantChange(index, "quantity", e.target.value)} 
-                                />
+                                <input disabled={loading} type="number" min="0" onWheel={stopScrollChange} required placeholder="0" className={`${inputClass} !py-1.5`} value={variant.quantity} onChange={(e) => handleVariantChange(index, "quantity", e.target.value)} />
                               </div>
                             </div>
                           </div>
@@ -354,45 +343,16 @@ const MenuFormModal = ({
                     <div className="grid grid-cols-3 gap-4">
                       <div className="space-y-1.5">
                         <label className={labelClass}>MRP (₹)</label>
-                        <input 
-                          disabled={loading} 
-                          type="number" 
-                          min="0" // മൈനസ് വാല്യൂ ഒഴിവാക്കാൻ
-                          onWheel={stopScrollChange} // സ്ക്രോൾ ചെയ്യുമ്പോൾ നമ്പർ മാറുന്നത് തടയാൻ
-                          required={!formData.has_variants} 
-                          placeholder="0" 
-                          className={inputClass} 
-                          value={formData.actual_price} 
-                          onChange={(e) => setFormData({ ...formData, actual_price: e.target.value })} 
-                        />
+                        <input disabled={loading} type="number" min="0" onWheel={stopScrollChange} required={!formData.has_variants} placeholder="0" className={inputClass} value={formData.actual_price} onChange={(e) => setFormData({ ...formData, actual_price: e.target.value })} />
                       </div>
                       <div className="space-y-1.5">
                         <label className={labelClass}>Offer Price (₹)</label>
-                        <input 
-                          disabled={loading} 
-                          type="number" 
-                          min="0" // മൈനസ് വാല്യൂ ഒഴിവാക്കാൻ
-                          onWheel={stopScrollChange} // സ്ക്രോൾ ചെയ്യുമ്പോൾ നമ്പർ മാറുന്നത് തടയാൻ
-                          placeholder="0" 
-                          className={`${inputClass} ${isPriceInvalid ? "border-red-500 bg-red-50 focus:border-red-600" : ""}`} 
-                          value={formData.offer_price} 
-                          onChange={(e) => setFormData({ ...formData, offer_price: e.target.value })} 
-                        />
+                        <input disabled={loading} type="number" min="0" onWheel={stopScrollChange} placeholder="0" className={`${inputClass} ${isPriceInvalid ? "border-red-500 bg-red-50 focus:border-red-600" : ""}`} value={formData.offer_price} onChange={(e) => setFormData({ ...formData, offer_price: e.target.value })} />
                         {isPriceInvalid && <p className="text-[8px] text-red-600 font-black uppercase ml-1">Must be less than MRP</p>}
                       </div>
                       <div className="space-y-1.5">
                         <label className={labelClass}>Stock</label>
-                        <input 
-                          disabled={loading} 
-                          type="number" 
-                          min="0" // മൈനസ് വാല്യൂ ഒഴിവാക്കാൻ
-                          onWheel={stopScrollChange} // സ്ക്രോൾ ചെയ്യുമ്പോൾ നമ്പർ മാറുന്നത് തടയാൻ
-                          required={!formData.has_variants} 
-                          placeholder="0" 
-                          className={inputClass} 
-                          value={formData.quantity} 
-                          onChange={(e) => setFormData({ ...formData, quantity: e.target.value })} 
-                        />
+                        <input disabled={loading} type="number" min="0" onWheel={stopScrollChange} required={!formData.has_variants} placeholder="0" className={inputClass} value={formData.quantity} onChange={(e) => setFormData({ ...formData, quantity: e.target.value })} />
                       </div>
                     </div>
                   )}

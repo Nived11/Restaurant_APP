@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { AnimatePresence } from "framer-motion";
 import ProductModal from "../../components/common/ProductModal";
 import {
@@ -20,6 +20,36 @@ import {
 const Home = () => {
   const { data, isLoading, isError, error, refetch } = useHomeData();
   const [selectedItem, setSelectedItem] = useState(null);
+
+  // --- Safe Mobile Back Button Logic (History API) ---
+  useEffect(() => {
+    // മൊബൈലിൽ ബാക്ക് അടിക്കുമ്പോൾ Modal ക്ലോസ് ചെയ്യാനുള്ള ഫങ്ക്ഷൻ
+    const handlePopState = () => {
+      if (selectedItem) {
+        setSelectedItem(null); // ബാക്ക് അടിക്കുമ്പോൾ Modal അടയുന്നു
+      }
+    };
+
+    // Modal ഓപ്പൺ ആകുമ്പോൾ ഹിസ്റ്ററിയിലേക്ക് ഒരു ഡമ്മി എൻട്രി ആഡ് ചെയ്യുന്നു
+    if (selectedItem) {
+      window.history.pushState({ modalOpen: true }, "");
+      window.addEventListener("popstate", handlePopState);
+    }
+
+    return () => {
+      window.removeEventListener("popstate", handlePopState);
+    };
+  }, [selectedItem]);
+
+  // MODIFIED: Added isNavigatingToCart parameter
+  const handleCloseModal = (isNavigatingToCart = false) => {
+    
+    if (window.history.state?.modalOpen && !isNavigatingToCart) {
+      window.history.back();
+    }
+    setSelectedItem(null);
+  };
+  // ---------------------------------------------------
 
   if (isError) {
     return (
@@ -58,17 +88,17 @@ const Home = () => {
       />
       <ExploreMore />
       
-     <Testimonials data={data?.feedbacks} />
+      <Testimonials data={data?.feedbacks} />
 
-     <FAQ data={data?.faqs} />
-     
+      <FAQ data={data?.faqs} />
+      
       <BrandFeatures />
 
       <AnimatePresence>
         {selectedItem && (
           <ProductModal
             item={selectedItem}
-            onClose={() => setSelectedItem(null)}
+            onClose={handleCloseModal} 
           />
         )}
       </AnimatePresence>
