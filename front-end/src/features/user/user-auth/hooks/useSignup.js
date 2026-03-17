@@ -12,6 +12,10 @@ export const useSignup = () => {
     const [error, setError] = useState(null);
     const [step, setStep] = useState(1);
     const [formData, setFormData] = useState({ name: '', phone: '', email: '' });
+    
+    // MODIFIED: Added state for the agreement checkbox
+    const [isAgreed, setIsAgreed] = useState(false);
+
     const [otp, setOtp] = useState(['', '', '', '', '', '']);
     const [timer, setTimer] = useState(120);
     const [canResend, setCanResend] = useState(false);
@@ -68,6 +72,13 @@ export const useSignup = () => {
             setError("Invalid phone number. Please enter 10 digits.");
             return;
         }
+        
+        // Validation for checkbox
+        if (!isAgreed) {
+            setError("Please agree to the Terms and Privacy Policy.");
+            return;
+        }
+
         setLoading(true);
         try {
             const response = await api.post('/auth/register/', {
@@ -147,6 +158,7 @@ export const useSignup = () => {
     return {
         step, setStep, formData, setFormData, otp, setOtp,
         loading, error, timer, canResend, inputRefs,
+        isAgreed, setIsAgreed, // EXPORTED checkbox state
         formatTime, handleOtpChange, handleKeyDown,
         handleRegisterSubmit, handleVerifySubmit, handleResend
     };

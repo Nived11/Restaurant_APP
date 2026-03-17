@@ -1,9 +1,7 @@
-import React from 'react';
 import { ArrowRight, ShieldCheck, Zap, ChevronRight, ChevronLeft, Loader2, AlertCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLogin } from '../hooks/useLogin';
-
 import logo from '../../../../assets/Logo-web.png';
 import logoicon from '../../../../assets/Logocrunch.png';
 import loginbg from '../../../../assets/loginbg.jpg';

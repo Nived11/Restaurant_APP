@@ -23,14 +23,12 @@ const Home = () => {
 
   // --- Safe Mobile Back Button Logic (History API) ---
   useEffect(() => {
-    // മൊബൈലിൽ ബാക്ക് അടിക്കുമ്പോൾ Modal ക്ലോസ് ചെയ്യാനുള്ള ഫങ്ക്ഷൻ
     const handlePopState = () => {
       if (selectedItem) {
-        setSelectedItem(null); // ബാക്ക് അടിക്കുമ്പോൾ Modal അടയുന്നു
+        setSelectedItem(null);
       }
     };
 
-    // Modal ഓപ്പൺ ആകുമ്പോൾ ഹിസ്റ്ററിയിലേക്ക് ഒരു ഡമ്മി എൻട്രി ആഡ് ചെയ്യുന്നു
     if (selectedItem) {
       window.history.pushState({ modalOpen: true }, "");
       window.addEventListener("popstate", handlePopState);
@@ -49,7 +47,6 @@ const Home = () => {
     }
     setSelectedItem(null);
   };
-  // ---------------------------------------------------
 
   if (isError) {
     return (

@@ -25,9 +25,10 @@ export const useAddress = () => {
   const getCurrentLocation = async () => {
     return new Promise((resolve, reject) => {
       if (!navigator.geolocation) {
-        toast.error("GPS not supported");
+        toast.error("GPS not supported on this browser.");
         return reject("Not supported");
       }
+      
       setIsLocating(true);
       navigator.geolocation.getCurrentPosition(
         async (position) => {
@@ -42,11 +43,24 @@ export const useAddress = () => {
           }
         },
         (error) => {
-          toast.warning("Enable GPS access");
           setIsLocating(false);
+          switch(error.code) {
+            case error.PERMISSION_DENIED:
+              toast.warning("Location access denied! Please allow location permission in your browser settings.");
+              break;
+            case error.POSITION_UNAVAILABLE:
+              toast.warning("Please turn on your device's Location/GPS.");
+              break;
+            case error.TIMEOUT:
+              toast.error("Location request timed out. Please try again.");
+              break;
+            default:
+              toast.error("An unknown error occurred while getting location.");
+              break;
+          }
           reject(error);
         },
-        { enableHighAccuracy: true, timeout: 5000 }
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 } 
       );
     });
   };
