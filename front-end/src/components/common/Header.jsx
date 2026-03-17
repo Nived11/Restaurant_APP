@@ -101,16 +101,23 @@ const Header = () => {
   }, [searchOpen]);
 
   // --- MODIFIED: Auto-Prompt Location on First Load ---
-  useEffect(() => {
+ useEffect(() => {
+    let timeoutId;
     if (!currentLocation?.lat) {
-      getCurrentLocation()
-        .then(async (loc) => {
-          await dispatch(handleLocationUpdate(loc.latitude, loc.longitude));
-        })
-        .catch((err) => {
-          setShowLocationPicker(true);
-        });
+      timeoutId = setTimeout(() => {
+        getCurrentLocation()
+          .then(async (loc) => {
+            await dispatch(handleLocationUpdate(loc.latitude, loc.longitude));
+          })
+          .catch((err) => {
+            setShowLocationPicker(true);
+          });
+      }, 3000); 
     }
+    
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId);
+    };
   }, [currentLocation?.lat]);
   // --------------------------------------------------
 
