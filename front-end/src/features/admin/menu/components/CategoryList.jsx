@@ -46,23 +46,28 @@ const CategoryList = ({ categories, onEdit, onDelete, fetching, error }) => {
       `}</style>
 
       {/* Category List */}
-      <div className="flex gap-6 overflow-x-auto no-scrollbar px-2 py-2 select-none">
-        {categories.map((cat) => (
-          <div 
-            key={cat.id} 
-            onClick={() => setSelectedCategory(cat)}
-            className="group flex flex-col items-center gap-3 cursor-pointer min-w-fit"
-          >
-            <div className="relative w-20 h-20 rounded-full border-4 border-white shadow-md overflow-hidden bg-white transition-all duration-300 sm:group-hover:scale-110 active:scale-90">
-              <img src={cat.image || placeholder} loading="lazy" alt={cat.name} className="w-full h-full object-cover transition-transform duration-500 sm:group-hover:blur-[2px]" />
-              <div className="absolute inset-0 bg-slate-900/40 opacity-0 sm:group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                <span className="text-[10px] font-black text-white uppercase tracking-widest">Click</span>
-              </div>
-            </div>
-            <span className="text-[11px] font-black uppercase tracking-tight text-slate-800">{cat.name}</span>
-          </div>
-        ))}
+      {/* Category List */}
+<div className="flex gap-6 overflow-x-auto no-scrollbar px-2 py-2 select-none">
+  {categories.map((cat) => (
+    <div 
+      key={cat.id} 
+      onClick={() => setSelectedCategory(cat)}
+      className="group flex flex-col items-center gap-3 cursor-pointer min-w-fit"
+    >
+      <div className="relative w-20 h-20 rounded-full border-4 border-white shadow-md overflow-hidden bg-white transition-all duration-300 sm:group-hover:scale-110 active:scale-90">
+        <img src={cat.image || placeholder} loading="lazy" alt={cat.name} className="w-full h-full object-cover transition-transform duration-500 sm:group-hover:blur-[2px]" />
+        <div className="absolute inset-0 bg-slate-900/40 opacity-0 sm:group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+          <span className="text-[10px] font-black text-white uppercase tracking-widest">Click</span>
+        </div>
       </div>
+      
+      {/* MODIFIED: Added line-clamp-2 and max-w to handle 2 lines and spacing */}
+      <span className="text-[11px] font-black uppercase tracking-tight text-slate-800 text-center max-w-[85px] leading-tight line-clamp-3 break-words">
+        {cat.name}
+      </span>
+    </div>
+  ))}
+</div>
 
       {/* --- Action Sheet --- */}
       <AnimatePresence>

@@ -8,7 +8,11 @@ const ComboSection = ({ data: combos = [], onItemClick }) => {
   const scroll = (direction) => {
     if (scrollRef.current) {
       const { scrollLeft, clientWidth } = scrollRef.current;
-      const scrollAmount = clientWidth * 0.8;
+      
+      // MODIFIED: സ്ക്രോൾ സ്പീഡ് കുറയ്ക്കാൻ scrollAmount മാറ്റി. 
+      // ഓരോ ക്ലിക്കിലും ഏകദേശം ഒരു കാർഡിന്റെ ദൂരം മാത്രം പോകുന്ന രീതിയിലാക്കി.
+      const scrollAmount = window.innerWidth < 768 ? 300 : 400; 
+      
       const scrollTo = direction === "left" ? scrollLeft - scrollAmount : scrollLeft + scrollAmount;
       scrollRef.current.scrollTo({ left: scrollTo, behavior: "smooth" });
     }
@@ -27,7 +31,7 @@ const ComboSection = ({ data: combos = [], onItemClick }) => {
       <div className="max-w-[1440px] mx-auto px-4 md:px-10">
         
         {/* Header Section */}
-        <div className="flex items-center gap-4 mb-8">
+        <div className="flex items-center gap-4 mb-6 md:mb-8">
           <h2 className="text-xl md:text-3xl font-black uppercase tracking-tighter whitespace-nowrap text-gray-900">
             Combo <span className="text-primary underline decoration-black/5">Deals</span>
           </h2>
@@ -62,94 +66,70 @@ const ComboSection = ({ data: combos = [], onItemClick }) => {
           >
             <style dangerouslySetInnerHTML={{__html: `.no-scrollbar::-webkit-scrollbar { display: none; }`}} />
 
-            {combos.length > 0 ? (
-              combos.map((combo) => {
-                // Check if variants exist
-                const hasVariants = combo?.has_variants && combo?.variants?.length > 0;
+            {combos.map((combo) => {
+              const hasVariants = combo?.has_variants && combo?.variants?.length > 0;
+              const rawOfferPrice = hasVariants 
+                ? (combo.variants[0].offer_price || combo.variants[0].actual_price) 
+                : (combo.offer_price || combo.actual_price || 0);
+              const rawActualPrice = hasVariants 
+                ? combo.variants[0].actual_price 
+                : (combo.actual_price || rawOfferPrice);
 
-                // Extract actual and offer prices
-                const rawOfferPrice = hasVariants 
-                  ? (combo.variants[0].offer_price || combo.variants[0].actual_price) 
-                  : (combo.offer_price || combo.actual_price || 0);
-                  
-                const rawActualPrice = hasVariants 
-                  ? combo.variants[0].actual_price 
-                  : (combo.actual_price || rawOfferPrice);
+              const actual = parseFloat(rawActualPrice);
+              const offer = parseFloat(rawOfferPrice);
+              const savings = Math.round(actual - offer);
 
-                const actual = parseFloat(rawActualPrice);
-                const offer = parseFloat(rawOfferPrice);
-                const savings = Math.round(actual - offer);
+              return (
+                <div 
+                  key={combo.id} 
+                  onClick={() => onItemClick?.(combo)}
+                  className="cursor-pointer snap-center shrink-0 w-[290px] max-w-[85vw] sm:w-[320px] md:w-[420px] bg-white rounded-[2rem] p-3 md:p-4 flex gap-3 md:gap-5 shadow-sm border border-gray-100 group/item items-center transition-all hover:shadow-md"
+                >
+                  <div className="relative shrink-0 w-24 h-24 md:w-32 md:h-36 overflow-hidden rounded-[1.5rem] md:rounded-[1.8rem] shadow-inner bg-gray-100">
+                    <img 
+                      src={combo.image} 
+                      loading="lazy"
+                      className="w-full h-full object-cover group-hover/item:scale-110 transition-transform duration-500" 
+                      alt={combo.name}
+                    />
+                    {savings > 0 && (
+                      <div className="absolute top-1.5 left-1.5 z-10 bg-primary text-black text-[7px] md:text-[9px] font-black px-2 py-0.5 rounded-[1rem] uppercase">
+                        Save ₹{savings}
+                      </div>
+                    )}
+                  </div>
 
-                return (
-                  <div 
-                    key={combo.id} 
-                    onClick={() => onItemClick?.(combo)}
-                    // MODIFIED: Changed mobile width to w-[320px] max-w-[85vw] for a better constrained look
-                    className="cursor-pointer snap-center shrink-0 w-[320px] max-w-[85vw] sm:w-[60vw] md:w-[480px] md:max-w-[500px] bg-white rounded-[2rem] p-3 md:p-4 flex gap-3 md:gap-6 shadow-sm border border-gray-100 group/item items-center"
-                  >
-                    {/* MODIFIED: Adjusted image size on mobile from w-28 h-28 to w-24 h-24 */}
-                    <div className="relative shrink-0 w-24 h-24 sm:w-28 sm:h-28 md:w-36 md:h-40 overflow-hidden rounded-[1.5rem] md:rounded-[2rem] shadow-inner bg-gray-100">
-                      <img 
-                        src={combo.image} 
-                        loading="lazy"
-                        decoding="async"
-                        className="w-full h-full object-cover group-hover/item:scale-110 transition-transform duration-500" 
-                        alt={combo.name}
-                      />
-                      {savings > 0 && (
-                        <div className="absolute top-1.5 left-1.5 z-10 bg-primary text-black text-[7px] md:text-[10px] font-black px-2 py-1 rounded-[1rem] uppercase shadow-sm">
-                          Save ₹{savings}
-                        </div>
-                      )}
+                  <div className="flex flex-col justify-center flex-1 min-w-0">
+                    <div>
+                      <h4 className="font-black uppercase text-gray-900 tracking-tight line-clamp-1 text-[13px] md:text-[15px] leading-tight" title={combo.name}>
+                        {combo.name}
+                      </h4>
+                      <p className="text-[8px] md:text-[10px] text-gray-500 font-semibold mt-1 md:mt-1.5 line-clamp-2 leading-snug min-h-[1.2rem] md:min-h-[1.5rem]">
+                        {combo.description}
+                      </p>
                     </div>
 
-                    <div className="flex flex-col justify-center flex-1 min-w-0 py-1">
-                      <div>
-                        <h4 
-                          className="font-black uppercase text-gray-900 tracking-tight line-clamp-1"
-                          style={{
-                            fontSize: 'clamp(0.75rem, 1.5vw + 0.5rem, 1.125rem)' 
-                          }}
-                          title={combo.name} 
-                        >
-                          {combo.name}
-                        </h4>
-                        
-                        <p className="text-[9px] md:text-xs text-gray-500 font-bold mt-1 md:mt-1.5 uppercase line-clamp-2 leading-tight min-h-[1.5rem] md:min-h-[2rem]">
-                          {combo.description}
-                        </p>
-                      </div>
-
-                      <div className="mt-2 md:mt-3">
-                        <div className="flex flex-col mb-2">
-                           {hasVariants && (
-                            <span className="text-gray-500 text-[8px] md:text-[9px] font-bold uppercase mb-0.5">
-                              Starts from
-                            </span>
+                    <div className="mt-2 md:mt-4">
+                      <div className="flex flex-col mb-1.5 md:mb-2">
+                         {hasVariants && (
+                          <span className="text-gray-400 text-[7px] md:text-[8px] font-black uppercase mb-0.5 tracking-wider">Starts from</span>
+                        )}
+                        <div className="flex items-baseline gap-1.5">
+                          <span className="text-base md:text-xl font-black text-black">₹{Math.round(offer)}</span>
+                          {actual > offer && (
+                            <span className="text-[8px] md:text-xs text-gray-400 line-through font-bold">₹{Math.round(actual)}</span>
                           )}
-                          <div className="flex items-baseline gap-2">
-                            <span className="text-lg md:text-2xl font-black text-black">₹{Math.round(offer)}</span>
-                            {actual > offer && (
-                              <span className="text-[9px] md:text-sm text-gray-500 line-through font-bold">₹{Math.round(actual)}</span>
-                            )}
-                          </div>
                         </div>
-                        
-                        <button className="w-full bg-black text-white py-2 md:py-3 rounded-xl text-[9px] md:text-xs font-black uppercase flex items-center justify-center gap-1.5 hover:bg-primary hover:text-black transition-all active:scale-95 shadow-lg shadow-black/5">
-                          <RiFlashlightFill size={14} className="text-primary group-hover/item:text-black md:w-4 md:h-4" />
-                          Grab Now
-                        </button>
                       </div>
+                      <button className="w-full bg-black text-white py-2 md:py-2.5 rounded-xl text-[8px] md:text-[10px] font-black uppercase flex items-center justify-center gap-1.5 hover:bg-primary hover:text-black transition-all active:scale-95">
+                        <RiFlashlightFill size={12} className="text-primary group-hover/item:text-black md:w-3.5 md:h-3.5" />
+                        Grab Now
+                      </button>
                     </div>
                   </div>
-                );
-              })
-            ) : (
-              <div className="min-w-full py-10 flex flex-col items-center justify-center border-2 border-dashed border-gray-100 rounded-[2rem]">
-                 <RiInboxLine size={32} className="text-gray-200 mb-2" />
-                 <p className="text-gray-400 text-[10px] font-bold uppercase tracking-widest">No Combo Deals Available</p>
-              </div>
-            )}
+                </div>
+              );
+            })}
             <div className="shrink-0 w-4 md:w-20 snap-end" />
           </div>
         </div>

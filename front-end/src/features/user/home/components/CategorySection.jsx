@@ -32,7 +32,7 @@ const CategorySection = ({ data: categories = [] }) => {
   if (categories.length === 0) return null;
 
   return (
-    <section className="py-12 bg-white">
+    <section className="py-4 md:py-12 bg-white">
       <div className="max-w-[1440px] mx-auto px-4 md:px-10">
         <div className="mb-8">
           <h2 className="text-xl md:text-3xl font-black text-gray-900 leading-tight uppercase">
