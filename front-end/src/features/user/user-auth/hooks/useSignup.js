@@ -93,6 +93,9 @@ export const useSignup = () => {
                 setCanResend(false);
             }
             console.log(response.data);
+            if (response.data.data?.test_otp) {
+                toast.info(`Test OTP: ${response.data.data.test_otp}`);
+            }
             
         } catch (err) {
             setError(extractErrorMessages(err));
