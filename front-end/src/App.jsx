@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { BrowserRouter } from "react-router-dom";
 import AppRoutes from "./routes";
 import ScrollToTop from "./hooks/ScrollToTop";
@@ -19,6 +20,16 @@ const AppContent = () => {
   const currentPath = window.location.pathname;
   const isAdminPath = currentPath.startsWith("/admin");
   const isAuthPath = currentPath === "/login" || currentPath === "/signup";
+
+  useEffect(() => {
+    const adminRole = localStorage.getItem("admin_role");
+    
+    const isPrivilegedUser = adminRole === "admin" || adminRole === "staff";
+
+    if (isPrivilegedUser && window.location.pathname === "/") {
+      window.location.replace("/admin");
+    }
+  }, []); 
 
   const showLoader = isChecking && !isAdminPath && !isAuthPath && !globalError;
 
