@@ -22,7 +22,7 @@ messaging.onBackgroundMessage((payload) => {
     body: payload.notification?.body || "You have a new order to process.",
     icon: '/icon-192.png',
     badge: '/icon-192.png',
-    tag: 'new-order', // ഒരേ ടൈപ്പ് നോട്ടിഫിക്കേഷൻ ഗ്രൂപ്പ് ചെയ്യാൻ
+    tag: 'new-order', 
     renotify: true,
     requireInteraction: true,
     data: { 
@@ -30,11 +30,9 @@ messaging.onBackgroundMessage((payload) => {
     }
   };
 
-  // ഇത് നിർബന്ധമാണ്: ബ്രൗസറിനോട് നോട്ടിഫിക്കേഷൻ കാണിക്കാൻ പറയുന്നു
   return self.registration.showNotification(notificationTitle, notificationOptions);
 });
 
-// നോട്ടിഫിക്കേഷനിൽ ക്ലിക്ക് ചെയ്യുമ്പോൾ അഡ്മിൻ പേജ് തുറക്കാൻ
 self.addEventListener('notificationclick', function(event) {
   event.notification.close();
   const targetUrl = event.notification.data.url;
