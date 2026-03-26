@@ -8,6 +8,7 @@ export default defineConfig({
     react(),
     tailwindcss(),
     VitePWA({
+      injectRegister: null, 
       registerType: 'autoUpdate',
       manifest: {
         name: 'THE CRUNCH INDIA',
@@ -39,8 +40,8 @@ export default defineConfig({
         ]
       },
       workbox: {
-       maximumFileSizeToCacheInBytes: 20 * 1024 * 1024, 
-       globPatterns: ['**/*.{js,css,html,png,svg,mp3}'],
+        maximumFileSizeToCacheInBytes: 20 * 1024 * 1024, 
+        globPatterns: ['**/*.{js,css,html,png,svg,mp3}'],
       }
     })
   ],

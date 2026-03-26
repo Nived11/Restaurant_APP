@@ -10,17 +10,25 @@ export const useFCM = (isAdminPath, user) => {
 
       if (isAdminPath && adminToken && "Notification" in window) {
         try {
-          // 1. സർവീസ് വർക്കർ രജിസ്റ്റർ ചെയ്യുക
+    
+          const registrations = await navigator.serviceWorker.getRegistrations();
+          for (let reg of registrations) {
+            if (reg.active && reg.active.scriptURL.includes('sw.js')) {
+              await reg.unregister();
+              console.log("Old sw.js conflict removed.");
+            }
+          }
+
+          // --- STEP 2: REGISTER FIREBASE SERVICE WORKER ---
           const registration = await navigator.serviceWorker.register("/firebase-messaging-sw.js");
           
-          // 2. സർവീസ് വർക്കർ റെഡി ആകുന്നത് വരെ കാത്തിരിക്കുക
           await navigator.serviceWorker.ready;
-          console.log("Service Worker is ready and active");
+          console.log("Firebase Service Worker is ready and active");
 
           const permission = await Notification.requestPermission();
           
           if (permission === "granted") {
-            // 3. രജിസ്ട്രേഷൻ ഒബ്ജക്റ്റ് സഹിതം ടോക്കൺ എടുക്കുക
+            // --- STEP 3: GET TOKEN USING THE REGISTRATION ---
             const token = await getToken(messaging, {
               vapidKey: import.meta.env.VITE_FIREBASE_VAPID_KEY,
               serviceWorkerRegistration: registration, 
@@ -43,15 +51,15 @@ export const useFCM = (isAdminPath, user) => {
 
     setupFCM();
 
-    // Foreground Notification (ആപ്പ് തുറന്നിരിക്കുമ്പോൾ)
+    // Foreground Notification Handling
     const unsubscribe = onMessage(messaging, (payload) => {
       console.log("Foreground message:", payload);
       toast.success(`${payload.notification.title}: ${payload.notification.body}`, {
         duration: 5000,
       });
-      // സൗണ്ട് പ്ലേ ചെയ്യുന്നു
+      // Custom Notification Sound
       const audio = new Audio("/OrderNotify.mp3");
-      audio.play().catch((err) => console.log("Audio play blocked:", err));
+      audio.play().catch((err) => console.log("Audio play blocked by browser:", err));
     });
 
     return () => unsubscribe();
