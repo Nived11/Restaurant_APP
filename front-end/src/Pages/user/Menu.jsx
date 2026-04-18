@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { AnimatePresence } from "framer-motion";
+import SEO from "../../components/common/SEO";
 import { 
   useMenu, 
   MenuHeader, 
@@ -46,6 +47,12 @@ const MenuPage = () => {
   // ---------------------------------------------------
 
   return (
+    <>
+    <SEO 
+        title="Our Menu | Best Burgers, Pasta & Fries in Kochi" 
+        description="Explore The Crunch India's menu in Ernakulam. Freshly prepared, mouth-watering burgers, loaded fries, authentic pasta, and refreshing beverages."
+        keywords="The Crunch menu, burgers Kochi, pasta Ernakulam, food delivery menu Kochi, best loaded fries"
+      />
     <div className="min-h-screen bg-white">
       <MenuHeader />
       
@@ -80,6 +87,7 @@ const MenuPage = () => {
         />
       )}
     </div>
+    </>
   );
 };
 

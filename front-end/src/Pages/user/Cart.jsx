@@ -10,6 +10,7 @@ import {
   OrderSection, 
   OrderAnimation 
 } from '../../features/user/cart';
+import SEO from '../../components/common/SEO';
 import { toast } from 'sonner';
 
 export default function Cart() {
@@ -71,6 +72,12 @@ export default function Cart() {
   if (isOrderProcessing) return <OrderAnimation />;
 
   return (
+    <>
+    <SEO 
+        title="Your Cart | The Crunch India" 
+        description="Review your selected dishes and proceed to checkout securely at The Crunch India."
+        noindex={true} 
+      />
     <div className="min-h-screen bg-white pt-6 pb-24 overflow-y-visible">
       <ProgressBar step={step} />
       <main className="max-w-7xl mx-auto px-6">
@@ -99,5 +106,6 @@ export default function Cart() {
         )}
       </main>
     </div>
+    </>
   );
 }
