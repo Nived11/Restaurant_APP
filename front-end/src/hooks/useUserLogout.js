@@ -1,18 +1,43 @@
+import { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom'; 
+import api from '../api/axios';
+import { logoutUser } from '../redux/authSlice';
 import { toast } from 'sonner';
 
 export const useUserLogout = () => {
-    const handleLogout = () => {
-        localStorage.removeItem("user_access");
-        localStorage.removeItem("user_refresh");
-        localStorage.removeItem("user_role");
-        localStorage.removeItem("user_name");
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const [isLoggingOut, setIsLoggingOut] = useState(false); 
 
-        toast.success("Logged out successfully!");
+    const handleLogout = async () => {
+        if (isLoggingOut) return;
 
-        setTimeout(() => {
-            window.location.href = "/";
-        }, 2000);
+        setIsLoggingOut(true);
+        try {
+            const response = await api.post('/auth/logout/'); 
+            
+            if (response.status === 200 || response.data?.status) {
+                
+                localStorage.removeItem("user_role");
+                localStorage.removeItem("user_name");
+
+                toast.success("Logged out successfully!");
+                
+                setTimeout(() => {
+                    dispatch(logoutUser());
+                    navigate("/", { replace: true });
+                }, 1000);
+            } else {
+                setIsLoggingOut(false);
+            }
+            
+        } catch (error) {
+            console.error("Logout API failed", error);
+            toast.error("Logout failed! Please try again.");
+            setIsLoggingOut(false);
+        }
     };
 
-    return { handleLogout };
+    return { handleLogout, isLoggingOut }; 
 };

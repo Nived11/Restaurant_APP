@@ -17,13 +17,15 @@ const ProductModal = ({ item, onClose }) => {
 
   const cartItems = useSelector((state) => state.cart.items);
   const { isOpen } = useSelector((state) => state.location); 
+
+  const isAuthenticated = useSelector((state) => state.auth?.isAuthenticated);
   
   // Check if regular item or specific variant exists in cart
-  const existingInCart = cartItems.find((i) => {
+ const existingInCart = cartItems.find((i) => {
     if (hasVariants) {
-      return Number(i.item_id) === Number(item.id) && Number(i.variant_id) === Number(selectedVariant?.id);
+      return i.item_id == item.id && i.variant_id == selectedVariant?.id;
     } else {
-      return Number(i.item_id) === Number(item.id) && !i.variant_id;
+      return i.item_id == item.id && !i.variant_id;
     }
   });
 
@@ -92,8 +94,7 @@ const ProductModal = ({ item, onClose }) => {
 
       dispatch(addToCart(cartPayload));
       
-      const token = localStorage.getItem('user_access'); 
-      if (token) {
+     if (isAuthenticated) {
         dispatch(syncCartUpdate({ 
           itemId: item.id, 
           variantId: hasVariants ? selectedVariant.id : null,

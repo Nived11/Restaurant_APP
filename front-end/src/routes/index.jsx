@@ -1,4 +1,6 @@
+// src/routes/index.jsx
 import { Routes, Route, Navigate } from "react-router-dom";
+import { useSelector } from "react-redux"; 
 import AdminRoute from "./AdminRoute";
 import AdminLayout from "../Layouts/AdminLayout";
 import PublicLayout from "../Layouts/PublicLayout";
@@ -9,11 +11,15 @@ import { Dashboard, Orders, Menu as AdminMenu, Bookings, Inbox, Reviews, Custome
 import NotFound from "../Pages/NotFound.jsx";
 
 const AppRoutes = () => {
-  const getAdminToken = () => localStorage.getItem("admin_token");
-  const getAdminRole = () => localStorage.getItem("admin_role");
-  const getUserToken = () => localStorage.getItem("user_access");
+  const { isAuthenticated, user, isLoading } = useSelector((state) => state.auth);
 
-  const adminInfo = { role: getAdminRole() };
+if (isLoading) {
+      return null; 
+  }
+
+  const isAdminOrStaff = isAuthenticated && (user?.role === "admin" || user?.role === "staff");
+  const isRegularUser = isAuthenticated && user?.role === "user";
+  const adminInfo = isAdminOrStaff ? { role: user.role } : { role: null };
 
   return (
     <Routes>
@@ -23,7 +29,7 @@ const AppRoutes = () => {
       <Route
         path="/login"
         element={
-          getUserToken() ? (
+          isRegularUser ? (
             <Navigate to="/" replace={true} state={{ from: null }} />
           ) : (
             <UserLogin />
@@ -33,7 +39,7 @@ const AppRoutes = () => {
       <Route
         path="/signup"
         element={
-          getUserToken() ? (
+          isRegularUser ? (
             <Navigate to="/" replace={true} state={{ from: null }} />
           ) : (
             <UserSignup />
@@ -42,7 +48,7 @@ const AppRoutes = () => {
       />
       <Route
         path="/admin/login"
-        element={getAdminToken() ? <Navigate to="/admin/dashboard" replace /> : <AdminLogin />}
+        element={isAdminOrStaff ? <Navigate to="/admin/dashboard" replace /> : <AdminLogin />}
       />
 
       {/* -----------------------------------------------------------
@@ -57,7 +63,7 @@ const AppRoutes = () => {
 
         <Route
           path="profile"
-          element={getUserToken() ? <Profile /> : <Navigate to="/login" replace />}
+          element={isRegularUser ? <Profile /> : <Navigate to="/login" replace />}
         />
       </Route>
 
@@ -76,19 +82,19 @@ const AppRoutes = () => {
 
           <Route
             path="reviews"
-            element={getAdminRole() === "admin" ? <Reviews user={adminInfo} /> : <Navigate to="/admin/dashboard" replace />}
+            element={user?.role === "admin" ? <Reviews user={adminInfo} /> : <Navigate to="/admin/dashboard" replace />}
           />
           <Route
             path="customers"
-            element={getAdminRole() === "admin" ? <Customers user={adminInfo} /> : <Navigate to="/admin/dashboard" replace />}
+            element={user?.role === "admin" ? <Customers user={adminInfo} /> : <Navigate to="/admin/dashboard" replace />}
           />
           <Route
             path="revenue"
-            element={getAdminRole() === "admin" ? <Revenue user={adminInfo} /> : <Navigate to="/admin/dashboard" replace />}
+            element={user?.role === "admin" ? <Revenue user={adminInfo} /> : <Navigate to="/admin/dashboard" replace />}
           />
           <Route
             path="settings"
-            element={getAdminRole() === "admin" ? <Settings user={adminInfo} /> : <Navigate to="/admin/dashboard" replace />}
+            element={user?.role === "admin" ? <Settings user={adminInfo} /> : <Navigate to="/admin/dashboard" replace />}
           />
         </Route>
       </Route>

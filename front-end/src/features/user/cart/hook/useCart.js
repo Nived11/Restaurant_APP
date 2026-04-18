@@ -1,3 +1,5 @@
+// src/features/user/cart/hook/useCart.js (അല്ലെങ്കിൽ നിങ്ങളുടെ ശരിയായ പാത്ത്)
+
 import { useSelector, useDispatch } from 'react-redux';
 import { useQuery } from "@tanstack/react-query";
 import { useEffect } from 'react';
@@ -15,13 +17,14 @@ const useCart = () => {
   
   const { items: cartItems, loading, error: reduxError } = useSelector((state) => state.cart);
   const { isOpen } = useSelector((state) => state.location); 
-  const token = localStorage.getItem('user_access');
+  
+  const { isAuthenticated } = useSelector((state) => state.auth);
 
   useEffect(() => {
-    if (token) {
+    if (isAuthenticated) {
       dispatch(fetchCart());
     }
-  }, [dispatch, token]);
+  }, [dispatch, isAuthenticated]);
 
   const isStoreClosed = isOpen === false;
 
@@ -77,7 +80,7 @@ const useCart = () => {
     const itemId = item.item_id || item.id;
     if (item.quantity < item.currentStock) {
       dispatch(updateQuantity({ id: item.id, quantity: item.quantity + 1 }));
-      if (token) dispatch(syncCartUpdate({ itemId, variantId: item.variant_id, actionType: 'add' })); 
+      if (isAuthenticated) dispatch(syncCartUpdate({ itemId, variantId: item.variant_id, actionType: 'add' })); 
     } else {
       toast.error(`Stock limit reached! Only ${item.currentStock} available.`);
     }
@@ -87,13 +90,13 @@ const useCart = () => {
     const itemId = item.item_id || item.id;
     if (item.quantity > 1) {
       dispatch(updateQuantity({ id: item.id, quantity: item.quantity - 1 }));
-      if (token) dispatch(syncCartUpdate({ itemId, variantId: item.variant_id, actionType: 'decrease' }));
+      if (isAuthenticated) dispatch(syncCartUpdate({ itemId, variantId: item.variant_id, actionType: 'decrease' }));
     }
   };
 
   const removeItem = (id, itemId, variantId = null) => {
     dispatch(removeFromCart(id));
-    if (token) dispatch(syncCartUpdate({ itemId, variantId, actionType: 'remove' }));
+    if (isAuthenticated) dispatch(syncCartUpdate({ itemId, variantId, actionType: 'remove' }));
     toast.success("Item removed from cart");
   };
 

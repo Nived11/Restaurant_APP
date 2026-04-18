@@ -1,9 +1,12 @@
+// src/features/user/user-auth/hooks/useSignup.js
+
 import { useState, useEffect, useRef } from 'react';
 import { useDispatch } from 'react-redux'; 
 import { useNavigate, useLocation } from 'react-router-dom';
 import api from '../../../../api/axios';
 import { extractErrorMessages } from '../../../../utils/extractErrorMessages';
 import { mergeCartOnLogin } from '../../../../redux/cartSlice'; 
+import { setCredentials } from '../../../../redux/authSlice';
 import { toast } from 'sonner';
 
 export const useSignup = () => {
@@ -92,9 +95,8 @@ export const useSignup = () => {
                 setTimer(120);
                 setCanResend(false);
             }
-            console.log(response.data);
-            if (response.data.data?.test_otp) {
-                toast.info(`Test OTP: ${response.data.data.test_otp}`);
+           if (response.data.otp) {
+                toast.info(`Test OTP: ${response.data.otp}`);
             }
             
         } catch (err) {
@@ -121,10 +123,15 @@ export const useSignup = () => {
             });
 
             if (response.data.status) {
-                localStorage.setItem('user_access', response.data.access);
-                localStorage.setItem('user_refresh', response.data.refresh);
+
                 localStorage.setItem('user_role', response.data.role);
-                localStorage.setItem('user_name', response.data.first_name);
+                localStorage.setItem('user_name', response.data.name);
+
+                dispatch(setCredentials({
+                    role: response.data.role,
+                    name: response.data.name,
+                    phone_number: formData.phone
+                }));
 
                 dispatch(mergeCartOnLogin());
 
@@ -151,6 +158,10 @@ export const useSignup = () => {
                 setCanResend(false);
                 setOtp(['', '', '', '', '', '']);
             }
+            console.log(response.data);
+            if (response.data.otp) {
+                toast.info(`Test OTP: ${response.data.otp}`);
+            }
         } catch (err) {
             setError("Failed to resend OTP");
         } finally {
@@ -161,7 +172,7 @@ export const useSignup = () => {
     return {
         step, setStep, formData, setFormData, otp, setOtp,
         loading, error, timer, canResend, inputRefs,
-        isAgreed, setIsAgreed, // EXPORTED checkbox state
+        isAgreed, setIsAgreed,
         formatTime, handleOtpChange, handleKeyDown,
         handleRegisterSubmit, handleVerifySubmit, handleResend
     };

@@ -1,6 +1,8 @@
+// src/Layouts/PublicLayout.jsx
+
 import { useState, useEffect } from "react";
 import { Outlet } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import Header from "../components/common/Header";
 import Footer from "../components/common/Footer";
 import ReviewModal from "../components/common/ReviewModal";
@@ -13,13 +15,14 @@ const PublicLayout = () => {
   const { eligibility } = useReviews();
   const [showPopup, setShowPopup] = useState(false);
 
+  const { isAuthenticated } = useSelector((state) => state.auth);
+
   // 1. Initial Cart Fetch
   useEffect(() => {
-    const token = localStorage.getItem('user_access');
-    if (token) {
+    if (isAuthenticated) {
       dispatch(fetchCart());
     }
-  }, [dispatch]);
+  }, [dispatch, isAuthenticated]);
 
   // 2. Initial App Setup & Real-time store status check (Polls every 20 seconds)
   useEffect(() => {

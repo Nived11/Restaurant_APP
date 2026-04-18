@@ -1,5 +1,7 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import { 
   useCart, 
   ProgressBar, 
@@ -17,7 +19,7 @@ export default function Cart() {
   const [isOrderProcessing, setIsOrderProcessing] = useState(false);
   const [selectedAddress, setSelectedAddress] = useState(null);
 
-  const isLoggedIn = !!localStorage.getItem('user_access');
+  const isLoggedIn = useSelector((state) => state.auth?.isAuthenticated);
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
@@ -99,4 +101,3 @@ export default function Cart() {
     </div>
   );
 }
-

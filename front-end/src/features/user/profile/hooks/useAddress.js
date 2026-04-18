@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
+import { useSelector } from "react-redux"; 
 import api from "../../../../api/axios"; 
 import { extractErrorMessages } from "../../../../utils/extractErrorMessages";
 import { fetchLocationDetails } from "../../../../utils/addressHelper";
@@ -9,7 +10,7 @@ export const useAddress = () => {
   const queryClient = useQueryClient();
   const [isLocating, setIsLocating] = useState(false);
   
-  const isLoggedIn = !!localStorage.getItem('user_access');
+  const { isAuthenticated } = useSelector((state) => state.auth);
 
   const addressQuery = useQuery({
     queryKey: ["addresses"],
@@ -17,7 +18,7 @@ export const useAddress = () => {
       const response = await api.get("/auth/addresses/");
       return response.data; 
     },
-    enabled: isLoggedIn, 
+    enabled: isAuthenticated, 
     staleTime: 60000, 
     retry: false,
   });
@@ -94,7 +95,7 @@ export const useAddress = () => {
 
   return {
     addresses: addressQuery.data || [],
-    isLoading: addressQuery.isLoading && isLoggedIn,
+    isLoading: addressQuery.isLoading && isAuthenticated,
     isLocating,
     getCurrentLocation,
     addAddress: addAddress.mutateAsync,

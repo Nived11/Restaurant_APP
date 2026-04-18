@@ -4,34 +4,55 @@ import AppRoutes from "./routes";
 import ScrollToTop from "./hooks/ScrollToTop";
 import { Toaster } from "./components/ui/sonner";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Provider, useSelector } from "react-redux";
+import { Provider, useDispatch, useSelector } from "react-redux";
 import { store } from "./redux/store";
 import { AnimatePresence } from "framer-motion";
 import SiteLaunchLoader from "./components/ui/SiteLaunchLoader";
 import ServerErrorPage from "./components/ui/ServerErrorPage";
 import ErrorBoundary from "./components/common/ErrorBoundary";
 import { useFCM } from "./hooks/useFCM";
+import api from "./api/axios"; 
+import { setCredentials, logoutUser, setAuthLoading } from "./redux/authSlice"; 
 
 const queryClient = new QueryClient();
 
 const AppContent = () => {
+  const dispatch = useDispatch();
   const { isChecking, globalError } = useSelector((state) => state.location);
-  const user = useSelector((state) => state.auth?.user);
+  const { user, isLoading: isAuthLoading } = useSelector((state) => state.auth); 
   const currentPath = window.location.pathname;
   const isAdminPath = currentPath.startsWith("/admin");
   const isAuthPath = currentPath === "/login" || currentPath === "/signup";
 
   useEffect(() => {
-    const adminRole = localStorage.getItem("admin_role");
-    
-    const isPrivilegedUser = adminRole === "admin" || adminRole === "staff";
+    const verifySession = async () => {
+      try {
+        const response = await api.get('/auth/verify-session/');
+        
+        if (response.data.status) {
+          dispatch(setCredentials(response.data.user));
+          
+          const isPrivilegedUser = response.data.user.role === "admin" || response.data.user.role === "staff";
+          if (isPrivilegedUser && currentPath === "/") {
+            window.location.replace("/admin/dashboard");
+          }
+        }
+      } catch (error) {
+        dispatch(logoutUser());
+        
+        const adminRole = localStorage.getItem("admin_role");
+        if ((adminRole === "admin" || adminRole === "staff") && currentPath === "/") {
+            window.location.replace("/admin/dashboard");
+        }
+      } finally {
+        dispatch(setAuthLoading(false)); 
+      }
+    };
 
-    if (isPrivilegedUser && window.location.pathname === "/") {
-      window.location.replace("/admin");
-    }
-  }, []); 
+    verifySession();
+  }, [dispatch, currentPath]);
 
-  const showLoader = isChecking && !isAdminPath && !isAuthPath && !globalError;
+  const showLoader = (isChecking || isAuthLoading) && !isAdminPath && !isAuthPath && !globalError;
 
   useFCM(isAdminPath, user);
 

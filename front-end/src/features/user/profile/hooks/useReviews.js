@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useSelector } from 'react-redux'; 
 import api from '../../../../api/axios';
 import { extractErrorMessages } from '../../../../utils/extractErrorMessages';
 import { toast } from 'sonner';
@@ -6,8 +7,7 @@ import { toast } from 'sonner';
 export const useReviews = () => {
   const queryClient = useQueryClient();
 
-  const token = localStorage.getItem('user_access');
-  const isLoggedIn = !!token;
+  const { isAuthenticated } = useSelector((state) => state.auth);
 
   // 1. Eligibility Check
   const { data: eligibility } = useQuery({
@@ -16,7 +16,7 @@ export const useReviews = () => {
       const response = await api.get('/feedback/eligibility/');
       return response.data;
     },
-    enabled: isLoggedIn,
+    enabled: isAuthenticated,
   });
 
   // 2. Fetch Reviews List
@@ -26,7 +26,7 @@ export const useReviews = () => {
       const response = await api.get('/feedback/list/');
       return Array.isArray(response.data) ? response.data : [];
     },
-    enabled: isLoggedIn,
+    enabled: isAuthenticated, 
   });
 
   // 3. Create Review Mutation

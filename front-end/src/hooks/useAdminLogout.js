@@ -1,33 +1,52 @@
+import { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom'; 
 import { toast } from 'sonner';
 import api from '../api/axios';
 import { messaging, getToken } from '../utils/firebase';
+import { logoutUser } from '../redux/authSlice'; 
 
 export const useAdminLogout = () => {
-    const handleLogout = async () => {
-        try {
-            const currentToken = await getToken(messaging);
-            const adminToken = localStorage.getItem("admin_token");
+    const dispatch = useDispatch();
+    const navigate = useNavigate(); 
+    const [isLoggingOut, setIsLoggingOut] = useState(false); 
 
-            if (currentToken && adminToken) {
+    const handleLogout = async () => {
+        if (isLoggingOut) return; 
+
+        setIsLoggingOut(true); 
+        try {
+            // 1. Delete FCM Token
+            const currentToken = await getToken(messaging);
+            if (currentToken) {
                 await api.post('/notifications/delete-fcm-token/', { 
                     fcm_token: currentToken 
                 });
-                console.log("FCM Token deleted from server");
             }
+
+            // 2. Call Logout API 
+            const response = await api.post('/auth/logout/'); 
+
+            if (response.status === 200 || response.data?.status) {
+                
+                localStorage.removeItem("admin_role");
+                
+                toast.success("Logged out successfully!");
+
+               
+                dispatch(logoutUser()); 
+                navigate("/admin/login", { replace: true }); 
+                
+            } else {
+                setIsLoggingOut(false);
+            }
+
         } catch (error) {
-            console.error("Error deleting FCM token:", error);
-        } finally {
-            localStorage.removeItem("admin_token");
-            localStorage.removeItem("admin_refresh");
-            localStorage.removeItem("admin_role");
-
-            toast.success("Logged out successfully!");
-
-            setTimeout(() => {
-                window.location.href = "/admin/login";
-            }, 2000);
-        }
+            console.error("Error during logout process:", error);
+            toast.error("Logout failed! Please try again.");
+            setIsLoggingOut(false);
+        } 
     };
 
-    return { handleLogout };
+    return { handleLogout, isLoggingOut }; 
 };

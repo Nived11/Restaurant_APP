@@ -1,3 +1,5 @@
+// src/hooks/useFCM.js
+
 import { useEffect } from "react";
 import { messaging, getToken, onMessage } from "../utils/firebase";
 import api from "../api/axios";
@@ -6,9 +8,9 @@ import { toast } from "sonner";
 export const useFCM = (isAdminPath, user) => {
   useEffect(() => {
     const setupFCM = async () => {
-      const adminToken = localStorage.getItem("admin_token");
+      const isAdminLoggedIn = user && (user.role === "admin" || user.role === "staff");
 
-      if (isAdminPath && adminToken && "Notification" in window) {
+      if (isAdminPath && isAdminLoggedIn && "Notification" in window) {
         try {
     
           const registrations = await navigator.serviceWorker.getRegistrations();
@@ -37,8 +39,7 @@ export const useFCM = (isAdminPath, user) => {
             if (token) {
               await api.post(
                 "/notifications/save-fcm-token/",
-                { fcm_token: token },
-                { headers: { Authorization: `Bearer ${adminToken}` } }
+                { fcm_token: token }
               );
               console.log("FCM Token synced with backend");
             }

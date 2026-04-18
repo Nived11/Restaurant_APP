@@ -2,6 +2,7 @@
 import { setLocation, setChecking, setErrorPopup, setGlobalError } from '../redux/locationSlice'; 
 import { fetchLocationDetails } from '../utils/addressHelper';
 import api from '../api/axios'; 
+import { logoutUser } from '../redux/authSlice';
 
 const calculateDistance = (lat1, lon1, lat2, lon2) => {
     const R = 6371; 
@@ -45,7 +46,7 @@ export const checkInitialStatus = (isSilent = false, showPopup = true) => async 
     } catch (error) {
         if (error.response?.status === 401) {
             console.warn("Unauthorized! Clearing session to recover...");
-            localStorage.clear();
+           dispatch(logoutUser());
             dispatch(setChecking(false));
             return "ERROR";
         }

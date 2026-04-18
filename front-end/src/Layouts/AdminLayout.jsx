@@ -1,32 +1,23 @@
-import React, { useState, useEffect } from "react";
-import { useOutletContext, Outlet, useLocation } from "react-router-dom";
+// src/Layouts/AdminLayout.jsx
+
+import React, { useState } from "react";
+import { useOutletContext, Outlet } from "react-router-dom";
 import AdminSidebar from "../components/common/AdminSidebar";
 import AdminHeader from "../components/common/AdminHeader";
 import { Menu } from "lucide-react";
 import logoCrunch from "../assets/Logocrunch.png";
-import api from "../api/axios";
 import ShopStatus from "../components/common/ShopStatus";
 import NotificationBadge from "../components/common/NotificationBadge";
 import { useSettings } from "../features/admin/settings/hooks/useSettings";
 
 const AdminLayout = () => {
-  const { user } = useOutletContext();
+  const { user } = useOutletContext() || {};
 
   const settingsProps = useSettings();
   const { settings, toggleShopStatus, isLoading } = settingsProps;
 
   const [isExpanded, setIsExpanded] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const location = useLocation();
-
-  useEffect(() => {
-    const verifySession = async () => {
-      const token = localStorage.getItem('admin_token');
-      if (!token) { window.location.href = '/admin/login'; return; }
-      try { await api.get('/auth/verify-session/'); } catch (error) { }
-    };
-    verifySession();
-  }, [location.pathname]);
 
   return (
     <div className="flex h-screen overflow-hidden bg-[#F8F8F8] text-[#1A1A1A] font-sans antialiased">

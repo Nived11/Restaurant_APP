@@ -1,12 +1,12 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { LogOut, User2, ShoppingBag, MapPin, Star } from "lucide-react";
+import { LogOut, User2, ShoppingBag, MapPin, Star,Loader2 } from "lucide-react";
 import { useUserLogout } from "../../../../hooks/useUserLogout";
-import { useReviews } from "../hooks/useReviews"; // Import hook
+import { useReviews } from "../hooks/useReviews"; 
 
 const ProfileTabs = ({ activeTab, setActiveTab }) => {
-  const { handleLogout } = useUserLogout();
-  const { eligibility } = useReviews(); // Get eligibility data
+  const { handleLogout, isLoggingOut } = useUserLogout();
+  const { eligibility } = useReviews(); 
 
   // Start with base tabs
   const tabItems = [
@@ -26,14 +26,26 @@ const ProfileTabs = ({ activeTab, setActiveTab }) => {
 
   return (
     <div className="flex flex-col lg:flex-row lg:items-center border-b border-gray-100 bg-white relative">
-      <div className="flex justify-end p-3 lg:p-0 lg:absolute lg:right-8 xl:right-14">
+      <div className="flex justify-end p-3 lg:p-0 lg:absolute lg:right-8 xl:right-14 z-10">
         <button 
           onClick={handleLogout}
-          className="cursor-pointer group flex items-center gap-2 px-3.5 py-2 md:px-4 md:py-2 bg-red-50 hover:bg-red-600 rounded-xl transition-all duration-300 border border-red-100 hover:border-red-600 shadow-sm"
+          disabled={isLoggingOut} 
+          className={`group flex items-center gap-2 px-3.5 py-2 md:px-4 md:py-2 rounded-xl transition-all duration-300 border shadow-sm ${
+            isLoggingOut 
+              ? "bg-red-50 border-red-100 cursor-not-allowed opacity-80" 
+              : "bg-red-50 hover:bg-red-600 border-red-100 hover:border-red-600 cursor-pointer" 
+          }`}
         >
-          <LogOut size={12} className="text-red-600 group-hover:text-white transition-colors" />
-          <span className="text-[9px] md:text-[10px] font-black uppercase tracking-wider text-red-600 group-hover:text-white">
-            Logout
+          {isLoggingOut ? (
+            <Loader2 size={12} className="text-red-600 animate-spin" />
+          ) : (
+            <LogOut size={12} className="text-red-600 group-hover:text-white transition-colors" />
+          )}
+
+          <span className={`text-[9px] md:text-[10px] font-black uppercase tracking-wider transition-colors ${
+            isLoggingOut ? "text-red-600" : "text-red-600 group-hover:text-white"
+          }`}>
+            {isLoggingOut ? "Logging out..." : "Logout"}
           </span>
         </button>
       </div>

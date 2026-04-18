@@ -1,11 +1,13 @@
+// src/features/user/user-auth/hooks/useLogin.js
+
 import { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux'; 
 import api from '../../../../api/axios';
 import { extractErrorMessages } from '../../../../utils/extractErrorMessages';
 import { mergeCartOnLogin } from '../../../../redux/cartSlice'; 
+import { setCredentials } from '../../../../redux/authSlice'; 
 import { toast } from 'sonner';
-
 
 export const useLogin = () => {
     const dispatch = useDispatch(); 
@@ -21,7 +23,6 @@ export const useLogin = () => {
 
     const navigate = useNavigate();
     const location = useLocation();
-
 
     const formatTime = (seconds) => {
         const mins = Math.floor(seconds / 60);
@@ -77,8 +78,10 @@ export const useLogin = () => {
                 setTimer(120);
                 setCanResend(false);
             }
-            if (response.data.data?.test_otp) {
-                toast.info(`Test OTP: ${response.data.data.test_otp}`);
+            console.log(response.data);
+            
+           if (response.data.otp) {
+                toast.info(`Test OTP: ${response.data.otp}`);
             }
         } catch (err) {
             setError(extractErrorMessages(err));
@@ -103,11 +106,15 @@ export const useLogin = () => {
             });
 
             if (response.data.status) {
-                localStorage.setItem('user_access', response.data.access);
-                localStorage.setItem('user_refresh', response.data.refresh);
+
                 localStorage.setItem('user_role', response.data.role);
-                localStorage.setItem('user_name', response.data.first_name);
-                
+                localStorage.setItem('user_name', response.data.name); 
+
+                dispatch(setCredentials({
+                    role: response.data.role,
+                    name: response.data.name,
+                    phone_number: mobile
+                }));
 
                 dispatch(mergeCartOnLogin());
 
@@ -134,6 +141,10 @@ export const useLogin = () => {
                 setCanResend(false);
                 setOtp(['', '', '', '', '', '']);
             }
+            console.log(response.data);
+                if (response.data.otp) {
+                    toast.info(`Test OTP: ${response.data.otp}`);
+                }
         } catch (err) {
             setError(extractErrorMessages(err));
         } finally {

@@ -2,7 +2,7 @@ import { NavLink } from "react-router-dom";
 import { 
   LayoutDashboard, ShoppingBag, Utensils, 
   Star, Users, DollarSign, LogOut, Mail, 
-  ChevronLeft, ChevronRight, X ,BookIcon,Settings
+  ChevronLeft, ChevronRight, X ,BookIcon,Settings,Loader2
 } from "lucide-react";
 import logoWeb from "../../assets/Logo-web.png";
 import logoCrunch from "../../assets/Logocrunch.png";
@@ -12,7 +12,7 @@ import { useAdminLogout } from "../../hooks/useAdminLogout";
 
 const AdminSidebar = ({ isExpanded, setIsExpanded, user, isMobile, closeMobileMenu }) => {
   const isAdmin = user?.role === "admin";
-  const { handleLogout } = useAdminLogout();
+const { handleLogout, isLoggingOut } = useAdminLogout();
   
   const navLinks = [
     { name: "Dashboard", path: "/admin/dashboard", icon: <LayoutDashboard size={20} />, show: true },
@@ -98,19 +98,30 @@ const AdminSidebar = ({ isExpanded, setIsExpanded, user, isMobile, closeMobileMe
       <div className="p-4 border-t border-white/5 bg-[#1A1A1A] flex-shrink-0 mb-safe">
         <button 
           onClick={handleLogout}
+          disabled={isLoggingOut} 
           className={`
-            flex items-center bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white 
-            rounded-2xl transition-all duration-300 py-4 cursor-pointer relative group
+            flex items-center rounded-2xl transition-all duration-300 py-4 relative group
             ${isFull ? "px-6 w-full gap-4" : "justify-center w-full"}
+            ${isLoggingOut 
+              ? "bg-red-500/10 text-red-500/50 cursor-not-allowed" 
+              : "bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white cursor-pointer"
+            }
           `}>
-          <LogOut size={20} className="flex-shrink-0" />
+          {isLoggingOut ? (
+            <Loader2 size={20} className="flex-shrink-0 animate-spin" />
+          ) : (
+            <LogOut size={20} className="flex-shrink-0" />
+          )}
+
           {isFull ? (
-            <span className="text-[13px] font-bold uppercase tracking-wider">Logout</span>
+            <span className="text-[13px] font-bold uppercase tracking-wider">
+               {isLoggingOut ? "LOGGING OUT..." : "LOGOUT"}
+            </span>
           ) : (
             <div className="fixed left-[90px] bg-red-500 text-white text-[10px] font-black px-3 py-2 rounded-md 
               invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all 
               uppercase whitespace-nowrap z-[999] shadow-2xl pointer-events-none">
-              Logout
+              {isLoggingOut ? "LOGGING OUT..." : "LOGOUT"}
               <div className="absolute top-1/2 -left-1 -translate-y-1/2 w-2 h-2 bg-red-500 rotate-45" />
             </div>
           )}
