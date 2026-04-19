@@ -5,7 +5,7 @@ import { useUserProfile } from "../hooks/useUserProfile";
 
 const ProfileOverview = () => {
   const { 
-    profile, 
+    profile: rawProfile, // CRITICAL FIX: Renamed to rawProfile to unwrap data below
     isLoading, 
     isError, 
     error, 
@@ -15,6 +15,9 @@ const ProfileOverview = () => {
     validationError, 
     clearErrors 
   } = useUserProfile();
+
+  // CRITICAL FIX: Extract actual data from the 'data' wrapper if it exists
+  const profile = rawProfile?.data ? rawProfile.data : rawProfile;
   
   const [isEditing, setIsEditing] = useState(false);
   const [tempData, setTempData] = useState({ name: "", email: "" });

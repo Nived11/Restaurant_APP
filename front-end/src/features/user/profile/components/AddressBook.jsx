@@ -23,6 +23,10 @@ const AddressBook = () => {
   const [deleteId, setDeleteId] = useState(null);
   const [deleteError, setDeleteError] = useState(null);
 
+  // CRITICAL FIX: Extract actual data from the 'data' wrapper if it exists
+  const addressList = addresses?.data ? addresses.data : addresses;
+  const safeAddresses = Array.isArray(addressList) ? addressList : [];
+
   const handleEdit = (addr) => {
     setEditingAddress(addr);
     setShowForm(true);
@@ -89,7 +93,7 @@ const AddressBook = () => {
   return (
     <div className="relative w-full">
       {/* Address List Grid */}
-      {addresses.length === 0 ? (
+      {safeAddresses.length === 0 ? (
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -112,7 +116,7 @@ const AddressBook = () => {
         </motion.div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-6">
-          {addresses.map((addr) => (
+          {safeAddresses.map((addr) => (
             <motion.div
               layout
               key={addr.id}

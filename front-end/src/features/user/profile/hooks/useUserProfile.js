@@ -13,6 +13,7 @@ export const useUserProfile = () => {
     queryFn: async () => {
       try {
         const response = await api.get("/auth/profile/"); 
+        // Return response.data to keep the exact wrapper structure 
         return response.data;
       } catch (err) {
         const errorMessage = extractErrorMessages(err);
@@ -40,6 +41,7 @@ export const useUserProfile = () => {
       }
     },
     onSuccess: (data) => {
+      // Ensure the query data is properly updated in the cache
       queryClient.setQueryData(["userProfile"], data);
       toast.success("Profile updated successfully!");
       setValidationError(null);

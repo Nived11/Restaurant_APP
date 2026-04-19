@@ -18,12 +18,16 @@ export const AddressSection = ({ selectedAddress, setSelectedAddress, onNext, on
   const dispatch = useDispatch();
   const { errorPopup } = useSelector((state) => state.location);
 
+  // CRITICAL FIX: Backend data structure issue fixed (checking for .data)
+  const addressList = addresses?.data ? addresses.data : addresses;
+  const safeAddresses = Array.isArray(addressList) ? addressList : [];
+
   useEffect(() => {
-    if (addresses && addresses.length > 0 && !selectedAddress) {
-      const defaultAddr = addresses.find(addr => addr.is_default) || addresses[0];
+    if (safeAddresses && safeAddresses.length > 0 && !selectedAddress) {
+      const defaultAddr = safeAddresses.find(addr => addr.is_default) || safeAddresses[0];
       setSelectedAddress(defaultAddr);
     }
-  }, [addresses, selectedAddress, setSelectedAddress]);
+  }, [safeAddresses, selectedAddress, setSelectedAddress]);
 
   useEffect(() => {
     if (errorPopup) {
@@ -42,7 +46,6 @@ export const AddressSection = ({ selectedAddress, setSelectedAddress, onNext, on
     setShowForm(true);
   };
 
-  // 1. handleFormSubmit
   const handleFormSubmit = async (data) => {
     try {
       let updatedAddr;
@@ -124,14 +127,14 @@ export const AddressSection = ({ selectedAddress, setSelectedAddress, onNext, on
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Left Side: Address List */}
         <div className="lg:col-span-2 space-y-5">
-          {addresses.length === 0 ? (
+          {safeAddresses.length === 0 ? (
             <div className="p-16 border-2 border-dashed border-gray-100 rounded-[2.5rem] text-center">
               <MapPin className="mx-auto text-gray-300 mb-4" size={40} />
               <p className="font-black text-gray-500 uppercase tracking-widest text-xs">No addresses saved</p>
               <button onClick={handleAddNew} className="mt-4 text-[10px] font-black uppercase text-[#f9a602]">Add one now</button>
             </div>
           ) : (
-            addresses.map((addr) => (
+            safeAddresses.map((addr) => (
               <div
                 key={addr.id}
                 onClick={() => setSelectedAddress(addr)}

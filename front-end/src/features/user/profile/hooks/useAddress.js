@@ -93,8 +93,13 @@ export const useAddress = () => {
     onError: (err) => toast.error(extractErrorMessages(err))
   });
 
+  // Extract actual data from the 'data' wrapper if it exists (safeguard)
+  const fetchedData = addressQuery.data;
+  const addressList = fetchedData?.data ? fetchedData.data : fetchedData;
+  const finalAddresses = Array.isArray(addressList) ? addressList : [];
+
   return {
-    addresses: addressQuery.data || [],
+    addresses: finalAddresses,
     isLoading: addressQuery.isLoading && isAuthenticated,
     isLocating,
     getCurrentLocation,
