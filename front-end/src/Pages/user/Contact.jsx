@@ -1,8 +1,21 @@
-import React from 'react';
+import React, { useState, useLayoutEffect } from 'react';
 import SEO from '../../components/common/SEO'; 
 import { ContactPage } from '../../features/user/contact';
 
 const Contact = () => {
+  const [isReady, setIsReady] = useState(false);
+
+  useLayoutEffect(() => {
+    const frame = requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        setIsReady(true);
+      });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, []);
+
+  if (!isReady) return null;
+
   return (
     <>
       <SEO 

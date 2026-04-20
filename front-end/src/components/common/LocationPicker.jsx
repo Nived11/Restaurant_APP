@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { MapContainer, TileLayer, useMapEvents, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import { Navigation, Loader2, MapPin, Search, X } from "lucide-react";
@@ -38,7 +38,15 @@ const LocationPicker = ({ initialPos, onConfirm, isLocating, getCurrentLocation 
         setSearchResults
     } = useLocationPicker(initialPos);
 
-    const [searchQuery, setSearchQuery] = React.useState("");
+    const [searchQuery, setSearchQuery] = useState("");
+    // ✅ അനിമേഷൻ ലാഗ് ഒഴിവാക്കാനുള്ള സ്റ്റേറ്റ്
+    const [isAnimationComplete, setIsAnimationComplete] = useState(false);
+
+    // ✅ മോഡൽ അനിമേഷൻ കഴിഞ്ഞ് മാത്രം മാപ്പ് ലോഡ് ചെയ്യാൻ 400ms ഡിലേ കൊടുക്കുന്നു
+    useEffect(() => {
+        const timer = setTimeout(() => setIsAnimationComplete(true), 400); 
+        return () => clearTimeout(timer);
+    }, []);
 
     useEffect(() => {
         updatePosition(position);
@@ -56,6 +64,11 @@ const LocationPicker = ({ initialPos, onConfirm, isLocating, getCurrentLocation 
         setSearchResults([]);
         setSearchQuery("");
     };
+
+    // ✅ മാപ്പ് വലിക്കുമ്പോൾ (Drag) ഉണ്ടാകുന്ന ലാഗ് ഒഴിവാക്കാൻ useCallback ചേർത്തു
+    const handleDragEnd = useCallback((newPos) => {
+        updatePosition(newPos);
+    }, [updatePosition]);
 
     return (
         <div className="flex flex-col h-full bg-white relative">
@@ -101,15 +114,22 @@ const LocationPicker = ({ initialPos, onConfirm, isLocating, getCurrentLocation 
 
             {/* Map Section */}
             <div className="relative flex-1">
-                <MapContainer center={position} zoom={15} className="h-full w-full" zoomControl={false} attributionControl={false}>
-                    <TileLayer
-                        url="http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}"
-                        subdomains={['mt0', 'mt1', 'mt2', 'mt3']}
-                        attribution='&copy; <a href="https://www.google.com/maps">Google Maps</a>'
-                    />
-                    <ChangeMapView center={position} />
-                    <LocationMarker setPosition={(pos) => updatePosition(pos)} />
-                </MapContainer>
+                {/* ✅ ഡിലേ കഴിഞ്ഞാൽ മാത്രം മാപ്പ് കാണിക്കും, അല്ലെങ്കിൽ സ്പിന്നർ കാണിക്കും */}
+                {isAnimationComplete ? (
+                    <MapContainer center={position} zoom={15} className="h-full w-full" zoomControl={false} attributionControl={false}>
+                        <TileLayer
+                            url="http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}"
+                            subdomains={['mt0', 'mt1', 'mt2', 'mt3']}
+                            attribution='© <a href="https://www.google.com/maps">Google Maps</a>'
+                        />
+                        <ChangeMapView center={position} />
+                        <LocationMarker setPosition={handleDragEnd} />
+                    </MapContainer>
+                ) : (
+                    <div className="flex items-center justify-center h-full w-full bg-gray-50/50">
+                        <Loader2 className="animate-spin text-primary" size={32} />
+                    </div>
+                )}
 
                 <button
                     type="button"

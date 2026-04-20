@@ -1,7 +1,5 @@
-// src/Layouts/PublicLayout.jsx
-
-import { useState, useEffect } from "react";
-import { Outlet } from "react-router-dom";
+import { useState, useEffect, useRef } from "react";
+import { Outlet, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import Header from "../components/common/Header";
 import Footer from "../components/common/Footer";
@@ -12,10 +10,12 @@ import { checkInitialStatus } from "../hooks/locationActions";
 
 const PublicLayout = () => {
   const dispatch = useDispatch();
+  const location = useLocation();
   const { eligibility } = useReviews();
   const [showPopup, setShowPopup] = useState(false);
-
   const { isAuthenticated } = useSelector((state) => state.auth);
+
+  const lastCheckTime = useRef(0);
 
   // 1. Initial Cart Fetch
   useEffect(() => {
@@ -24,20 +24,41 @@ const PublicLayout = () => {
     }
   }, [dispatch, isAuthenticated]);
 
-  // 2. Initial App Setup & Real-time store status check (Polls every 20 seconds)
+  // 2. Optimized Setup & Real-time store status check
   useEffect(() => {
-    const initializeApp = async () => {
-      await dispatch(checkInitialStatus(false, true));
+    const checkStatus = () => {
+      const now = Date.now();
+      if (now - lastCheckTime.current > 60000) {
+        dispatch(checkInitialStatus(true, false));
+        lastCheckTime.current = now;
+      }
     };
-    
-    initializeApp();
 
+    const navigationTimeout = setTimeout(() => {
+      checkStatus();
+    }, 2000); 
+
+    // Polling interval (3 min 20 sec)
     const interval = setInterval(() => {
-      dispatch(checkInitialStatus(true, false));
-    }, 20000);
+      if (!document.hidden) {
+        checkStatus();
+      }
+    }, 200000); 
     
-    return () => clearInterval(interval);
-  }, [dispatch]);
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        checkStatus();
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      clearTimeout(navigationTimeout);
+      clearInterval(interval);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [dispatch, location.pathname]); 
 
   // 3. Review Popup Logic
   useEffect(() => {

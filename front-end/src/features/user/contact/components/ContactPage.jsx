@@ -1,16 +1,17 @@
+import { useState } from "react";
 import { useContact } from '../hooks/useContact';
 import { Loader2, Sparkles, ArrowRight, AlertCircle } from 'lucide-react';
-import pizzaImg from '../../../../assets/pizza.png';
+import pizzaImg from '../../../../assets/pizza.webp';
 
 function ContactPage() {
   const { formData, loading, error, handleChange, handleSubmit } = useContact();
+  const [imageLoaded, setImageLoaded] = useState(false);
 
   return (
     <div className="min-h-screen bg-white flex font-sans">
       
       <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12 lg:p-24 bg-white relative">
         <div className="w-full max-w-md space-y-8">
-          
           <div className="text-left">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gray-100 text-xs font-bold uppercase tracking-wider mb-4 text-gray-600">
                <Sparkles size={14} className="text-[var(--color-primary)]" /> Contact Us
@@ -20,7 +21,6 @@ function ContactPage() {
             </h1>
           </div>
 
-          {/* Show Error at the top of the form */}
           {error && (
             <div className="bg-red-50 border-2 border-red-100 p-4 rounded-xl flex items-center gap-3 text-red-600">
               <AlertCircle size={20} />
@@ -84,26 +84,38 @@ function ContactPage() {
             <button
               type="submit"
               disabled={loading}
-
-              className="cursor-pointer w-full  py-3 sm:py-4  rounded-xl font-black text-lg flex items-center justify-center gap-3 transition-all duration-300 shadow-lg bg-black text-white hover:bg-gray-900 disabled:opacity-70"
+              className="cursor-pointer w-full py-3 sm:py-4 rounded-xl font-black text-lg flex items-center justify-center gap-3 transition-all duration-300 shadow-lg bg-black text-white hover:bg-gray-900 disabled:opacity-70"
             >
               {loading ? (
-                <>
-                  <Loader2 className="animate-spin w-5 h-5 cursor-disabled" /> Sending...
-                </>
+                <><Loader2 className="animate-spin w-5 h-5" /> Sending...</>
               ) : (
-                <>
-                  Send Message <ArrowRight className="w-5 h-5" />
-                </>
+                <>Send Message <ArrowRight className="w-5 h-5" /></>
               )}
             </button>
           </form>
         </div>
       </div>
 
-      {/* Right Side Image (Hidden on Mobile) */}
-      <div className="hidden lg:flex w-1/2 relative bg-white flex-col items-center justify-center p-12">
-        <img src={pizzaImg} alt="Pizza" className="w-full max-w-lg drop-shadow-2xl" />
+      {/* ✅ Right Side Image with Shimmer Effect */}
+      <div className="hidden lg:flex w-1/2 relative bg-white flex-col items-center justify-center p-12 overflow-hidden">
+        
+        {/* Shimmer Skeleton - Exact shape of the container */}
+        {!imageLoaded && (
+          <div className="w-full max-w-lg aspect-square relative bg-gray-100 rounded-3xl overflow-hidden animate-pulse">
+            {/* Shimmer Animation Layer */}
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent shimmer-overlay"></div>
+          </div>
+        )}
+
+        <img 
+          src={pizzaImg} 
+          alt="Pizza" 
+          loading="lazy" 
+          decoding="async" 
+          fetchPriority="low" 
+          onLoad={() => setImageLoaded(true)}
+          className={`w-full max-w-lg drop-shadow-2xl transition-all duration-700 ease-out ${imageLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-95 absolute'}`} 
+        />
       </div>
     </div>
   );

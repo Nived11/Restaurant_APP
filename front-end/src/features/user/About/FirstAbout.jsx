@@ -1,12 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ChefHat, Leaf, ShieldCheck, Award, Heart } from 'lucide-react';
 import soup from "../../../assets/soup.jpg";
 import Rice from "../../../assets/Rice.jpg";
-
 import Food from "../../../assets/Food.webp";
-
-
 
 const FirstAbout = () => {
   return (
@@ -33,17 +30,22 @@ const FirstAbout = () => {
         {/* Mobile Story */}
         <section className="px-5 pb-12">
           <div className="flex gap-2 overflow-hidden mb-8">
-            <img src={Rice} alt="Cooking" className="w-2/3 h-56 object-cover rounded-lg border border-gray-100" />
+            {/* ✅ Shimmer Image Applied */}
+            <ShimmerImage src={Rice} alt="Cooking" containerClass="w-2/3 h-56 rounded-lg border border-gray-100" />
+            
             <div className="w-1/3 flex flex-col gap-2">
-              <img src={Food} alt="Food" className="h-24 object-cover rounded-lg border border-gray-100" />
-              <div className="h-full  rounded-lg flex items-center justify-center">
-                <img src={soup} alt="Cooking" className="object-cover rounded-lg border border-gray-100" />
+              {/* ✅ Shimmer Image Applied */}
+              <ShimmerImage src={Food} alt="Food" containerClass="h-24 rounded-lg border border-gray-100" />
+              
+              <div className="h-full rounded-lg flex items-center justify-center">
+                {/* ✅ Shimmer Image Applied */}
+                <ShimmerImage src={soup} alt="Cooking" containerClass="w-full h-full rounded-lg border border-gray-100" />
               </div>
             </div>
           </div>
 
-          <h2 className="text-3x2  font-bold mb-1 text-[#1e2939]">The Secret Ingredient
-            is </h2><span className="text-[var(--color-primary)] font-bold text-1xl">Passion.</span>
+          <h2 className="text-3x2 font-bold mb-1 text-[#1e2939]">The Secret Ingredient is </h2>
+          <span className="text-[var(--color-primary)] font-bold text-1xl">Passion.</span>
           <div className="text-[#1e2939]/80 text-sm leading-7 mb-6 space-y-4">
             <p>Our journey began in a small kitchen with a big dream: to bring restaurant-quality hygiene and home-cooked love together.</p>
             <p>We don't believe in shortcuts. From hand-picking the freshest vegetables at dawn to slow-cooking our sauces, every step is a testament to our commitment to quality.</p>
@@ -66,12 +68,11 @@ const FirstAbout = () => {
           </div>
         </section>
 
-        {/* Mobile CTA - SMALLER BUTTON HERE */}
+        {/* Mobile CTA */}
         <section className="px-5 py-12 text-center">
           <h2 className="text-1xl font-bold mb-6 text-[#1e2939]">Taste the difference today</h2>
           <Link
             to="/menu"
-            // Changed: w-fit, px-6, py-2.5, text-sm to make it smaller
             className="inline-block bg-[#1e2939] text-white font-bold py-2 px-4 rounded-full shadow-lg active:scale-95 transition-transform text-sm w-fit"
           >
             Explore Full Menu
@@ -103,8 +104,9 @@ const FirstAbout = () => {
           <div className="flex flex-col gap-10">
             <div className="relative">
               <div className="grid grid-cols-2 gap-4">
-                <img src={soup} alt="Chefs" className="rounded-2xl h-56 w-full object-cover shadow-md" />
-                <img src={Rice}  alt="Ingredients" className="rounded-2xl h-56 w-full object-cover shadow-md mt-6" />
+                {/* ✅ Shimmer Image Applied */}
+                <ShimmerImage src={soup} alt="Chefs" containerClass="rounded-2xl h-56 w-full shadow-md" />
+                <ShimmerImage src={Rice} alt="Ingredients" containerClass="rounded-2xl h-56 w-full shadow-md mt-6" />
               </div>
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white p-3 rounded-full shadow-lg">
                 <Heart className="w-6 h-6 text-red-500 fill-current" />
@@ -177,8 +179,9 @@ const FirstAbout = () => {
           <div className="grid grid-cols-2 gap-20 items-center">
             <div className="relative">
               <div className="grid grid-cols-2 gap-4">
-                <img src={soup} alt="Chefs" className="rounded-2xl h-64 w-full object-cover shadow-lg hover:scale-105 transition-transform duration-500" />
-                <img src={Rice} alt="Ingredients" className="rounded-2xl h-64 w-full object-cover shadow-lg mt-8 hover:scale-105 transition-transform duration-500" />
+                {/* ✅ Shimmer Image Applied */}
+                <ShimmerImage src={soup} alt="Chefs" containerClass="rounded-2xl h-64 w-full shadow-lg hover:scale-105 transition-transform duration-500" />
+                <ShimmerImage src={Rice} alt="Ingredients" containerClass="rounded-2xl h-64 w-full shadow-lg mt-8 hover:scale-105 transition-transform duration-500" />
               </div>
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white p-4 rounded-full shadow-xl">
                 <Heart className="w-8 h-8 text-red-500 fill-current" />
@@ -234,6 +237,29 @@ const FirstAbout = () => {
 
 // --- SUB COMPONENTS ---
 
+const ShimmerImage = ({ src, alt, containerClass }) => {
+  const [isLoaded, setIsLoaded] = useState(false);
+  
+  return (
+    <div className={`relative overflow-hidden bg-gray-100 ${containerClass}`}>
+      {!isLoaded && (
+        <div className="absolute inset-0 animate-pulse z-0">
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent shimmer-overlay"></div>
+        </div>
+      )}
+      <img
+        src={src}
+        alt={alt}
+        loading="lazy"
+        decoding="async"
+        fetchPriority="low"
+        onLoad={() => setIsLoaded(true)}
+        className={`w-full h-full object-cover transition-opacity duration-700 ease-out z-10 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}
+      />
+    </div>
+  );
+};
+
 const MobileFeatureRow = ({ icon, title, desc }) => (
   <div className="flex items-center gap-4 bg-white p-4 rounded-xl border border-gray-100">
     <div className="w-10 h-10 bg-[var(--color-primary)]/10 text-[var(--color-primary)] rounded-lg flex items-center justify-center shrink-0">
@@ -256,4 +282,4 @@ const DesktopFeatureCard = ({ icon, title, desc }) => (
   </div>
 );
 
-export default FirstAbout
+export default FirstAbout;
