@@ -49,10 +49,10 @@ const SiteLaunchLoader = () => {
           <motion.div
             className="absolute top-0 left-0 h-full bg-primary"
             initial={{ width: "0%" }}
-            animate={{ width: "100%" }}
+            animate={{ width: ["0%", "70%", "85%", "100%"] }}
             transition={{ 
-              duration: 2, 
-              repeat: Infinity, 
+              duration: 3, 
+              times: [0, 0.4, 0.8, 1], 
               ease: "easeInOut" 
             }}
           />

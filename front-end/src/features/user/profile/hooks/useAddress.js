@@ -47,16 +47,16 @@ export const useAddress = () => {
           setIsLocating(false);
           switch(error.code) {
             case error.PERMISSION_DENIED:
-              toast.warning("Location access denied. Please enable it.");
+              toast.warning("Access denied. Search manually.");
               break;
             case error.POSITION_UNAVAILABLE:
-              toast.warning("Please enable your location ");
+              toast.warning("Location off. Please turn on GPS.");
               break;
             case error.TIMEOUT:
-              toast.error("Location request timed out. Please try again.");
+              toast.error("Timeout. Please search manually");
               break;
             default:
-              toast.error("An unknown error occurred while getting location.");
+              toast.error("Location error. Search manually.");
               break;
           }
           reject(error);

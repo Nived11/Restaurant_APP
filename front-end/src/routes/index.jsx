@@ -40,7 +40,7 @@ const AppRoutes = () => {
   const { isAuthenticated, user, isLoading } = useSelector((state) => state.auth);
 
   if (isLoading) {
-      return null; 
+    return <PageLoader />;
   }
 
   const isAdminOrStaff = isAuthenticated && (user?.role === "admin" || user?.role === "staff");
@@ -49,7 +49,7 @@ const AppRoutes = () => {
 
   return (
     // 3. SUSPENSE WRAPPER
-    <Suspense fallback={<PageLoader />}>
+    <Suspense fallback={null}>
       <Routes>
         {/* -----------------------------------------------------------
              1. AUTH ROUTES 

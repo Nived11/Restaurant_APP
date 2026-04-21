@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { BrowserRouter } from "react-router-dom";
 import AppRoutes from "./routes";
 import ScrollToTop from "./hooks/ScrollToTop";
@@ -18,11 +18,18 @@ const queryClient = new QueryClient();
 
 const AppContent = () => {
   const dispatch = useDispatch();
-  const { isChecking, globalError } = useSelector((state) => state.location);
-  const { user, isLoading: isAuthLoading } = useSelector((state) => state.auth); 
+  const { globalError } = useSelector((state) => state.location);
+  const { user } = useSelector((state) => state.auth); 
   const currentPath = window.location.pathname;
   const isAdminPath = currentPath.startsWith("/admin");
   const isAuthPath = currentPath === "/login" || currentPath === "/signup";
+
+  const [isSplashVisible, setIsSplashVisible] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setIsSplashVisible(false), 3000);
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     const verifySession = async () => {
@@ -52,7 +59,7 @@ const AppContent = () => {
     verifySession();
   }, [dispatch, currentPath]);
 
-  const showLoader = (isChecking || isAuthLoading) && !isAdminPath && !isAuthPath && !globalError;
+  const showLoader = isSplashVisible && !isAdminPath && !isAuthPath && !globalError;
 
   useFCM(isAdminPath, user);
 
@@ -67,7 +74,12 @@ const AppContent = () => {
       </AnimatePresence>
       <ScrollToTop />
       <Toaster position="top-center" />
-      <div style={{ visibility: showLoader ? "hidden" : "visible" }}>
+      
+      <div style={{ 
+        visibility: showLoader ? "hidden" : "visible",
+        height: showLoader ? "100vh" : "auto",
+        overflow: showLoader ? "hidden" : "visible"
+      }}>
         <ErrorBoundary>
           <AppRoutes />
         </ErrorBoundary>

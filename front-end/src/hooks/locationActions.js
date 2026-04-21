@@ -1,4 +1,3 @@
-// locationActions.js
 import { setLocation, setChecking, setErrorPopup, setGlobalError } from '../redux/locationSlice'; 
 import { fetchLocationDetails } from '../utils/addressHelper';
 import api from '../api/axios'; 
@@ -99,7 +98,7 @@ export const handleLocationUpdate = (lat, lng, isBackground = false) => async (d
 
         if (!isDeliverable) {
             if (!isBackground) {
-                dispatch(setErrorPopup(`Delivery is not available in your area.`));
+                dispatch(setErrorPopup(`We're sorry! We don't deliver to this location yet.`));
             }
             return false; 
         }

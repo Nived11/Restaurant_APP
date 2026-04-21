@@ -94,7 +94,7 @@ const ProductModal = ({ item, onClose }) => {
 
       dispatch(addToCart(cartPayload));
       
-     if (isAuthenticated) {
+      if (isAuthenticated) {
         dispatch(syncCartUpdate({ 
           itemId: item.id, 
           variantId: hasVariants ? selectedVariant.id : null,
@@ -124,16 +124,15 @@ const ProductModal = ({ item, onClose }) => {
     discountPercent = Math.round(((actualPrice - offerPrice) / actualPrice) * 100);
   }
 
-  // MODIFIED: Simplified and optimized animation for mobile GPUs
   const modalVariants = {
     initial: isMobile ? { y: "100%" } : { y: 20, opacity: 0 },
     animate: {
       y: 0,
       opacity: 1,
       transition: { 
-        type: "tween", // Changed from 'spring' to 'tween' for better mobile performance
+        type: "tween", 
         ease: "easeOut", 
-        duration: 0.25 // Faster animation
+        duration: 0.25 
       }
     },
     exit: {
@@ -169,7 +168,6 @@ const ProductModal = ({ item, onClose }) => {
         onDragEnd={(e, { offset, velocity }) => {
           if (offset.y > 100 || velocity.y > 400) onClose();
         }}
-        // MODIFIED: Added `will-change-transform` for better GPU rendering
         className="relative bg-white w-full md:max-w-5xl rounded-t-[2.5rem] md:rounded-[2.5rem] shadow-2xl flex flex-col md:flex-row overflow-hidden h-auto max-h-[95vh] md:max-h-[85vh] z-10 mt-auto md:my-auto will-change-transform"
         onClick={(e) => e.stopPropagation()}
       >
@@ -235,7 +233,7 @@ const ProductModal = ({ item, onClose }) => {
               </div>
             </div>
 
-            {/* Variants Selection (MODIFIED TO FORCE 3 COLUMNS ON ALL SCREENS) */}
+            {/* Variants Selection */}
             {hasVariants && (
               <div className="mt-3 sm:mt-0 space-y-2 pb-2 shrink-0">
                 <div className="flex items-center justify-between">
@@ -255,7 +253,7 @@ const ProductModal = ({ item, onClose }) => {
                    <span className="text-[7px] font-bold text-slate-600 bg-slate-50 px-1.5 py-0.5 rounded uppercase border border-slate-100">Required</span>
                 </div>
                 
-                {/* 3 COLUMNS GRID - Adjusted padding and text size for mobile */}
+                {/* 3 COLUMNS GRID */}
                 <div className="grid grid-cols-3 gap-1.5 sm:gap-2 md:gap-3 mt-1">
                   {item.variants.map((variant) => {
                     const isSelected = selectedVariant?.id === variant.id;
@@ -386,15 +384,16 @@ const ProductModal = ({ item, onClose }) => {
                 )}
               </>
             ) : (
-              // Out of Stock Warning Logic with Variant Check
               <div className="space-y-2.5 md:space-y-4">
-                <div className="flex items-start md:items-center gap-2 md:gap-3 bg-red-50 border border-red-100 p-2 md:p-4 rounded-xl">
+                <div className="flex items-start md:items-center  gap-2 md:gap-3 bg-red-50 border border-red-100 p-2 md:p-4 rounded-xl">
                   <AlertCircle className="text-red-500 shrink-0 mt-0.5 md:mt-0" size={14} md:size={20} />
-                  <p className="text-red-600 font-bold text-[9px] md:text-xs leading-tight">
+                  <p className="text-red-600 font-bold text-[9px] md:text-xs mt-0.5 md:mt-0 leading-tight">
                     {availableStock === 0 ? (
                       hasVariants 
-                        ? `The selected variant is out of stock Please select another one.`
+                        ? `The selected variant is out of stock. Please select another one.`
                         : "Sold Out! This item is currently out of stock."
+                    ) : maxAvailableToAdd <= 0 ? (
+                      "You have reached the maximum quantity limit for this item."
                     ) : (
                       `Hurry! Only ${maxAvailableToAdd} left in your limit.`
                     )}

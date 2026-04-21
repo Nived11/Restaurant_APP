@@ -3,9 +3,11 @@ import { useSelector, useDispatch } from "react-redux";
 import { useState, useEffect, useRef, useMemo } from "react";
 import { motion, AnimatePresence, useScroll, useMotionValueEvent, LayoutGroup } from "framer-motion";
 import { RiRestaurantLine, RiUserFill, RiStore2Line } from "react-icons/ri";
-import { X, MapPin } from "lucide-react";
+import { X } from "lucide-react";
 
 import Logo from "../../assets/Logo-web.png";
+import mapicon from "../../assets/mapicon.webp"; 
+import shopicon from "../../assets/shop.webp";
 import ReserveTable from "./ReserveTable.jsx";
 import SearchBar from "./SearchBar.jsx";
 import ProductModal from "./ProductModal.jsx";
@@ -21,9 +23,9 @@ import { MobileNav, DesktopNav } from "./Navbar.jsx";
 import CartBadge from "./CartBadge.jsx";
 
 const modalVariants = {
-  initial: { y: "100%", opacity: 0.5 },
-  animate: { y: 0, opacity: 1, transition: { type: "spring", damping: 25, stiffness: 280, mass: 0.5 } },
-  exit: { y: "100%", opacity: 0, transition: { duration: 0.2, ease: "easeIn" } }
+  initial: { y: "100%", opacity: 0 },
+  animate: { y: 0, opacity: 1, transition: { type: "tween", ease: "easeOut", duration: 0.3 } },
+  exit: { y: "100%", opacity: 0, transition: { type: "tween", ease: "easeIn", duration: 0.2 } }
 };
 
 const Header = () => {
@@ -38,7 +40,6 @@ const Header = () => {
   const storedName = localStorage.getItem('user_name');
   const dispatch = useDispatch();
 
-  // കാർട്ട് കൗണ്ടും useLocation ഉം ഇവിടെ നിന്നും ഒഴിവാക്കി, കാരണം അത് Navbar-ലും CartBadge-ലും നേരിട്ട് എടുക്കുന്നുണ്ട്
   const { currentLocation, errorPopup, isOpen } = useSelector((state) => state.location);
   
   const searchRef = useRef(null);
@@ -101,7 +102,7 @@ const Header = () => {
           .catch((err) => {
             setShowLocationPicker(true);
           });
-      }, 3000); 
+      }, 6000); 
     }
     return () => {
       if (timeoutId) clearTimeout(timeoutId);
@@ -128,7 +129,6 @@ const Header = () => {
           <Location variant="mobile" address={currentLocation.address} onClick={() => setShowLocationPicker(true)} />
         </motion.div>
 
-        {/* Extracted Mobile Nav Component */}
         <MobileNav setIsReserveOpen={setIsReserveOpen} />
       </div>
 
@@ -143,7 +143,6 @@ const Header = () => {
               {!searchOpen && <Location variant="desktop" address={currentLocation.address} onClick={() => setShowLocationPicker(true)} />}
             </div>
 
-            {/* Extracted Desktop Nav Component */}
             <DesktopNav searchOpen={searchOpen} />
 
             <div className="flex items-center gap-1 md:gap-3 lg:gap-6 shrink-0 relative">
@@ -154,10 +153,7 @@ const Header = () => {
                 />
               </div>
               <div className="flex items-center gap-1 md:gap-3 lg:gap-6">
-                
-                {/* 🛒 New Extracted Cart Badge Component */}
                 <CartBadge />
-
                 <Link to="/profile" className="p-2 bg-primary border border-accent/30 shadow-md hover:bg-primary/90 rounded-full text-gray-700 flex items-center justify-center">
                   {storedName ? (
                     <div className="w-[28px] h-[28px] flex items-center justify-center text-black/80 font-black text-[18px] uppercase leading-none">
@@ -179,20 +175,20 @@ const Header = () => {
       {/* --- Modals and Popups --- */}
       <AnimatePresence>
         {errorPopup && (
-          <div className="fixed inset-0 z-[2000] flex items-center justify-center p-4">
+          <div className="fixed inset-0 z-[3000] flex items-center justify-center p-4">
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => dispatch(clearError())} className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
             <motion.div initial={{ scale: 0.9, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.9, opacity: 0, y: 20 }} className="relative bg-white w-full max-w-[400px] rounded-[1rem] overflow-hidden shadow-2xl px-8 py-8 flex flex-col items-center">
-              <div className="relative mb-6">
-                <motion.div animate={{ scale: [1, 1.1, 1] }} transition={{ repeat: Infinity, duration: 2 }} className="absolute inset-0 bg-primary/10 rounded-full scale-150 blur-sm" />
-                <div className="relative bg-primary p-4 rounded-full shadow-lg shadow-primary/40">
-                  {isStoreClosedError() ? <RiStore2Line size={32} className="text-white" /> : <MapPin size={32} className="text-white" />}
+              <div className="relative mb-4">
+                <motion.div animate={{ scale: [1, 1.1, 1] }} transition={{ repeat: Infinity, duration: 2 }} className="absolute inset-0  scale-150 " />
+                <div className="relative ">
+                  {isStoreClosedError() ? <img src={shopicon} className="w-20 h-20 "/> : <img src={mapicon} className="w-20 h-20" />}
                 </div>
               </div>
               <h3 className="text-xl font-black text-gray-900 mb-2 text-center uppercase tracking-tight">
                 {isStoreClosedError() ? "Store Closed !" : "Out of Range !"}
               </h3>
               <p className="text-gray-600 font-semibold text-sm leading-relaxed mb-8 text-center px-2">{getErrorMessage()}</p>
-              <button onClick={() => { const closed = isStoreClosedError(); dispatch(clearError()); if (!closed) setShowLocationPicker(true); }} className="cursor-pointer w-full py-4 bg-black hover:bg-gray-900 text-white text-sm rounded-2xl font-bold transition-all active:scale-95 flex items-center justify-center gap-2 shadow-xl"> OK</button>
+              <button onClick={() => { const closed = isStoreClosedError(); dispatch(clearError()); if (!closed) setShowLocationPicker(true); }} className="cursor-pointer w-full py-4 bg-black hover:bg-gray-900 text-white text-sm rounded-xl font-bold transition-all active:scale-95 flex items-center justify-center gap-2 shadow-xl"> OK</button>
             </motion.div>
           </div>
         )}
@@ -202,11 +198,11 @@ const Header = () => {
         {showLocationPicker && (
           <div className="fixed inset-0 z-[2000] flex items-end md:items-center justify-center p-0 md:p-4 overflow-hidden">
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setShowLocationPicker(false)} className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
-            <motion.div variants={modalVariants} initial="initial" animate="animate" exit="exit" drag={isMobile ? "y" : false} dragConstraints={{ top: 0 }} dragElastic={0.1} onDragEnd={(e, { offset, velocity }) => { if (offset.y > 100 || velocity.y > 500) setShowLocationPicker(false); }} className="relative bg-white w-full max-w-2xl rounded-t-[2.5rem] md:rounded-[2.5rem] shadow-2xl flex flex-col h-[90vh] md:h-[80vh] overflow-hidden" onClick={(e) => e.stopPropagation()}>
+            <motion.div variants={modalVariants} initial="initial" animate="animate" exit="exit" drag={isMobile ? "y" : false} dragConstraints={{ top: 0 }} dragElastic={0.1} onDragEnd={(e, { offset, velocity }) => { if (offset.y > 100 || velocity.y > 500) setShowLocationPicker(false); }} className="relative bg-white w-full max-w-2xl rounded-t-[2.5rem] md:rounded-[2.5rem] shadow-2xl flex flex-col h-[86vh] md:h-[80vh] overflow-hidden" onClick={(e) => e.stopPropagation()}>
               <div className="md:hidden flex justify-center pt-3 shrink-0"><div className="w-12 h-1 bg-gray-200 rounded-full" /></div>
               <div className="flex justify-between items-center p-6 border-b bg-white shrink-0">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 bg-primary rounded-xl"><MapPin size={20} className="text-black" /></div>
+                  <div className="p-2 bg-gray-100 rounded-full "><img src={mapicon} className="w-6 h-6 object-contain" /></div>
                   <div>
                     <h4 className="font-black text-[14px] uppercase tracking-tighter text-gray-900 leading-none">Select Delivery Location</h4>
                     <p className="text-[9px] font-bold text-gray-500 uppercase tracking-widest mt-1">Pin your exact location on map</p>
@@ -215,14 +211,24 @@ const Header = () => {
                 <button onClick={() => setShowLocationPicker(false)} className="p-2 bg-gray-100 hover:bg-gray-200 rounded-full transition-colors cursor-pointer"><X size={20} className="text-gray-600" /></button>
               </div>
               <div className="flex-1 relative bg-gray-50 overflow-hidden">
-                <LocationPicker initialPos={currentLocation.lat ? { lat: currentLocation.lat, lng: currentLocation.lng } : null} onConfirm={async (data) => { const result = await dispatch(handleLocationUpdate(data.lat, data.lng)); if (result !== "CLOSED") setShowLocationPicker(false); }} getCurrentLocation={getCurrentLocation} isLocating={isLocating} />
+                <LocationPicker 
+                  initialPos={currentLocation.lat ? { lat: currentLocation.lat, lng: currentLocation.lng } : null} 
+                  onConfirm={async (data) => { 
+                    const result = await dispatch(handleLocationUpdate(data.lat, data.lng)); 
+                    if (result === true || result === "CLOSED") {
+                      setShowLocationPicker(false);
+                    }
+                  }} 
+                  getCurrentLocation={getCurrentLocation} 
+                  isLocating={isLocating} 
+                />
               </div>
             </motion.div>
           </div>
         )}
       </AnimatePresence>
 
-      {/* --- Reserve Table Floating Button --- */}
+      {/* --- Reserve Table --- */}
       <div className="hidden md:block fixed bottom-6 right-6 lg:bottom-10 lg:right-10 z-[100]">
         <motion.button 
           onTap={() => setIsReserveOpen(true)} 

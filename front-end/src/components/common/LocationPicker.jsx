@@ -39,12 +39,13 @@ const LocationPicker = ({ initialPos, onConfirm, isLocating, getCurrentLocation 
     } = useLocationPicker(initialPos);
 
     const [searchQuery, setSearchQuery] = useState("");
-    // ✅ അനിമേഷൻ ലാഗ് ഒഴിവാക്കാനുള്ള സ്റ്റേറ്റ്
+    
+    // 🚀 അനിമേഷൻ ലാഗ് ഒഴിവാക്കാനുള്ള സ്റ്റേറ്റ്
     const [isAnimationComplete, setIsAnimationComplete] = useState(false);
 
-    // ✅ മോഡൽ അനിമേഷൻ കഴിഞ്ഞ് മാത്രം മാപ്പ് ലോഡ് ചെയ്യാൻ 400ms ഡിലേ കൊടുക്കുന്നു
+    // 🚀 അനിമേഷൻ (300ms) തീരുന്ന സമയത്ത് കറക്റ്റ് ആയി മാപ്പ് റെൻഡർ ചെയ്യും
     useEffect(() => {
-        const timer = setTimeout(() => setIsAnimationComplete(true), 400); 
+        const timer = setTimeout(() => setIsAnimationComplete(true), 300); 
         return () => clearTimeout(timer);
     }, []);
 
@@ -65,7 +66,6 @@ const LocationPicker = ({ initialPos, onConfirm, isLocating, getCurrentLocation 
         setSearchQuery("");
     };
 
-    // ✅ മാപ്പ് വലിക്കുമ്പോൾ (Drag) ഉണ്ടാകുന്ന ലാഗ് ഒഴിവാക്കാൻ useCallback ചേർത്തു
     const handleDragEnd = useCallback((newPos) => {
         updatePosition(newPos);
     }, [updatePosition]);
@@ -114,13 +114,12 @@ const LocationPicker = ({ initialPos, onConfirm, isLocating, getCurrentLocation 
 
             {/* Map Section */}
             <div className="relative flex-1">
-                {/* ✅ ഡിലേ കഴിഞ്ഞാൽ മാത്രം മാപ്പ് കാണിക്കും, അല്ലെങ്കിൽ സ്പിന്നർ കാണിക്കും */}
                 {isAnimationComplete ? (
                     <MapContainer center={position} zoom={15} className="h-full w-full" zoomControl={false} attributionControl={false}>
                         <TileLayer
                             url="http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}"
                             subdomains={['mt0', 'mt1', 'mt2', 'mt3']}
-                            attribution='© <a href="https://www.google.com/maps">Google Maps</a>'
+                            attribution='© Google Maps'
                         />
                         <ChangeMapView center={position} />
                         <LocationMarker setPosition={handleDragEnd} />
