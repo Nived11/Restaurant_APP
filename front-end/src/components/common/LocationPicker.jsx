@@ -40,10 +40,8 @@ const LocationPicker = ({ initialPos, onConfirm, isLocating, getCurrentLocation 
 
     const [searchQuery, setSearchQuery] = useState("");
     
-    // 🚀 അനിമേഷൻ ലാഗ് ഒഴിവാക്കാനുള്ള സ്റ്റേറ്റ്
     const [isAnimationComplete, setIsAnimationComplete] = useState(false);
 
-    // 🚀 അനിമേഷൻ (300ms) തീരുന്ന സമയത്ത് കറക്റ്റ് ആയി മാപ്പ് റെൻഡർ ചെയ്യും
     useEffect(() => {
         const timer = setTimeout(() => setIsAnimationComplete(true), 300); 
         return () => clearTimeout(timer);

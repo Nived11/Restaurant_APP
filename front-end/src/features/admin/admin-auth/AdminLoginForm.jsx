@@ -1,6 +1,6 @@
 import React from 'react';
 import { Lock, User, Loader2, ShieldCheck, ArrowRight, Eye, EyeOff, Activity, ShoppingCart, AlertCircle } from 'lucide-react';
-import Logo from "../../../assets/Logocrunch.png";
+import Logo from "../../../assets/Logocrunch.webp";
 import { useAdminLogin } from './useAdminLogin';
 
 const AdminLoginForm = () => {

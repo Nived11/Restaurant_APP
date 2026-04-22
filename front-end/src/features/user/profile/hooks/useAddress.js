@@ -107,6 +107,7 @@ export const useAddress = () => {
     updateAddress: updateAddress.mutateAsync,
     deleteAddress: deleteAddress.mutateAsync,
     isAdding: addAddress.isPending,
+    isDeleting: deleteAddress.isPending,
   };
 };
 

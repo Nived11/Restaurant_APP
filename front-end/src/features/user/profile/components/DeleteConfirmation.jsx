@@ -20,7 +20,6 @@ const DeleteConfirmation = ({ isOpen, onClose, onConfirm, isLoading, error }) =>
             exit={{ scale: 0.9, opacity: 0 }}
             className="relative bg-white w-full max-w-md rounded-xl p-8 md:p-10 shadow-2xl text-center"
           >
-            {/* എറർ ഉണ്ടെങ്കിൽ ഐക്കൺ മാറ്റുന്നു */}
             <div className={`w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 ${error ? 'bg-orange-50 text-orange-500' : 'bg-red-50 text-red-500'}`}>
               {error ? (
                 <XCircle size={40} />
@@ -33,7 +32,6 @@ const DeleteConfirmation = ({ isOpen, onClose, onConfirm, isLoading, error }) =>
              Delete Address?
             </h3>
 
-            {/* എറർ മെസ്സേജ് കാണിക്കുന്നു */}
             {error ? (
               <p className="text-[11px] font-bold text-red-500 bg-red-50 p-3 rounded-lg uppercase tracking-tight mb-8">
                 {error}
@@ -46,7 +44,7 @@ const DeleteConfirmation = ({ isOpen, onClose, onConfirm, isLoading, error }) =>
             
             <div className="flex gap-3">
               <button 
-                disabled={isLoading} // ലോഡിംഗ് സമയത്ത് ബട്ടൺ പ്രവർത്തിക്കില്ല
+                disabled={isLoading}
                 onClick={onClose} 
                 className="flex-1 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest text-gray-800 bg-gray-200 hover:bg-gray-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
@@ -55,7 +53,7 @@ const DeleteConfirmation = ({ isOpen, onClose, onConfirm, isLoading, error }) =>
               
               {!error && (
                 <button 
-                  disabled={isLoading} // ലോഡിംഗ് സമയത്ത് ബട്ടൺ പ്രവർത്തിക്കില്ല
+                  disabled={isLoading}
                   onClick={onConfirm} 
                   className="flex-1 py-4 bg-red-500 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-lg shadow-red-200 hover:bg-red-600 transition-all flex items-center justify-center gap-2 disabled:opacity-80 disabled:cursor-not-allowed"
                 >
@@ -70,13 +68,20 @@ const DeleteConfirmation = ({ isOpen, onClose, onConfirm, isLoading, error }) =>
                 </button>
               )}
               
-              {/* എറർ വന്നാൽ വീണ്ടും ശ്രമിക്കാൻ ഒരു ബട്ടൺ കൂടി വേണമെങ്കിൽ */}
               {error && (
                 <button 
+                  disabled={isLoading} // 🚀 FIX: Try Again ബട്ടണിലും ലോഡിങ് കണ്ടീഷൻ കൊടുത്തു
                   onClick={onConfirm} 
-                  className="flex-1 py-4 bg-gray-800 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-black transition-colors"
+                  className="flex-1 py-4 bg-gray-800 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-black transition-colors disabled:opacity-80 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
-                  Try Again
+                  {isLoading ? (
+                    <>
+                      <Loader2 size={14} className="animate-spin" />
+                      Deleting
+                    </>
+                  ) : (
+                    "Try Again"
+                  )}
                 </button>
               )}
             </div>

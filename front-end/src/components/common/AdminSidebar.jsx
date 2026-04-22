@@ -4,8 +4,8 @@ import {
   Star, Users, DollarSign, LogOut, Mail, 
   ChevronLeft, ChevronRight, X ,BookIcon,Settings,Loader2
 } from "lucide-react";
-import logoWeb from "../../assets/Logo-web.png";
-import logoCrunch from "../../assets/Logocrunch.png";
+import logoWeb from "../../assets/Logo-web.webp";
+import logoCrunch from "../../assets/Logocrunch.webp";
 import { useAdminLogout } from "../../hooks/useAdminLogout";
 
 

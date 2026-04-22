@@ -27,10 +27,12 @@ export const useMenu = () => {
         throw new Error(extractErrorMessages(err));
       }
     },
-    staleTime: 0,
+    staleTime: 1000 * 60 * 2, // 2 minute 
+    refetchOnMount: true,
+    refetchOnWindowFocus: false,
   });
 
-  // 2. Fetch ALL Menu Items 
+  // 2. Fetch ALL Menu Items (Master list for internal use)
   const { data: allItems = [] } = useQuery({
     queryKey: ["allMenuItemsMaster"],
     queryFn: async () => {
@@ -41,7 +43,9 @@ export const useMenu = () => {
         return [];
       }
     },
-    staleTime: 0,
+    staleTime: 1000 * 60, // 1 minute
+    refetchOnMount: true,
+    refetchOnWindowFocus: false,
   });
 
   // 3. Fetch Filtered Menu Items 
@@ -50,11 +54,8 @@ export const useMenu = () => {
     queryFn: async () => {
       try {
         let params = new URLSearchParams();
-
         if (searchQueryURL) params.append('search', searchQueryURL);
-        
         if (activeCategoryId !== 'All') params.append('category', activeCategoryId);
-
         if (filterType !== 'All') params.append('diet', filterType.toUpperCase());
 
         const res = await api.get(`/inventory/public/menu-items/`, { params });
@@ -63,6 +64,8 @@ export const useMenu = () => {
         throw new Error(extractErrorMessages(err));
       }
     },
+    staleTime: 1000 * 60, // 1 minute
+    keepPreviousData: true, 
   });
 
   const categories = [{ id: 'All', name: 'All' }, ...(categoriesData || [])];

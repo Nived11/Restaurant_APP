@@ -17,6 +17,7 @@ export const useReviews = () => {
       return response.data;
     },
     enabled: isAuthenticated,
+    staleTime: 1000 * 60 * 5, 
   });
 
   // 2. Fetch Reviews List
@@ -27,6 +28,8 @@ export const useReviews = () => {
       return Array.isArray(response.data) ? response.data : [];
     },
     enabled: isAuthenticated, 
+    staleTime: 1000 * 60,
+    refetchOnMount: true,
   });
 
   // 3. Create Review Mutation
@@ -39,6 +42,7 @@ export const useReviews = () => {
       toast.success("Review submitted for approval!");
       queryClient.invalidateQueries(['user-reviews']);
       queryClient.invalidateQueries(['review-eligibility']);
+      queryClient.invalidateQueries(['homeData']);
     },
     onError: (err) => {
       toast.error(extractErrorMessages(err));

@@ -5,7 +5,7 @@ import { motion, AnimatePresence, useScroll, useMotionValueEvent, LayoutGroup } 
 import { RiRestaurantLine, RiUserFill, RiStore2Line } from "react-icons/ri";
 import { X } from "lucide-react";
 
-import Logo from "../../assets/Logo-web.png";
+import Logo from "../../assets/Logo-web.webp";
 import mapicon from "../../assets/mapicon.webp"; 
 import shopicon from "../../assets/shop.webp";
 import ReserveTable from "./ReserveTable.jsx";
@@ -117,7 +117,7 @@ const Header = () => {
       {/* --- Mobile Header --- */}
       <div className="rounded-b-2xl md:hidden sticky top-0 z-[100] transition-all duration-300" style={{ background: "linear-gradient(180deg, #f9a602 0%, #fffbeb 60%, #ffffff 100%)" }}>
         <div className="flex justify-center pt-0">
-          <Link to="/"><img src={Logo} alt="Logo" className="h-20 w-50 object-contain" /></Link>
+          <Link to="/"><img src={Logo} loading="eager" alt="Logo" className="h-20 w-50 object-contain" /></Link>
         </div>
         <div className="px-5 pb-4">
           <SearchBar
@@ -181,7 +181,7 @@ const Header = () => {
               <div className="relative mb-4">
                 <motion.div animate={{ scale: [1, 1.1, 1] }} transition={{ repeat: Infinity, duration: 2 }} className="absolute inset-0  scale-150 " />
                 <div className="relative ">
-                  {isStoreClosedError() ? <img src={shopicon} className="w-20 h-20 "/> : <img src={mapicon} className="w-20 h-20" />}
+                  {isStoreClosedError() ? <img src={shopicon} alt="shopicon" className="w-20 h-20 "/> : <img src={mapicon} alt="mapicon" className="w-20 h-20" />}
                 </div>
               </div>
               <h3 className="text-xl font-black text-gray-900 mb-2 text-center uppercase tracking-tight">
@@ -202,7 +202,7 @@ const Header = () => {
               <div className="md:hidden flex justify-center pt-3 shrink-0"><div className="w-12 h-1 bg-gray-200 rounded-full" /></div>
               <div className="flex justify-between items-center p-6 border-b bg-white shrink-0">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 bg-gray-100 rounded-full "><img src={mapicon} className="w-6 h-6 object-contain" /></div>
+                  <div className="p-2 bg-gray-100 rounded-full "><img src={mapicon} alt="mapicon" className="w-6 h-6 object-contain" /></div>
                   <div>
                     <h4 className="font-black text-[14px] uppercase tracking-tighter text-gray-900 leading-none">Select Delivery Location</h4>
                     <p className="text-[9px] font-bold text-gray-500 uppercase tracking-widest mt-1">Pin your exact location on map</p>

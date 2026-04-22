@@ -5,7 +5,7 @@ import { useOutletContext, Outlet } from "react-router-dom";
 import AdminSidebar from "../components/common/AdminSidebar";
 import AdminHeader from "../components/common/AdminHeader";
 import { Menu } from "lucide-react";
-import logoCrunch from "../assets/Logocrunch.png";
+import logoCrunch from "../assets/Logocrunch.webp";
 import ShopStatus from "../components/common/ShopStatus";
 import NotificationBadge from "../components/common/NotificationBadge";
 import { useSettings } from "../features/admin/settings/hooks/useSettings";

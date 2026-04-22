@@ -58,7 +58,6 @@ const OrderHistory = () => {
       <div className="grid gap-4">
         {orders.map((order) => {
           const isPending = order.order_status === "PLACED" || order.order_status === "PENDING";
-          const isPaid = order.payment_status === "COMPLETED" || order.payment_status === "PAID";
           const isExpanded = expandedOrder === order.id;
 
           return (
@@ -71,9 +70,11 @@ const OrderHistory = () => {
                 {/* Main Flex Container */}
                 <div className="flex justify-between items-start md:items-center">
 
-                  {/* LEFT SIDE: ID, Date, and Status (Mobile: Stacked) */}
-                  <div className="flex flex-col gap-3 md:flex-row md:items-center md:gap-10 flex-1">
-                    <div className="flex items-center gap-4">
+                  {/* LEFT SIDE: ID, Date, Status, and Address */}
+                  <div className="flex flex-col gap-3 md:flex-row md:items-center md:gap-8 lg:gap-10 flex-1 min-w-0">
+                    
+                    {/* Icon, ID & Date */}
+                    <div className="flex items-center gap-4 shrink-0">
                       <div className="bg-gray-100 p-3 rounded-2xl hidden md:block">
                         <ShoppingBag className="text-gray-600" size={24} />
                       </div>
@@ -86,18 +87,35 @@ const OrderHistory = () => {
                       </div>
                     </div>
 
-                    {/* Status Badge */}
-                    <div>
-                      <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full font-black text-[9px] uppercase tracking-wide ${order.order_status === "DELIVERED" ? "bg-green-100 text-green-600" : "bg-orange-100 text-orange-600"
-                        }`}>
-                        {order.order_status === "DELIVERED" ? <CheckCircle2 size={12} /> : <Clock size={12} />}
-                        {order.order_status}
-                      </span>
+
+                    {/* 🚀 FIX: Status Badge & Address Wrapper */}
+                    <div className="flex flex-col gap-2 md:flex-row md:items-center md:gap-6 min-w-0">
+                      {/* Status Badge */}
+                      {order.delivery_address && (
+                        <div className="flex flex-col min-w-0 md:border-l md:border-gray-200 md:pl-5">
+                          <span className="text-[8px] font-black text-gray-800 uppercase tracking-widest truncate">
+                            {order.delivery_address.address_type}
+                          </span>
+                          <span className="text-[8px] font-bold text-gray-500 truncate max-w-[200px] lg:max-w-[250px]">
+                            {order.delivery_address.complete_address}
+                          </span>
+                        </div>
+                      )}
+                      <div className="shrink-0">
+                        <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full font-black text-[9px] uppercase tracking-wide ${order.order_status === "DELIVERED" ? "bg-green-100 text-green-600" : "bg-orange-100 text-orange-600"
+                          }`}>
+                          {order.order_status === "DELIVERED" ? <CheckCircle2 size={12} /> : <Clock size={12} />}
+                          {order.order_status}
+                        </span>
+                      </div>
+
+                      {/* 🚀 FIX: Address Info (Only shows if delivery_address exists) */}
+                      
                     </div>
                   </div>
 
                   {/* RIGHT SIDE: Cancel, Total, Details (Stacked in Mobile) */}
-                  <div className="flex flex-col items-end justify-between min-h-[90px] md:min-h-0 md:gap-1">
+                  <div className="flex flex-col items-end justify-between min-h-[90px] md:min-h-0 md:gap-1 shrink-0 ml-4">
                     {/* Top: Cancel Button */}
                     <div className="h-8">
                       {isPending && (
@@ -115,14 +133,14 @@ const OrderHistory = () => {
 
                     {/* Center: Total Amount */}
                     <div className="py-1">
-                      <p className="text-lg font-black text-black tracking-tight flex flex-col md:flex-row items-end md:items-center md:gap-1">
+                      <p className="text-sm md:text-xl font-black text-black tracking-tight flex flex-col md:flex-row items-end md:items-center md:gap-1">
                         <span className="text-[8px] md:text-[9px] font-black text-gray-500 uppercase">Total</span>
                         ₹{Math.round(order.total_amount)}
                       </p>
                     </div>
 
                     {/* Bottom: Details Button */}
-                    <div className="flex items-center gap-1 text-[9px] font-black text-gray-700 uppercase tracking-widest">
+                    <div className="flex items-center gap-1 text-[8px] md:text-[10px] font-black text-gray-700 uppercase tracking-widest">
                       Details <ChevronDown size={14} className={`transition-transform duration-300 ${isExpanded ? "rotate-180" : ""}`} />
                     </div>
                   </div>
@@ -138,17 +156,16 @@ const OrderHistory = () => {
                     exit={{ height: 0, opacity: 0 }}
                     className="border-t border-gray-50 bg-gray-50/40"
                   >
-                    <div className="p-6 space-y-4">
+                    <div className="p-3 md:p-6 space-y-4">
                       {order.items.map((item, idx) => {
-                        // FIX: Display name with variant size if available
                         const displayName = item.size_name 
                           ? `${item.item_name} (${item.size_name})` 
                           : item.item_name;
 
                         return (
-                          <div key={idx} className="flex justify-between items-center bg-white p-3 rounded-2xl border border-gray-100 shadow-sm">
-                            <div className="flex items-center gap-4">
-                              <div className="w-12 h-12 bg-gray-50 rounded-xl flex-shrink-0 overflow-hidden border border-gray-100">
+                          <div key={idx} className="flex justify-between items-center bg-white p-3 rounded-xl border border-gray-100 shadow-sm">
+                            <div className="flex items-center gap-2">
+                              <div className="w-10 h-10 bg-gray-50 rounded-xl flex-shrink-0 overflow-hidden border border-gray-100">
                                 {item.image ? (
                                   <img
                                     src={item.image}
@@ -162,13 +179,13 @@ const OrderHistory = () => {
                                 )}
                               </div>
                               <div>
-                                <p className="text-xs font-black uppercase text-gray-800 leading-tight mb-1">
+                                <p className="text-[9px] md:text-xs font-black uppercase text-gray-800 leading-tight mb-1">
                                   {displayName}
                                 </p>
-                                <p className="text-[10px] font-bold text-gray-500 uppercase">Qty: {item.quantity} <span className="text-[8px]">x</span> ₹{Math.round(item.price)}</p>
+                                <p className="text-[8px] md:text-[10px] font-bold text-gray-500 uppercase">Qty: {item.quantity} <span className="text-[8px]">x</span> ₹{Math.round(item.price)}</p>
                               </div>
                             </div>
-                            <p className="text-sm font-black text-black">₹{Math.round(item.price * item.quantity)}</p>
+                            <p className="text-xs  md:text-sm font-black text-black">₹{Math.round(item.price * item.quantity)}</p>
                           </div>
                         )
                       })}
@@ -214,7 +231,6 @@ const OrderHistory = () => {
                 {/* Confirm Button - Shows loading state */}
                 <button
                   onClick={async () => {
-                    // onSuccess ലഭിക്കുന്നത് വരെ മോഡൽ ക്ലോസ് ചെയ്യില്ല
                     cancelOrder(orderToCancel, {
                       onSuccess: () => {
                         setOrderToCancel(null);

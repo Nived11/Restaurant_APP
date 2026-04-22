@@ -1,5 +1,3 @@
-// src/features/user/user-auth/hooks/useSignup.js
-
 import { useState, useEffect, useRef } from 'react';
 import { useDispatch } from 'react-redux'; 
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -16,11 +14,10 @@ export const useSignup = () => {
     const [step, setStep] = useState(1);
     const [formData, setFormData] = useState({ name: '', phone: '', email: '' });
     
-    // MODIFIED: Added state for the agreement checkbox
     const [isAgreed, setIsAgreed] = useState(false);
 
     const [otp, setOtp] = useState(['', '', '', '', '', '']);
-    const [timer, setTimer] = useState(120);
+    const [timer, setTimer] = useState(60); 
     const [canResend, setCanResend] = useState(false);
     const inputRefs = useRef([]);
     const navigate = useNavigate(); 
@@ -30,9 +27,9 @@ export const useSignup = () => {
         let interval;
         if (step === 2 && timer > 0) {
             interval = setInterval(() => setTimer((prev) => prev - 1), 1000);
-        } else if (timer === 0) {
+        } else if (timer <= 0) {
             setCanResend(true);
-            clearInterval(interval);
+            if (interval) clearInterval(interval);
         }
         return () => clearInterval(interval);
     }, [step, timer]);
@@ -76,7 +73,6 @@ export const useSignup = () => {
             return;
         }
         
-        // Validation for checkbox
         if (!isAgreed) {
             setError("Please agree to the Terms and Privacy Policy.");
             return;
@@ -92,10 +88,10 @@ export const useSignup = () => {
             if (response.data.status) {
                 toast.success("OTP Sent to your phone!");
                 setStep(2);
-                setTimer(120);
+                setTimer(response.data.resend_delay || 60);
                 setCanResend(false);
             }
-           if (response.data.otp) {
+            if (response.data.otp) {
                 toast.info(`Test OTP: ${response.data.otp}`);
             }
             
@@ -123,13 +119,15 @@ export const useSignup = () => {
             });
 
             if (response.data.status) {
+                const userName = response.data.name || formData.name;
+                const userRole = response.data.role || "user";
 
-                localStorage.setItem('user_role', response.data.role);
-                localStorage.setItem('user_name', response.data.name);
+                localStorage.setItem('user_role', userRole);
+                localStorage.setItem('user_name', userName);
 
                 dispatch(setCredentials({
-                    role: response.data.role,
-                    name: response.data.name,
+                    role: userRole,
+                    name: userName,
                     phone_number: formData.phone
                 }));
 
@@ -154,16 +152,20 @@ export const useSignup = () => {
             const response = await api.post('/auth/resend-otp/', { phone_number: formData.phone });
             if (response.data.status) {
                 toast.success("OTP Resent!");
-                setTimer(120);
+                setTimer(response.data.resend_delay || 60);
                 setCanResend(false);
                 setOtp(['', '', '', '', '', '']);
+            } else {
+                setTimer(response.data.resend_delay);
+                setCanResend(false);
+                toast.error(response.data.message);
             }
-            console.log(response.data);
+            
             if (response.data.otp) {
                 toast.info(`Test OTP: ${response.data.otp}`);
             }
         } catch (err) {
-            setError("Failed to resend OTP");
+            setError(extractErrorMessages(err));
         } finally {
             setLoading(false);
         }

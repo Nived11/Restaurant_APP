@@ -18,7 +18,6 @@ export const AddressSection = ({ selectedAddress, setSelectedAddress, onNext, on
   const dispatch = useDispatch();
   const { errorPopup } = useSelector((state) => state.location);
 
-  // CRITICAL FIX: Backend data structure issue fixed (checking for .data)
   const addressList = addresses?.data ? addresses.data : addresses;
   const safeAddresses = Array.isArray(addressList) ? addressList : [];
 
@@ -48,16 +47,17 @@ export const AddressSection = ({ selectedAddress, setSelectedAddress, onNext, on
 
   const handleFormSubmit = async (data) => {
     try {
-      let updatedAddr;
       if (editingAddress) {
-        updatedAddr = await updateAddress({ id: editingAddress.id, data });
-
+        const res = await updateAddress({ id: editingAddress.id, data });
+        const updatedAddr = res?.data?.data || res?.data || res;
+        
         if (selectedAddress?.id === editingAddress.id) {
           setSelectedAddress(updatedAddr);
         }
       } else {
-        updatedAddr = await addAddress(data);
-        setSelectedAddress(updatedAddr);
+        const res = await addAddress(data);
+        const newAddr = res?.data?.data || res?.data || res;
+        setSelectedAddress(newAddr);
       }
       setShowForm(false);
     } catch (err) {
@@ -131,19 +131,18 @@ export const AddressSection = ({ selectedAddress, setSelectedAddress, onNext, on
             <div className="p-16 border-2 border-dashed border-gray-100 rounded-[2.5rem] text-center">
               <MapPin className="mx-auto text-gray-300 mb-4" size={40} />
               <p className="font-black text-gray-500 uppercase tracking-widest text-xs">No addresses saved</p>
-              <button onClick={handleAddNew} className="mt-4 text-[10px] font-black uppercase text-[#f9a602]">Add one now</button>
+              <button onClick={handleAddNew} className="cursor-pointer mt-4 text-[10px] font-black uppercase text-[#f9a602]">Add one now</button>
             </div>
           ) : (
             safeAddresses.map((addr) => (
               <div
                 key={addr.id}
                 onClick={() => setSelectedAddress(addr)}
-                className={`p-5 md:p-8 rounded-[1.8rem] md:rounded-[2.5rem] border-2 cursor-pointer transition-all duration-300 group relative overflow-hidden min-h-[140px] md:min-h-[160px] flex flex-col justify-center ${selectedAddress?.id === addr.id
+                className={`p-5 md:p-8 rounded-[1.8rem] md:rounded-[2rem] border-2 cursor-pointer transition-all duration-300 group relative overflow-hidden min-h-[140px] md:min-h-[160px] flex flex-col justify-center ${selectedAddress?.id === addr.id
                   ? 'border-black bg-white shadow-xl ring-1 ring-black/5'
                   : 'border-gray-200 bg-white hover:border-gray-400 shadow-sm'
                   }`}
               >
-                {/* Edit Icon - Top Right with safe padding */}
                 <button
                   onClick={(e) => handleEdit(e, addr)}
                   className="absolute top-4 right-4 md:top-6 md:right-6 p-2.5 bg-gray-200 text-gray-500 hover:text-black hover:bg-gray-200 rounded-full cursor-pointer transition-all z-10"
@@ -170,7 +169,6 @@ export const AddressSection = ({ selectedAddress, setSelectedAddress, onNext, on
                     </div>
                   </div>
 
-                  {/* Radio-style Indicator - Bottom Right with safe padding */}
                   <div className="absolute bottom-4 right-4 md:bottom-6 md:right-6">
                     <div className={`w-6 h-6 md:w-7 md:h-7 rounded-full border-2 flex items-center justify-center transition-all ${selectedAddress?.id === addr.id ? 'border-black bg-black' : 'border-gray-500 bg-gray-50'
                       }`}>
@@ -193,12 +191,25 @@ export const AddressSection = ({ selectedAddress, setSelectedAddress, onNext, on
           <div className="bg-gray-100 border-2 border-gray-200 rounded-[2.5rem] p-8">
             <h4 className="text-[10px] font-black text-gray-600 uppercase tracking-[0.2em] mb-6">Selection Summary</h4>
             <div className="space-y-5">
-              <div className="p-5 bg-white rounded-2xl border border-gray-300 shadow-sm">
-                <p className="text-[9px] font-black text-gray-500 uppercase mb-1.5 tracking-widest">Deliver To</p>
-                <p className="text-[11px] font-black text-black uppercase truncate ">
-                  {selectedAddress ? `${selectedAddress.address_type} (${selectedAddress.pincode})` : "Select an address"}
-                </p>
+              
+              {/* 🚀 FIX: അഡ്രസ്സ് ഇല്ലാത്തപ്പോൾ "Deliver To" ഹൈഡ് ചെയ്തു! */}
+              <div className="p-5 bg-white rounded-2xl border border-gray-300 shadow-sm flex flex-col justify-center min-h-[70px]">
+                {safeAddresses.length === 0 ? (
+                  <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest text-center">
+                    No Address Saved
+                  </p>
+                ) : (
+                  <>
+                    <p className="text-[9px] font-black text-gray-500 uppercase mb-1.5 tracking-widest">Deliver To</p>
+                    <p className="text-[11px] font-black text-black uppercase truncate ">
+                      {selectedAddress?.address_type 
+                        ? `${selectedAddress.address_type} (${selectedAddress.pincode})` 
+                        : "Select an address"}
+                    </p>
+                  </>
+                )}
               </div>
+
               <div className="flex flex-col gap-3.5">
                 <button
                   onClick={handleConfirmAddress}

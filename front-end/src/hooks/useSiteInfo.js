@@ -25,7 +25,6 @@ export const useSiteInfo = () => {
     queryFn: async () => {
       try {
         const res = await api.get("/site-settings/info/");
-        // If data is empty or missing appName (typical after DB reset), use default
         if (!res.data || !res.data.appName) {
           return DEFAULT_INFO;
         }
@@ -35,9 +34,9 @@ export const useSiteInfo = () => {
         return DEFAULT_INFO;
       }
     },
-   
     placeholderData: DEFAULT_INFO,
-    staleTime: 0,
+    staleTime: Infinity, 
+    refetchOnWindowFocus: false,
     retry: 1, 
   });
 };

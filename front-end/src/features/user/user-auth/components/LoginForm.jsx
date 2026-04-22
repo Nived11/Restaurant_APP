@@ -2,9 +2,9 @@ import { ArrowRight, ShieldCheck, Zap, ChevronRight, ChevronLeft, Loader2, Alert
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLogin } from '../hooks/useLogin';
-import logo from '../../../../assets/Logo-web.png';
-import logoicon from '../../../../assets/Logocrunch.png';
-import loginbg from '../../../../assets/loginbg.jpg';
+import logo from '../../../../assets/Logo-web.webp';
+import logoicon from '../../../../assets/Logocrunch.webp';
+import loginbg from '../../../../assets/loginbg.webp';
 
 const LoginForm = () => {
   const navigate = useNavigate();

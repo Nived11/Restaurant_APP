@@ -16,7 +16,7 @@ import {
   RiArrowRightSLine
 } from "react-icons/ri";
 import { IoFastFoodOutline } from "react-icons/io5";
-import Logo from "../../assets/Logo-web.png";
+import Logo from "../../assets/Logo-web.webp";
 import TermsModal from "../common/TermsModal";
 import PrivacyModal from "../common/PrivacyModal";
 
@@ -50,16 +50,16 @@ const Footer = () => {
 
               {/* Social Icons */}
               <div className="flex gap-5 pt-5">
-                <a href={info?.socials?.instagram !== "#" ? `https://instagram.com/${info?.socials?.instagram}` : "#"} target="_blank" rel="noreferrer" className="text-gray-500 hover:text-[#E4405F] transition-all transform hover:-translate-y-1">
+                <a href={info?.socials?.instagram !== "#" ? `https://instagram.com/${info?.socials?.instagram}` : "#"} target="_blank" rel="noreferrer" aria-label="Follow us on Instagram" className="text-gray-500 hover:text-[#E4405F] transition-all transform hover:-translate-y-1">
                   <RiInstagramFill size={20} />
                 </a>
-                <a href={info?.socials?.facebook !== "#" ? `https://facebook.com/${info?.socials?.facebook}` : "#"} target="_blank" rel="noreferrer" className="text-gray-500 hover:text-[#1877F2] transition-all transform hover:-translate-y-1">
+                <a href={info?.socials?.facebook !== "#" ? `https://facebook.com/${info?.socials?.facebook}` : "#"} target="_blank" rel="noreferrer" aria-label="Follow us on Facebook" className="text-gray-500 hover:text-[#1877F2] transition-all transform hover:-translate-y-1">
                   <RiFacebookCircleFill size={20} />
                 </a>
-                <a href={info?.socials?.twitter !== "#" ? `https://twitter.com/${info?.socials?.twitter}` : "#"} target="_blank" rel="noreferrer" className="text-gray-500 hover:text-white transition-all transform hover:-translate-y-1">
+                <a href={info?.socials?.twitter !== "#" ? `https://twitter.com/${info?.socials?.twitter}` : "#"} target="_blank" rel="noreferrer" aria-label="Follow us on Twitter" className="text-gray-500 hover:text-white transition-all transform hover:-translate-y-1">
                   <RiTwitterXFill size={18} />
                 </a>
-                <a href={info?.socials?.whatsapp !== "#" ? `https://wa.me/${info?.socials?.whatsapp}` : "#"} target="_blank" rel="noreferrer" className="text-gray-500 hover:text-[#25D366] transition-all transform hover:-translate-y-1">
+                <a href={info?.socials?.whatsapp !== "#" ? `https://wa.me/${info?.socials?.whatsapp}` : "#"} target="_blank" rel="noreferrer" aria-label="Contact us on WhatsApp" className="text-gray-500 hover:text-[#25D366] transition-all transform hover:-translate-y-1">
                   <RiWhatsappFill size={20} />
                 </a>
               </div>

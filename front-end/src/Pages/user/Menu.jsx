@@ -37,7 +37,6 @@ const MenuPage = () => {
     };
   }, [selectedItem]);
 
-  // MODIFIED: Added isNavigatingToCart parameter
   const handleCloseModal = (isNavigatingToCart = false) => {
     if (window.history.state?.modalOpen && !isNavigatingToCart) {
       window.history.back();

@@ -1,5 +1,3 @@
-// src/features/user/user-auth/hooks/useLogin.js
-
 import { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux'; 
@@ -16,11 +14,10 @@ export const useLogin = () => {
     const [step, setStep] = useState(1);
     const [mobile, setMobile] = useState('');
     const [otp, setOtp] = useState(['', '', '', '', '', '']);
-    const [timer, setTimer] = useState(120);
+    const [timer, setTimer] = useState(60); 
     const [canResend, setCanResend] = useState(false);
 
     const inputRefs = useRef([]);
-
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -34,7 +31,7 @@ export const useLogin = () => {
         let interval;
         if (step === 2 && timer > 0) {
             interval = setInterval(() => setTimer((prev) => prev - 1), 1000);
-        } else if (timer === 0) {
+        } else if (timer <= 0) {
             setCanResend(true);
             clearInterval(interval);
         }
@@ -75,12 +72,11 @@ export const useLogin = () => {
             if (response.data.status) {
                 toast.success("OTP Sent to your phone!");
                 setStep(2);
-                setTimer(120);
+                setTimer(response.data.resend_delay || 60);
                 setCanResend(false);
             }
-            console.log(response.data);
             
-           if (response.data.otp) {
+            if (response.data.otp) {
                 toast.info(`Test OTP: ${response.data.otp}`);
             }
         } catch (err) {
@@ -105,19 +101,20 @@ export const useLogin = () => {
                 otp: otpString
             });
 
-            if (response.data.status) {
+           if (response.data.status) {
+                const userName = response.data.name || "User";
+                const userRole = response.data.role || "user";
 
-                localStorage.setItem('user_role', response.data.role);
-                localStorage.setItem('user_name', response.data.name); 
+                localStorage.setItem('user_role', userRole);
+                localStorage.setItem('user_name', userName); 
 
                 dispatch(setCredentials({
-                    role: response.data.role,
-                    name: response.data.name,
+                    role: userRole,
+                    name: userName,
                     phone_number: mobile
                 }));
 
                 dispatch(mergeCartOnLogin());
-
                 toast.success("Welcome back!");
                 const origin = location.state?.from || '/';
                 setTimeout(() => {
@@ -134,17 +131,22 @@ export const useLogin = () => {
     const resendOtp = async () => {
         setLoading(true);
         try {
-            const response = await api.post('/auth/login-otp/', { phone_number: mobile });
+            const response = await api.post('/auth/resend-otp/', { phone_number: mobile });
+            
             if (response.data.status) {
                 toast.success("OTP Resent Successfully!");
-                setTimer(120);
+                setTimer(response.data.resend_delay || 60);
                 setCanResend(false);
                 setOtp(['', '', '', '', '', '']);
+            } else {
+                setTimer(response.data.resend_delay);
+                setCanResend(false);
+                toast.error(response.data.message);
             }
-            console.log(response.data);
-                if (response.data.otp) {
-                    toast.info(`Test OTP: ${response.data.otp}`);
-                }
+
+            if (response.data.otp) {
+                toast.info(`Test OTP: ${response.data.otp}`);
+            }
         } catch (err) {
             setError(extractErrorMessages(err));
         } finally {

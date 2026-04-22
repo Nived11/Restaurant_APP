@@ -36,8 +36,9 @@ export const useHomeData = () => {
         throw new Error(errorMessage); 
       }
     },
-    staleTime: 0, 
-    refetchOnWindowFocus: true, 
+    staleTime: 1000 * 60, 
+    refetchOnMount: true,
+    refetchOnWindowFocus: false, 
   });
 };
 

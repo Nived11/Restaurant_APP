@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ChefHat, Leaf, ShieldCheck, Award, Heart } from 'lucide-react';
-import soup from "../../../assets/soup.jpg";
-import Rice from "../../../assets/Rice.jpg";
+import soup from "../../../assets/soup.webp";
+import Rice from "../../../assets/Rice.webp";
 import Food from "../../../assets/Food.webp";
 
 const FirstAbout = () => {

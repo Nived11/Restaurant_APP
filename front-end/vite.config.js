@@ -11,7 +11,7 @@ export default defineConfig({
       injectRegister: null, 
       registerType: 'autoUpdate',
       manifest: {
-        name: 'THE CRUNCH INDIA',
+        name: 'THE CRUNCH ',
         short_name: 'Crunch', 
         theme_color: '#1b1b1b', 
         background_color: '#ffffff', 

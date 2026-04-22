@@ -38,26 +38,26 @@ export const OrderSection = ({ selectedAddress, cartItems, subTotal, totalAmount
         <div className="lg:col-span-2 space-y-6">
           
           {/* 1. Address Summary */}
-          <div className="bg-white p-6 rounded-[2rem] border-2 border-gray-100 shadow-sm">
+          <div className="bg-white p-6 rounded-[1.5rem] border-2 border-gray-100 shadow-sm">
             <div className="flex items-center gap-2 mb-4">
               <MapPin size={18} className="text-[#f9a602]" />
-              <h4 className="text-xs font-black text-black uppercase tracking-widest">Delivery Address</h4>
+              <h4 className="text-[10px]  md:text-[12px] font-black text-black uppercase tracking-widest">Delivery Address</h4>
             </div>
             <div className="pl-7">
-              <p className="text-sm font-black uppercase text-black">
+              <p className="text-[10px]  md:text-[12px] font-black uppercase text-black">
                 {selectedAddress?.address_type || "No Type"}
               </p>
-              <p className="text-xs text-gray-600 font-bold mt-1 leading-relaxed truncate">
+              <p className="text-[10px] md:text-[12px] text-gray-600 font-bold mt-1 leading-relaxed truncate">
                 {selectedAddress?.complete_address}, {selectedAddress?.landmark}, {selectedAddress?.pincode}
               </p>
             </div>
           </div>
 
           {/* 2. Items List */}
-          <div className="bg-white p-6 rounded-[2rem] border-2 border-gray-100 shadow-sm">
+          <div className="bg-white p-6 rounded-[1.5rem] border-2 border-gray-100 shadow-sm">
             <div className="flex items-center gap-2 mb-6 border-b border-gray-50 pb-4">
               <ShoppingBag size={18} className="text-[#f9a602]" />
-              <h4 className="text-xs font-black text-black uppercase tracking-widest">Your Items</h4>
+              <h4 className="text-[10px]  md:text-[12px] font-black text-black uppercase tracking-widest">Your Items</h4>
             </div>
             <div className="space-y-5">
               {cartItems.map((item) => (
@@ -67,7 +67,7 @@ export const OrderSection = ({ selectedAddress, cartItems, subTotal, totalAmount
                       <img src={item.image} alt=" product" className="w-full h-full object-cover  rounded-xl " />
                     </div>
                     <div>
-                      <p className="text-[11px] md:text-xs font-black uppercase text-black">
+                      <p className="text-[10px] md:text-xs font-black uppercase text-black">
                         {item.name}
                       </p>
                       <p className="text-[9px] text-gray-500 font-bold"> {item.quantity} x ₹{item.offer_price}</p>
@@ -82,7 +82,7 @@ export const OrderSection = ({ selectedAddress, cartItems, subTotal, totalAmount
           </div>
 
           {/* 3. Payment Method */}
-          <div className="bg-white p-6 rounded-[2rem] border-2 border-gray-100 shadow-sm">
+          <div className="bg-white p-6 rounded-[1.5rem] border-2 border-gray-100 shadow-sm">
              <h4 className="text-[10px] font-black text-gray-500 uppercase mb-4 tracking-widest">Payment Method</h4>
              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-2xl border-2 border-black">
                <div className="flex items-center gap-3">
@@ -97,7 +97,7 @@ export const OrderSection = ({ selectedAddress, cartItems, subTotal, totalAmount
 
         {/* Right Side: Bill Summary & Place Order */}
         <div className="lg:sticky lg:top-32">
-          <div className="bg-black text-white rounded-[2.5rem] p-8 shadow-2xl relative overflow-hidden">
+          <div className="bg-black text-white rounded-[2rem] p-8 shadow-2xl relative overflow-hidden">
             <h4 className="relative z-10 text-[10px] font-black text-[#f9a602] uppercase tracking-[0.2em] mb-8">Bill Details</h4>
             
             <div className="relative z-10 space-y-4">

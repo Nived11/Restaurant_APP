@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import Logo from "../../assets/Logo-web.png"; 
+import Logo from "../../assets/Logo-web.webp"; 
 
 const SiteLaunchLoader = () => {
   return (

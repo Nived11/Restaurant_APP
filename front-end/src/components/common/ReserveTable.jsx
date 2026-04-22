@@ -1,14 +1,34 @@
 import React, { useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Phone, User, Mail, Loader2, Calendar, Clock, Users } from "lucide-react";
-import Logo from "../../assets/Logo-web.png";
+import Logo from "../../assets/Logo-web.webp";
 import { useReserveTable } from "../../hooks/useReserveTable";
 
 const ReserveTable = ({ isOpen, onClose }) => {
   const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
-  const { formData, loading, error, handleChange, handleSubmit } = useReserveTable(onClose);
+  
+  const { formData, loading, error, handleChange, handleSubmit, minTime, maxTime } = useReserveTable(onClose);
   const today = new Date().toISOString().split("T")[0];
 
+  useEffect(() => {
+    if (!isOpen) return;
+    const handlePopState = () => {
+      onClose();
+    };
+
+    window.history.pushState({ modal: "reserve" }, "");
+    window.addEventListener("popstate", handlePopState);
+
+    return () => {
+      window.removeEventListener("popstate", handlePopState);
+      
+      if (window.history.state?.modal === "reserve") {
+        window.history.back();
+      }
+    };
+  }, [isOpen, onClose]);
+
+  // Existing scroll lock logic
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = "hidden";
@@ -21,7 +41,6 @@ const ReserveTable = ({ isOpen, onClose }) => {
   const inputClass = "w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-2 md:py-3 text-[11px] md:text-[12px] font-bold text-slate-900 outline-none focus:border-primary focus:bg-white transition-all appearance-none placeholder:text-slate-400";
   const labelClass = "text-[8px] md:text-[10px] font-black text-slate-700 uppercase tracking-widest ml-1 mb-1 block";
 
-  // MODIFIED: Exact same smooth tween animation used in Privacy and Terms Modals
   const modalVariants = {
     initial: isMobile ? { y: "100%" } : { y: 20, opacity: 0 },
     animate: { 
@@ -40,7 +59,6 @@ const ReserveTable = ({ isOpen, onClose }) => {
     <AnimatePresence>
       {isOpen && (
         <div className="fixed inset-0 z-[2000] flex items-end md:items-center justify-center p-0 md:p-6 overflow-hidden outline-none">
-          {/* Backdrop Animation Synced */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -50,7 +68,6 @@ const ReserveTable = ({ isOpen, onClose }) => {
             className="absolute inset-0 bg-black/70 backdrop-blur-sm"
           />
 
-          {/* Modal Container */}
           <motion.div
             variants={modalVariants}
             initial="initial"
@@ -62,14 +79,11 @@ const ReserveTable = ({ isOpen, onClose }) => {
             onDragEnd={(e, { offset, velocity }) => {
               if (offset.y > 100 || velocity.y > 400) onClose();
             }}
-            // will-change-transform added for 60fps mobile rendering
             className="relative bg-white w-full md:max-w-4xl rounded-t-[2.5rem] md:rounded-[3rem] shadow-2xl flex flex-col h-auto max-h-[95vh] overflow-hidden touch-none md:touch-auto will-change-transform"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Mobile Handle Bar */}
             <div className="md:hidden absolute top-3 left-1/2 -translate-x-1/2 w-12 h-1.5 bg-gray-200 rounded-full z-50" />
 
-            {/* Close Button */}
             <button 
               onClick={onClose} 
               className="absolute right-4 top-4 md:right-5 md:top-5 p-2 bg-slate-100 hover:bg-primary/10 transition-colors rounded-full z-50 text-slate-900 cursor-pointer"
@@ -77,7 +91,6 @@ const ReserveTable = ({ isOpen, onClose }) => {
               <X size={isMobile ? 18 : 22} />
             </button>
 
-            {/* Header Section */}
             <div className="relative pt-8 md:pt-10 pb-2 md:pb-4 px-6 text-center shrink-0">
               <div className="flex justify-center mb-2 md:mb-3">
                 <img src={Logo} alt="Logo" className="h-10 md:h-14 w-auto object-contain" />
@@ -93,7 +106,6 @@ const ReserveTable = ({ isOpen, onClose }) => {
               )}
             </div>
 
-            {/* Form Content */}
             <form onSubmit={handleSubmit} className="px-6 md:px-16 pb-8 md:pb-10 overflow-y-auto md:overflow-visible space-y-3 md:space-y-4 flex-1">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-5">
                 <div className="space-y-1">
@@ -140,7 +152,7 @@ const ReserveTable = ({ isOpen, onClose }) => {
                 </div>
                 <div className="space-y-1">
                   <label className={labelClass}>Time</label>
-                  <input name="time" value={formData.time} onChange={handleChange} required type="time" className={inputClass} />
+                  <input name="time" value={formData.time} onChange={handleChange} required min={minTime} max={maxTime} type="time" className={inputClass} />
                 </div>
                 <div className="space-y-1 col-span-2 md:col-span-1">
                   <label className={labelClass}>Guests</label>

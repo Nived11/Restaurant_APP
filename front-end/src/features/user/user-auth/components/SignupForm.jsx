@@ -3,9 +3,9 @@ import { ArrowRight, ShieldCheck, Zap, ChevronLeft, User, Phone, Mail, Loader2, 
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSignup } from '../hooks/useSignup';
-import logo from '../../../../assets/Logo-web.png';
-import logoicon from '../../../../assets/Logocrunch.png';
-import loginbg from '../../../../assets/loginbg.jpg';
+import logo from '../../../../assets/Logo-web.webp';
+import logoicon from '../../../../assets/Logocrunch.webp';
+import loginbg from '../../../../assets/loginbg.webp';
 import TermsModal from '../../../../components/common/TermsModal';
 import PrivacyModal from '../../../../components/common/PrivacyModal';
 

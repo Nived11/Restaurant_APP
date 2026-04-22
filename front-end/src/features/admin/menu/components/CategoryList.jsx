@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import placeholder from "../../../../assets/placeholder.jpg";
+import placeholder from "../../../../assets/placeholder.webp";
 import { Edit2, Trash2, AlertTriangle, X } from "lucide-react";
 
 const CategoryList = ({ categories, onEdit, onDelete, fetching, error }) => {

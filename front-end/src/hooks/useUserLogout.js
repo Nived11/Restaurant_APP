@@ -21,6 +21,7 @@ export const useUserLogout = () => {
                 
                 localStorage.removeItem("user_role");
                 localStorage.removeItem("user_name");
+                localStorage.removeItem("cart");
 
                 toast.success("Logged out successfully!");
                 
