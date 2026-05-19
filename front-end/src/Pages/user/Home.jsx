@@ -3,7 +3,6 @@ import { AnimatePresence } from "framer-motion";
 import ProductModal from "../../components/common/ProductModal";
 import SEO from '../../components/common/SEO';
 
-// ✅ മുകളിൽ കാണേണ്ട പ്രധാന സെക്ഷനുകൾ മാത്രം ആദ്യം ഇമ്പോർട്ട് ചെയ്യുന്നു
 import {
   BannerSection,
   CategorySection,
@@ -16,8 +15,6 @@ import {
   useHomeData
 } from "../../features/user/home";
 
-// ✅ താഴെ കിടക്കുന്ന സെക്ഷനുകൾ (Below the fold) Lazy ആയി ഇമ്പോർട്ട് ചെയ്യുന്നു
-// ഇത് മൊത്തം ആപ്പിന്റെ ലോഡിങ് സ്പീഡ് 40% വരെ കൂട്ടും!
 const ExploreMore = lazy(() => import("../../features/user/home").then(module => ({ default: module.ExploreMore })));
 const Testimonials = lazy(() => import("../../features/user/home").then(module => ({ default: module.Testimonials })));
 const FAQ = lazy(() => import("../../features/user/home").then(module => ({ default: module.FAQ })));
@@ -80,7 +77,6 @@ const Home = () => {
       <FirstOrderBanner />
       <ComboSection data={data?.combos} onItemClick={(item) => setSelectedItem(item)} />
       
-      {/* ✅ Lazy ആയി ഇമ്പോർട്ട് ചെയ്തവ Suspense-നകത്ത് കൊടുക്കുന്നു */}
       <Suspense fallback={<div className="py-10 text-center text-gray-400 text-xs font-bold uppercase tracking-widest animate-pulse">Loading more...</div>}>
         <ExploreMore />
         <Testimonials data={data?.feedbacks} />

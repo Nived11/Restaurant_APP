@@ -1,8 +1,10 @@
 import axios from 'axios';
 import { toast } from 'sonner';
 
+const API_URL = '/api';
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL,
+  baseURL: API_URL,
   withCredentials: true,
 });
 
