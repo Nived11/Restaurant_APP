@@ -35,7 +35,7 @@ export const useAdminLogin = () => {
             
             if (res.data.status === true) {
                 
-                localStorage.setItem("admin_role", res.data.role); 
+                localStorage.setItem("admin_role", res.data.role);
                 
                 dispatch(setAuthCredentials({
                     role: res.data.role,

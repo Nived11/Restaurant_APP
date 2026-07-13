@@ -44,9 +44,7 @@ api.interceptors.response.use(
     }
 
     // 2. TOKEN REFRESH LOGIC (401)
-    
     const isLikelyLoggedIn = localStorage.getItem('user_role') || localStorage.getItem('admin_role');
-    
     const skipUrls = ['login', 'refresh-token', 'token/refresh']; 
     const isSkippedUrl = skipUrls.some(url => originalRequest.url.includes(url));
 
@@ -58,22 +56,24 @@ api.interceptors.response.use(
       }
 
       try {
-        const res = await axios.post(`${import.meta.env.VITE_API_URL}/auth/refresh-token/`, {}, {
+        const res = await axios.post('/api/auth/refresh-token/', {}, {
           withCredentials: true
         });
 
         if (res.status === 200) {
-          return api(originalRequest);
+          return api(originalRequest); 
         }
       } catch (refreshError) {
         console.error("Refresh failed, session expired.");
-        localStorage.clear();
         
         if (isLikelyLoggedIn) {
             toast.error('Session expired. Please login again !');
+            localStorage.clear(); 
             setTimeout(() => {
               window.location.href = loginRedirect;
             }, 1500);
+        } else {
+            localStorage.clear();
         }
         return Promise.reject(refreshError);
       }
