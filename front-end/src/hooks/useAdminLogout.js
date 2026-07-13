@@ -15,16 +15,26 @@ export const useAdminLogout = () => {
         if (isLoggingOut) return; 
 
         setIsLoggingOut(true); 
+        
+        // 🌟 1. Safe FCM Token Deletion
         try {
-            // 1. Delete FCM Token
-            const currentToken = await getToken(messaging);
-            if (currentToken) {
-                await api.post('/notifications/delete-fcm-token/', { 
-                    fcm_token: currentToken 
-                });
+            if (typeof window !== "undefined" && "Notification" in window && Notification.permission === "granted") {
+                const currentToken = await getToken(messaging).catch(() => null);
+                if (currentToken) {
+                    await api.post('/notifications/delete-fcm-token/', { 
+                        fcm_token: currentToken 
+                    });
+                    console.log("FCM Token successfully deleted from backend.");
+                }
+            } else {
+                console.log("Notification permission is not granted. Skipping FCM deletion.");
             }
+        } catch (firebaseError) {
+            console.warn("Firebase token clearing skipped:", firebaseError.message);
+        }
 
-            // 2. Call Logout API 
+        // 🌟 2. Main Logout Process
+        try {
             const response = await api.post('/auth/logout/'); 
 
             if (response.status === 200 || response.data?.status) {
@@ -33,7 +43,6 @@ export const useAdminLogout = () => {
                 
                 toast.success("Logged out successfully!");
 
-               
                 dispatch(logoutUser()); 
                 navigate("/admin/login", { replace: true }); 
                 
@@ -42,8 +51,10 @@ export const useAdminLogout = () => {
             }
 
         } catch (error) {
-            console.error("Error during logout process:", error);
-            toast.error("Logout failed! Please try again.");
+            console.error("Error during logout API call:", error);
+            localStorage.removeItem("admin_role");
+            dispatch(logoutUser()); 
+            navigate("/admin/login", { replace: true }); 
             setIsLoggingOut(false);
         } 
     };

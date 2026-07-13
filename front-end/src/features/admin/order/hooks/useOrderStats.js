@@ -5,7 +5,7 @@ export const useOrderStats = () => {
   const { data, isLoading } = useQuery({
     queryKey: ['admin-order-stats'],
     queryFn: async () => {
-      const response = await api.get('/orders/admin/stats');
+      const response = await api.get('/orders/admin/stats/');
       const resData = response.data;
       return {
         'NEW ORDERS': resData.new_orders || 0,
